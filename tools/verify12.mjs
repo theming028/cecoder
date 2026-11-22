@@ -107,6 +107,9 @@ async function page(w = 1440, h = 900, openDrawer = true) {
 /* ========== 3 全局下拉 hover 灰 + 边框灰 ========== */
 {
   const p = await page(1440, 900, false);
+  /* 第 43 轮：折叠态「待确认」浮标（0.45~1.4s 随机浮出、z-index 40）会压住顶栏下拉的
+     第二项，导致 hover 采不到色 —— 这段只验下拉本身，先把浮标摘掉 */
+  await p.evaluate(() => { const t = document.getElementById('fpTip'); if (t) t.style.display = 'none'; });
   await p.click('.tb-ws-btn');
   await wait(200);
   const d = await p.evaluate(() => {

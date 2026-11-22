@@ -120,7 +120,7 @@ ok('E2 与「云端任务同步」弹窗左栏同色', bg.stg === bg.sync, JSON.
 ok('E3 弹窗无报错', p.__e.length === 0, p.__e.join(' | '));
 await p.close();
 
-/* ============ F 左栏能拖到让 chat 面板 < 400 ============ */
+/* ============ F 左栏拖到最宽：中间面板停在 400（第 43 轮口径） ============ */
 p = await mk('cecoder-session.html?id=0', () => { localStorage.setItem('cecoder.wsDrawer', JSON.stringify({ open: true })); localStorage.removeItem('cecoder.rsDrawer'); });
 await p.click('#rsToggle'); await wait(500);
 const rz = await p.evaluate(() => { const r = document.querySelector('.ws-resizer').getBoundingClientRect(); return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) }; });
@@ -130,12 +130,21 @@ await p.mouse.up(); await wait(400);
 const wd = await p.evaluate(() => ({
   ws: Math.round(document.getElementById('wsDrawer').getBoundingClientRect().width),
   pm: Math.round(document.querySelector('.panel-main').getBoundingClientRect().width),
+  rs: Math.round(document.getElementById('rsDrawer').getBoundingClientRect().width),
   overflow: document.querySelector('.panel-main').scrollWidth > document.querySelector('.panel-main').clientWidth + 1
 }));
-ok('F1 左栏可拖到 > 480（原上限）', wd.ws > 480, JSON.stringify(wd));
-ok('F2 chat 面板可被拖到 320 以下 400（不再卡在 400）', wd.pm <= 340 && wd.pm >= 300, JSON.stringify(wd));
+ok('F1 中间面板拖窄到 400 就停住（不再往 320 走）', wd.pm >= 399 && wd.pm <= 401, JSON.stringify(wd));
+ok('F2 左栏宽度 = 面板宽 - 右栏 - 400', Math.abs(wd.ws - (1424 - wd.rs - 400)) <= 1, JSON.stringify(wd));
 ok('F3 拖到最窄时中间面板无横向溢出', !wd.overflow, JSON.stringify(wd));
-ok('F4 无脚本报错', p.__e.length === 0, p.__e.join(' | '));
+/* 右栏收起后再拖：480 的旧上限确实解除了 */
+await p.click('#rsToggle'); await wait(500);
+const rz2 = await p.evaluate(() => { const r = document.querySelector('.ws-resizer').getBoundingClientRect(); return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) }; });
+await p.mouse.move(rz2.x, rz2.y); await p.mouse.down();
+for (const dx of [120, 240, 360, 480, 600]) { await p.mouse.move(rz2.x + dx, rz2.y); await wait(60); }
+await p.mouse.up(); await wait(400);
+const wd2 = await p.evaluate(() => Math.round(document.getElementById('wsDrawer').getBoundingClientRect().width));
+ok('F4 右栏收起时左栏可拖过 480（旧上限已解除）', wd2 > 480, String(wd2));
+ok('F5 无脚本报错', p.__e.length === 0, p.__e.join(' | '));
 await p.close();
 
 await b.close();

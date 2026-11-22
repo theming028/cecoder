@@ -233,7 +233,7 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
   width: max-content; max-width: 268px;
   padding: 11px 12px 10px 13px;
   background: var(--cds-bg-container);
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 0 0 1px rgba(247, 114, 52, .22),
               0 10px 26px rgba(31, 68, 118, .16),
               0 2px 6px rgba(31, 68, 118, .07);
@@ -251,14 +251,20 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
   opacity: 1; transform: none; pointer-events: auto; visibility: visible;
   transition: opacity .2s var(--cds-motion-ease), transform .26s cubic-bezier(.2, .9, .25, 1);
 }
-/* 尖角：8×12 的实心三角，底边贴住卡片左缘，尖端离折叠按钮 3px；
-   圆心 y=17（+浮标 top 4 = 按钮中线 21）。用 clip-path + 1px 投影描出橙色轮廓，
-   比「转 45° 的方块」干净：不会在卡片角上留下被压掉一半的描边 */
+/* 尖角：一个 9×16 的实心三角，底边贴住卡片左缘，尖端指向折叠按钮；
+   中线 y=17（+浮标 top 4 = 按钮中线 21）。第 43 轮补上橙色轮廓：外层三角填橙色，
+   内层 ::before 用同样的 clip-path 缩进 1.5px 再挖成白色 —— 这样两条斜边都是
+   均匀的 1px 橙线（单用 drop-shadow 只能描出一条左阴影，看着像没描边）。
+   内层白色一路铺到卡片边缘，正好接上卡片那圈 1px 橙环，不留缺口。 */
 .fp-arrow {
-  position: absolute; left: -8px; top: 10.5px; width: 8px; height: 13px;
+  position: absolute; left: -9px; top: 9px; width: 10px; height: 16px;
+  background: rgba(247, 114, 52, .55);
+  clip-path: polygon(10px 0, 0 50%, 10px 100%);
+}
+.fp-arrow::before {
+  content: ''; position: absolute; inset: 1px 0;
   background: var(--cds-bg-container);
-  clip-path: polygon(100% 0, 0 50%, 100% 100%);
-  filter: drop-shadow(-1px 0 0 rgba(247, 114, 52, .45));
+  clip-path: polygon(10px 0, 1.5px 50%, 10px 100%);
 }
 .fp-main { display: flex; align-items: flex-start; gap: 8px; }
 .fp-bell { flex: 0 0 auto; width: 16px; height: 16px; margin-top: 1px; display: block; }

@@ -737,16 +737,21 @@
   /* ---------- 侧栏状态记忆（展开/收起 + 宽度） ---------- */
   var WS_KEY = 'cecoder.wsDrawer';
   var WS_MIN = 300, WS_MAX = 720, WS_DEF = 320;
-  /* 第 41 轮：左栏上限不再死守 480 —— 原来拖到 480 就停，1440 下左右栏同开时
-     panel-main（is-chat）被卡在 ~392 再也拖不窄。改成「让中间面板至少剩 320」，
-     上限同时封在 720，避免大屏上左栏吃满。 */
-  var CHAT_MIN_PM = 320;
+  /* 第 41 轮：左栏上限不再死守 480（原来拖到 480 就停，1440 下左右栏同开时中间面板被卡死）。
+     第 43 轮修正：用户要的是「中间面板拖窄到 400 就到底」，所以把下限口径改成 400，
+     并且左栏、右栏、窗口缩放三条路径共用同一个 pmMinW() —— 之前只给左栏设了 320，
+     右栏一拉宽照样能把中间面板压到 400 以下。 */
+  var PM_MIN_CHAT = 400, PM_MIN_PLAIN = 320;
+  function pmMinW() {
+    var pm = document.querySelector('.panel-main');
+    return (pm && pm.classList.contains('is-chat')) ? PM_MIN_CHAT : PM_MIN_PLAIN;
+  }
   function wsMax() {
     var hostEl = drawer.parentElement;
     var panelW = hostEl ? hostEl.clientWidth : window.innerWidth;
     var rd = document.getElementById('rsDrawer');
     var rsW = (rd && rd.classList.contains('is-open')) ? rd.getBoundingClientRect().width : 0;
-    return Math.max(WS_MIN + 80, Math.min(WS_MAX, Math.round(panelW - rsW - CHAT_MIN_PM)));
+    return Math.max(WS_MIN + 80, Math.min(WS_MAX, Math.round(panelW - rsW - pmMinW())));
   }
   var resizer = document.getElementById('wsResizer');
   function wsStore() {
@@ -925,7 +930,7 @@
     syncThumb();
     /* 侧栏滑出后进度条再长出来（等 120ms，避免和宽度动画抢视觉） */
     setTimeout(growBars, 120);
-    setTimeout(function () { syncStageScroll(); rsFollow(); }, 320);
+    setTimeout(function () { clampPanels(); syncStageScroll(); rsFollow(); }, 320);
     setTimeout(function () { drawer.focus({ preventScroll: true }); }, 40);
   }
 
@@ -941,7 +946,7 @@
     closeCardMenu();
     wsSave({ open: false });
     syncFpTip();
-    setTimeout(function () { syncStageScroll(); rsFollow(); }, 320);
+    setTimeout(function () { clampPanels(); syncStageScroll(); rsFollow(); }, 320);
     if (back) menuBtn.focus({ preventScroll: true });
   }
   syncFpTip();
@@ -1007,6 +1012,15 @@
     return Math.max(0, w);
   }
   function rsDefaultW() { return Math.max(RS_MIN, Math.min(RS_MAX, Math.round(rsBaseW() / 2))); }
+  /* 第 43 轮：右栏也有上限 —— 拉宽右栏一样会把中间面板压窄，
+     所以上限同样按「总宽 - 左栏 - 中间面板下限」算（is-chat 时下限 400）。 */
+  function rsMaxW() {
+    var panel = rsDrawer && rsDrawer.parentElement;
+    var total = panel ? panel.clientWidth : window.innerWidth;
+    var ws = document.getElementById('wsDrawer');
+    var wsW = (ws && ws.classList.contains('is-open')) ? ws.offsetWidth : 0;
+    return Math.max(RS_MIN, Math.min(RS_MAX, Math.round(total - wsW - pmMinW())));
+  }
   /* 左栏展开/收起会改 panel-main 宽度 —— 没手动拖过就重新按「一半」算 */
   function rsManualW() { var s = rsStore(); return s.manual ? s.w : 0; }
   function rsFollow() { if (rsDrawer && !rsManualW()) rsSetWidth(rsDefaultW()); }
@@ -1017,10 +1031,17 @@
   }
   function rsSetWidth(w) {
     if (!rsDrawer) return w;
-    w = Math.max(RS_MIN, Math.min(RS_MAX, Math.round(w)));
+    w = Math.max(RS_MIN, Math.min(rsMaxW(), Math.round(w)));
     rsDrawer.style.setProperty('--rs-w', w + 'px');
     if (rsResizer) rsResizer.setAttribute('aria-valuenow', String(w));
     return w;
+  }
+  /* 中间面板下限的统一兜底：窗口缩放、进出会话态、左右栏开合之后各再收一次。
+     顺序必须是「先收左栏，再收右栏」—— 否则右栏上限会按还没收窄的左栏去算，
+     白丢一截宽度。 */
+  function clampPanels() {
+    if (drawer.classList.contains('is-open')) wsSetWidth(wsWidth());
+    if (rsDrawer) rsSetWidth(rsWidth());
   }
   function rsSyncBtn() {
     if (!rsToggle || !rsDrawer) return;
@@ -1060,6 +1081,8 @@
 
     /* 窗口 / 左栏变化时，未被手动拖过的右栏继续跟着「一半」走 */
     window.addEventListener('resize', function () {
+      /* 第 43 轮：窄窗时先收左栏再收右栏，保证中间面板不破 400 */
+      clampPanels();
       if (!rsManualW()) rsSetWidth(rsDefaultW());
     });
 
@@ -1551,6 +1574,8 @@
     if (panelMainEl) panelMainEl.classList.add('is-chat');
     ta.value = '';
     ciApply(CI_MIN);
+    /* 进入会话态后中间面板下限从 320 → 400，两边栏超宽的立刻收回一点 */
+    clampPanels();
     ta.placeholder = CHAT_PH;
     syncStageScroll();
     chatView.scrollTop = chatView.scrollHeight;

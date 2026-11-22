@@ -80,7 +80,7 @@ ok('C6 尖角尖端不压按钮（间隙 2~5px）', g.arrowTipX - g.btnRight >= 
 ok('C7 卡片整体在按钮右侧', g.x > g.btnRight, g.x + ' vs ' + g.btnRight);
 ok('C8 卡片贴左上角（left 46 / top 4）', Math.abs(g.x - (g.btnX + 39)) <= 1.5 && g.y > 46, `${g.x},${g.y}`);
 ok('C9 完全显示 + 可点击', g.op === '1' && g.pe === 'auto' && g.hidden === 'false' && g.vis === 'visible');
-ok('C10 圆角 10 + 橙色描边投影', g.radius === '10px' && /247, 114, 52/.test(g.shadow), g.radius + ' | ' + g.shadow.slice(0, 60));
+ok('C10 圆角 8 + 橙色描边投影', g.radius === '8px' && /247, 114, 52/.test(g.shadow), g.radius + ' | ' + g.shadow.slice(0, 60));
 ok('C11 没有循环缩放动画（去掉涟漪）', await p.evaluate(() => {
   const t = document.getElementById('fpTip'), a = t.querySelector('.fp-arrow');
   return getComputedStyle(t).animationName === 'none' && getComputedStyle(a).animationName === 'none';
