@@ -30,7 +30,7 @@ if (await page.evaluate(() => { const t = document.querySelector('.wd-tab.is-act
 /* 第 11 轮：卡片新增常驻「更多操作」按钮（hover/选中才显示，但占 20px），
    第 2 张卡标题由 1 行变 2 行，纵向基线整体下移 20。 */
 const EXP = [
-  ['aside',        '.ws-drawer',     0, 0, 320, 850],
+  ['aside',        '.ws-drawer',     0, 0, 320, 852], /* 第 39 轮：panel 去边框，内高 +2 */
   ['head',         '.wd-head',       0, 0, 320, 44],
   ['title',        '.wd-title',     16, 11, null, 22],
   ['link新建',      '.wd-link',      120, 11, 72, 22],

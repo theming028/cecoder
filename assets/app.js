@@ -1162,7 +1162,7 @@
   var wdSearchClear = document.getElementById('wdSearchClear');
 
   function wdFilter(qOverride) {
-    /* 第 15 轮：任务用展开式搜索框、会话用内联搜索框，query 由调用方给定 */
+    /* 第 39 轮：两个页签共用同一套工具行 + 同一个展开式搜索框，query 直接取输入值 */
     var q = (qOverride !== undefined ? qOverride : wdSearchInput.value).trim().toLowerCase();
     drawer.querySelectorAll('.wd-card, .wd-sess-card').forEach(function (c) {
       var hit = !q || (c.textContent || '').toLowerCase().indexOf(q) > -1;
@@ -1199,20 +1199,6 @@
   wdSearchInput.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { e.stopPropagation(); wdSearchExit(); }
   });
-
-  /* 会话页签的内联搜索框（稿 3083:44433）：只过滤会话视图 */
-  var wdSessSearchInput = document.getElementById('wdSessSearchInput');
-  if (wdSessSearchInput) {
-    wdSessSearchInput.addEventListener('input', function () { wdFilter(wdSessSearchInput.value); });
-    wdSessSearchInput.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        wdSessSearchInput.value = '';
-        wdFilter('');
-        wdSessSearchInput.blur();
-      }
-    });
-  }
 
   /* ---------- 排序：下拉选「创建时间 / 更新顺序」 ---------- */
   var wdSortBtn = document.getElementById('wdSortBtn');
@@ -1272,7 +1258,6 @@
   var wdViewTask = document.getElementById('wdViewTask');
   var wdViewSession = document.getElementById('wdViewSession');
   var wdSearchInput = document.getElementById('wdSearchInput');
-  var wdSessSearch = document.getElementById('wdSessSearch');
   drawer.querySelectorAll('.wd-tab').forEach(function (t) {
     t.addEventListener('click', function () {
       /* 第 31 轮：记住最后停在「任务」还是「会话」，下次进页面直接还原 */
@@ -1284,12 +1269,14 @@
       var session = t.dataset.wdTab === '会话';
       if (wdViewTask) wdViewTask.hidden = session;
       if (wdViewSession) wdViewSession.hidden = !session;
-      /* 第 15 轮：工具行随页签换装 —— 会话页签是「内联搜索框 + 排序」，没有添加工作目录 */
-      if (wdTools) wdTools.classList.toggle('is-session', session);
-      if (wdSessSearch) wdSessSearch.hidden = !session;
-      if (wdSessSearchInput && !session && wdSessSearchInput.value) { wdSessSearchInput.value = ''; }
+      /* 第 39 轮：两个页签的工具行完全一致（添加工作目录 + 搜索 + 排序），
+         只换搜索框的占位文案与无障碍标签，不再有 is-session 换装 */
       wdFilter('');
       if (wdSearchInput) wdSearchInput.placeholder = session ? '搜索会话关键词' : '搜索关键词';
+      if (wdSearchBtn) {
+        wdSearchBtn.setAttribute('aria-label', session ? '搜索会话' : '搜索任务');
+        wdSearchBtn.setAttribute('data-tip', session ? '搜索会话' : '搜索任务');
+      }
       if (typeof closeCardMenu === 'function') closeCardMenu();
       if (typeof wdSortClose === 'function') wdSortClose();
       if (typeof wdSearchExit === 'function' && wdTools && wdTools.classList.contains('is-searching')) wdSearchExit(true);
@@ -2087,17 +2074,17 @@
     }, 1600);
   });
 
-  /* ---------- 第 19 轮：背景方案切换（B 循环 / ?bg= / localStorage） ---------- */
-  var BG_KEY = 'cecoder.bg.v2';   /* 第 20 轮：默认回到纯色，换 key 让旧选择失效 */
+  /* ---------- 背景方案切换（B 循环 / ?bg= / localStorage） ---------- */
+  var BG_KEY = 'cecoder.bg.v3';   /* 第 39 轮：换 key —— 默认改成稿件渐变，旧选择一律作废 */
   var BG_LIST = [
+    ['design', '渐变 · 设计稿'],
     ['ai', '极光 · AI 氛围'],
-    ['grid', '工程网格'],
-    ['plain', '纯色 · 原方案']
+    ['grid', '工程网格']
   ];
 
   function applyBg(name, silent) {
     var valid = BG_LIST.some(function (x) { return x[0] === name; });
-    var key = valid ? name : 'plain';
+    var key = valid ? name : 'design';
     frame.dataset.bg = key;
     if (silent) return;
     BG_LIST.forEach(function (x) { if (x[0] === key) toast('背景：' + x[1]); });
@@ -2107,7 +2094,7 @@
   try { bgFromUrl = new URLSearchParams(location.search).get('bg'); } catch (e) {}
   var bgSaved = null;
   try { bgSaved = localStorage.getItem(BG_KEY); } catch (e) {}
-  applyBg(bgFromUrl || bgSaved || 'plain', true);
+  applyBg(bgFromUrl || bgSaved || 'design', true);
 
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'b' && e.key !== 'B') return;
@@ -2367,6 +2354,12 @@
     window.addEventListener('resize', layoutSteps);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutSteps);
     setTimeout(layoutSteps, 60);
+    /* 第 39 轮：左侧抽屉是「宽度动画展开」的，动画期间 panel-main 会从 1424 收到 1104，
+       60ms 那次量到的是中间态，连线就永远按错误圆心画着了（以前靠首页解析期展开掩盖了）。
+       用 ResizeObserver 盯住滚动容器：抽屉开合 / 右栏挤压 / 窗口缩放都能重新对位 */
+    if (window.ResizeObserver && stepScroll) {
+      new ResizeObserver(function () { layoutSteps(); }).observe(stepScroll);
+    }
 
     /* 折叠：点已选中的「工序进度」把整条工序栏收起，再点展开 */
     function setStepsOff(off) {

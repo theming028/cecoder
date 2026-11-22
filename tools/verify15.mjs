@@ -53,18 +53,14 @@ async function page(w, h, dw, open) {
   await wait(320);
   const s = await p.evaluate(() => {
     const tools = document.getElementById('wdTools');
-    const ss = document.getElementById('wdSessSearch');
     const cards = [...document.querySelectorAll('#wdViewSession .wd-sess-card')];
     return {
-      isSession: tools.classList.contains('is-session'),
-      ssHidden: ss.hidden,
-      ssVisible: getComputedStyle(ss).display !== 'none' && ss.getBoundingClientRect().width > 100,
       addHidden: getComputedStyle(document.querySelector('.wd-adddir')).display === 'none',
       searchBtnHidden: getComputedStyle(document.getElementById('wdSearchBtn')).display === 'none',
       sortVisible: getComputedStyle(document.getElementById('wdSortBtn')).display !== 'none',
-      ssW: Math.round(ss.getBoundingClientRect().width),
-      ph: ss.querySelector('input').placeholder,
-      phColor: getComputedStyle(ss.querySelector('input')).getPropertyValue('color') || getComputedStyle(ss.querySelector('input'), '::placeholder').color,
+      addW: Math.round(document.querySelector('.wd-adddir').getBoundingClientRect().width),
+      ph: document.getElementById('wdSearchInput').placeholder,
+      tip: document.getElementById('wdSearchBtn').getAttribute('data-tip'),
       titles: cards.map(c => c.querySelector('.wd-sess-title').textContent),
       subs: cards.map(c => c.querySelector('.wd-sess-sub').textContent),
       sel: cards.map(c => c.classList.contains('is-sel')),
@@ -77,13 +73,9 @@ async function page(w, h, dw, open) {
       linkDeco: document.querySelector('#wdViewSession .wd-empty-link') ? getComputedStyle(document.querySelector('#wdViewSession .wd-empty-link')).textDecorationLine : ''
     };
   });
-  ok('2 工具行挂 is-session', s.isSession);
-  ok('2 内联搜索框显示且占满左区', !s.ssHidden && s.ssVisible, String(s.ssW));
-  ok('2 添加工作目录隐藏', s.addHidden);
-  ok('2 搜索图标按钮隐藏', s.searchBtnHidden);
-  ok('2 排序按钮保留', s.sortVisible);
-  ok('2 搜索框宽 248', Math.abs(s.ssW - 248) < 2, String(s.ssW));
-  ok('2 占位文案「搜索会话」', s.ph === '搜索会话', s.ph);
+  ok('2 会话页签保留「添加工作目录」208（第 39 轮统一工具行）', !s.addHidden && Math.abs(s.addW - 208) < 2, String(s.addW));
+  ok('2 会话页签保留搜索 + 排序两枚按钮', !s.searchBtnHidden && s.sortVisible);
+  ok('2 搜索占位＝搜索会话关键词 / 提示＝搜索会话', s.ph === '搜索会话关键词' && s.tip === '搜索会话', s.ph + ' | ' + s.tip);
   ok('2 卡序 1 会话绑定云端工程路径', s.titles[0] === '会话绑定云端工程路径', s.titles.join('|'));
   ok('2 卡序 2 业务需求，生成交付状态', s.titles[1] === '业务需求，生成交付状态', '');
   ok('2 卡序 3 生成交付状态跟踪表…（昨天 09:21）', s.titles[2] === '生成交付状态跟踪表，并启动新一轮的...' && s.subs[2] === '普通会话 · 昨天 09:21', s.subs.join('|'));
@@ -96,7 +88,9 @@ async function page(w, h, dw, open) {
   ok('2 链接色 #6B6B6B + 下划线', s.linkColor.includes('107, 107, 107') && s.linkDeco === 'underline', s.linkColor + ' ' + s.linkDeco);
 
   /* 内联搜索过滤 */
-  await p.type('#wdSessSearchInput', '登录');
+  await p.click('#wdSearchBtn');
+  await wait(380);
+  await p.type('#wdSearchInput', '登录');
   await wait(260);
   const f = await p.evaluate(() => {
     const vis = [...document.querySelectorAll('#wdViewSession .wd-sess-card')].filter(c => c.style.display !== 'none');
@@ -106,7 +100,7 @@ async function page(w, h, dw, open) {
   await p.keyboard.press('Escape');
   await wait(200);
   const clr = await p.evaluate(() => ({
-    v: document.getElementById('wdSessSearchInput').value,
+    v: document.getElementById('wdSearchInput').value,
     n: [...document.querySelectorAll('#wdViewSession .wd-sess-card')].filter(c => c.style.display !== 'none').length
   }));
   ok('2 Esc 清空并还原 4 张', clr.v === '' && clr.n === 4, JSON.stringify(clr));
@@ -116,11 +110,10 @@ async function page(w, h, dw, open) {
   await wait(300);
   const back = await p.evaluate(() => ({
     addVisible: getComputedStyle(document.querySelector('.wd-adddir')).display !== 'none',
-    ssHidden: document.getElementById('wdSessSearch').hidden,
     taskCards: [...document.querySelectorAll('#wdViewTask .wd-card')].filter(c => c.style.display !== 'none').length,
     sessViewHidden: document.getElementById('wdViewSession').hidden
   }));
-  ok('2 切回任务：添加工作目录还原、内联搜索框隐藏', back.addVisible && back.ssHidden, JSON.stringify(back));
+  ok('2 切回任务：添加工作目录仍在（两页签一致）', back.addVisible, JSON.stringify(back));
   /* 第 21 轮：Nutstore 改为空态，任务卡 7 → 6 */
 ok('2 切回任务：6 张任务卡不受影响', back.taskCards === 6, String(back.taskCards));
   ok('2 会话视图隐藏', back.sessViewHidden);
@@ -135,11 +128,11 @@ ok('2 切回任务：6 张任务卡不受影响', back.taskCards === 6, String(b
   await p.click('[data-wd-tab="会话"]');
   await wait(320);
   const s = await p.evaluate(() => ({
-    ssW: Math.round(document.getElementById('wdSessSearch').getBoundingClientRect().width),
+    addW: Math.round(document.querySelector('.wd-adddir').getBoundingClientRect().width),
     tabs: [...document.querySelectorAll('.wd-tab')].map(x => Math.round(x.getBoundingClientRect().width)),
     cardW: Math.round(document.querySelector('#wdViewSession .wd-sess-card').getBoundingClientRect().width)
   }));
-  ok('3 480 下搜索框拉宽到 408', Math.abs(s.ssW - 408) < 3, String(s.ssW));
+  ok('3 480 下添加工作目录拉宽到 368', Math.abs(s.addW - 368) < 3, String(s.addW));
   ok('3 480 下 tab 各 222', Math.abs(s.tabs[0] - 222) < 2, JSON.stringify(s.tabs));
   ok('3 会话卡随宽抽屉拉满', Math.abs(s.cardW - 448) < 3, String(s.cardW));
   await p.close();

@@ -128,7 +128,7 @@ async function rsCase(label, w, h, seed) {
   /* 第 35 轮：外环改成 32×32 遮罩点阵、绕圆心旋转，靠 50% + 负 margin 保证同心 */
   ok('C8 当前项 32 点阵环（mask + 旋转，居中 -16）', d.ring && d.ring.w === '32px' && d.ring.h === '32px' && d.ring.mask && d.ring.anim === 'tsOrbit' && d.ring.ml === '-16px' && d.ring.mt === '-16px', JSON.stringify(d.ring));
   /* 第 36 轮：那条其实是滚动条 —— 几何照稿（左缩 16、离底 4、6 高），1440 放得下时整条不出现 */
-  ok('C9 底部滚动条：左右各缩 16、离底 4、6 高，放得下时隐藏', d.prog.x === 16 && d.prog.h === 6 && d.prog.y === 156 && d.prog.w === 1070 && d.progOp === '0', JSON.stringify(d.prog) + ' op=' + d.progOp);
+  ok('C9 底部滚动条：左右各缩 16、离底 4、6 高，放得下时隐藏', d.prog.x === 16 && d.prog.h === 6 && d.prog.y === 156 && d.prog.w === 1072 && d.progOp === '0', JSON.stringify(d.prog) + ' op=' + d.progOp);
   ok('C10 页签：概要设计 80 宽、共 5 个、2 条竖分隔', d.tabsRow.length === 5 && d.tabsRow[0].w === 80 && d.vseps === 2, JSON.stringify(d.tabsRow) + ' sep=' + d.vseps);
   ok('C11 旧标题栏 / 占位内容已删除', !d.old, d.old);
   ok('C12 输入卡收起', d.comp === 'none', d.comp);

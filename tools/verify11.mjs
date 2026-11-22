@@ -110,12 +110,12 @@ const ok = (n, c, x) => { if (c) pass++; else fail.push(n + (x !== undefined ? '
     ok(`3 ${w}x${h} 页面无横向滚动`, m.docX <= m.docW, m.docX + ' vs ' + m.docW);
   }
 
-  /* ========== 4 内容列恢复固定 860（第 12 轮回滚 50% 方案） ========== */
+  /* ========== 4 内容列固定 960（第 39 轮从 860 改 960） ========== */
   /* 先确保左栏收起，否则 50% 是相对被挤压后的可用宽 */
   if (await p.evaluate(() => document.getElementById('wsDrawer').classList.contains('is-open'))) {
     await p.click('.wd-collapse'); await new Promise(r => setTimeout(r, 700));
   }
-  for (const [w, h, expect] of [[1920, 1080, 860], [1440, 900, 860], [1366, 768, 860], [1280, 800, 860]]) {
+  for (const [w, h, expect] of [[1920, 1080, 960], [1440, 900, 960], [1366, 768, 960], [1280, 800, 960]]) {
     await p.setViewport({ width: w, height: h });
     await new Promise(r => setTimeout(r, 400));
     const m = await p.evaluate(() => {
@@ -139,7 +139,7 @@ const ok = (n, c, x) => { if (c) pass++; else fail.push(n + (x !== undefined ? '
     const r = st.getBoundingClientRect(), pr = pm.getBoundingClientRect();
     return { w: +(r.width - 12).toFixed(1), pmW: +pr.width.toFixed(1), sw: st.scrollWidth, cw: st.clientWidth };
   });
-  ok('4 左栏展开后内容列仍 860', Math.abs(d.w - 860) < 1.5, JSON.stringify(d));
+  ok('4 左栏展开后内容列仍 960', Math.abs(d.w - 960) < 1.5, JSON.stringify(d));
   ok('4 左栏展开后仍不横向溢出', d.sw <= d.cw + 0.5, JSON.stringify(d));
   ok('4 左栏展开后内容列不超出可用宽', d.w <= d.pmW - 12, JSON.stringify(d));
 
@@ -155,7 +155,7 @@ const ok = (n, c, x) => { if (c) pass++; else fail.push(n + (x !== undefined ? '
     return { w: +(r.width - 12).toFixed(1), pmW: +pr.width.toFixed(1), sw: st.scrollWidth, cw: st.clientWidth,
              inside: r.left >= pr.left - 0.5 && r.right <= pr.right + 0.5 };
   });
-  ok('4 左右栏同时出现时内容列按可用宽收缩', Math.abs(r1.w - Math.min(860, r1.pmW - 24)) < 1.5, JSON.stringify(r1));
+  ok('4 左右栏同时出现时内容列按可用宽收缩', Math.abs(r1.w - Math.min(960, r1.pmW - 24)) < 1.5, JSON.stringify(r1));
   ok('4 左右栏同时出现时不横向溢出且不越出面板', r1.sw <= r1.cw + 0.5 && r1.inside, JSON.stringify(r1));
   /* 关掉左栏，只留右栏 */
   await p.click('.wd-collapse'); await new Promise(r => setTimeout(r, 700));
@@ -165,7 +165,7 @@ const ok = (n, c, x) => { if (c) pass++; else fail.push(n + (x !== undefined ? '
     return { w: +(r.width - 12).toFixed(1), pmW: +pr.width.toFixed(1), sw: st.scrollWidth, cw: st.clientWidth,
              centered: Math.abs((r.left + r.width / 2) - (pr.left + pr.width / 2)) < 1.5 };
   });
-  ok('4 仅右栏时内容列 860', Math.abs(r2.w - 860) < 1.5, JSON.stringify(r2));
+  ok('4 仅右栏时内容列按可用宽收窄（≤960）', r2.w <= 960 && Math.abs(r2.w - Math.min(960, r2.pmW - 24)) < 1.5, JSON.stringify(r2));
   ok('4 仅右栏时仍居中且不横向溢出', r2.centered && r2.sw <= r2.cw + 0.5, JSON.stringify(r2));
   await p.evaluate(() => { const r = document.getElementById('probeRail'); if (r) r.remove(); });
 

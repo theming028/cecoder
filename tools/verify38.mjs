@@ -78,13 +78,13 @@ ok('D2 会话 x=16 / 任务 x=162', /@16$/.test(order[0]) && /@162$/.test(order[
 ok('D3 默认选中改成「会话」', (await activeTab(p)) === '会话');
 ok('D4 「12」角标跟着会话', await p.evaluate(() => document.querySelector('.wd-tab .wd-tab-num').parentElement.dataset.wdTab) === '会话');
 ok('D5 默认落在会话视图（任务视图隐藏）', await p.evaluate(() => document.getElementById('wdViewSession').hidden === false && document.getElementById('wdViewTask').hidden === true));
-ok('D6 工具行默认会话态（内联搜索，无添加工作目录）', await p.evaluate(() => document.getElementById('wdTools').classList.contains('is-session') && document.getElementById('wdSessSearch').hidden === false));
+ok('D6 会话页签工具行＝添加工作目录 + 搜索 + 排序（第 39 轮统一）', await p.evaluate(() => { const a = document.querySelector('.wd-adddir'); return getComputedStyle(a).display !== 'none' && a.getBoundingClientRect().width > 200 && !document.querySelector('.wd-sess-search, #wdSessSearch'); }));
 /* 点右侧「任务」应切到任务视图 */
 await p.evaluate(() => document.querySelector('[data-wd-tab="任务"]').click());
 await wait(350);
 ok('D7 点任务 → 选中任务', (await activeTab(p)) === '任务');
 ok('D8 任务视图显示、会话视图隐藏', await p.evaluate(() => document.getElementById('wdViewTask').hidden === false && document.getElementById('wdViewSession').hidden === true));
-ok('D9 工具行回到任务态（添加工作目录可见）', await p.evaluate(() => !document.getElementById('wdTools').classList.contains('is-session') && document.getElementById('wdSessSearch').hidden === true));
+ok('D9 任务页签工具行同样三件套', await p.evaluate(() => { const a = document.querySelector('.wd-adddir'); return getComputedStyle(a).display !== 'none' && a.getBoundingClientRect().width > 200; }));
 ok('D10 侧栏宽度不变', (await p.evaluate(() => Math.round(document.getElementById('wsDrawer').getBoundingClientRect().width))) === 320);
 /* 未选中页签的底色/底线仍成立（交换后两个 tab 的样式不串） */
 ok('D11 选中 tab 无底线 / 未选中带底线', await p.evaluate(() => {

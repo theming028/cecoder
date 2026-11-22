@@ -142,7 +142,7 @@ function d_c(cls, k) { return cls.split(/\s+/).indexOf(k) >= 0; }
   await p.close();
 }
 
-/* ========== 4 背景方案（第 20 轮：默认回到纯色，ai/grid 仍可切换） ========== */
+/* ========== 4 背景方案（第 39 轮：默认改稿件渐变 design，ai/grid 仍可切换） ========== */
 {
   const p = await page();
   const d0 = await p.evaluate(() => {
@@ -151,8 +151,8 @@ function d_c(cls, k) { return cls.split(/\s+/).indexOf(k) >= 0; }
     return { bg: fr.dataset.bg, panelBg: getComputedStyle(document.querySelector('.panel')).backgroundImage,
       pattern: before.backgroundImage, mask: before.maskImage || before.webkitMaskImage };
   });
-  ok('4 默认纯色（原方案）', d0.bg === 'plain', String(d0.bg));
-  ok('4 纯色方案面板无渐变、无纹理', d0.panelBg === 'none' && d0.pattern === 'none', d0.panelBg + ' | ' + d0.pattern);
+  ok('4 默认设计稿渐变', d0.bg === 'design', String(d0.bg));
+  ok('4 渐变方案面板纯白、无纹理', d0.panelBg === 'none' && d0.pattern === 'none', d0.panelBg + ' | ' + d0.pattern);
 
   await p.keyboard.press('b');
   await wait(250);
@@ -175,10 +175,10 @@ function d_c(cls, k) { return cls.split(/\s+/).indexOf(k) >= 0; }
 
   await p.keyboard.press('b');
   await wait(250);
-  ok('4 再循环回纯色', (await p.evaluate(() => document.querySelector('.cds-frame').dataset.bg)) === 'plain', '');
+  ok('4 再循环回设计稿渐变', (await p.evaluate(() => document.querySelector('.cds-frame').dataset.bg)) === 'design', '');
   await p.reload({ waitUntil: 'load' });
   await wait(400);
-  ok('4 刷新后记住选择', (await p.evaluate(() => document.querySelector('.cds-frame').dataset.bg)) === 'plain', '');
+  ok('4 刷新后记住选择', (await p.evaluate(() => document.querySelector('.cds-frame').dataset.bg)) === 'design', '');
   await p.close();
 
   const p2 = await b.newPage();

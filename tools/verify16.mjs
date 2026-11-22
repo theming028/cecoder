@@ -46,7 +46,7 @@ async function page(w, h, dw, open) {
   ok('1 focus 描边变 #C9C9C9', d.border.includes('201, 201, 201'), d.border);
   ok('1 focus 外环 0 0 0 4px', /0\.05\)?\s*0px 0px 0px 4px/.test(d.shadow.replace('rgba(0, 0, 0, ', 'rgba(0,0,0,')), d.shadow);
   ok('1 stage 左右各留 6px 环位', d.ringRoom.split(',').every(v => Number(v) >= 5.5), d.ringRoom);
-  ok('1 内容列仍为 860', Math.abs(d.contentW - 860) < 1, String(d.contentW));
+  ok('1 内容列仍为 960（第 39 轮）', Math.abs(d.contentW - 960) < 1, String(d.contentW));
   const s1 = await p.screenshot({ path: 'R16-focus.png' });
   ok('1 截图 R16-focus.png', !!s1, '');
   await p.close();
@@ -246,13 +246,13 @@ async function page(w, h, dw, open) {
   const p = await page(1440, 900, 320, false);
   await p.hover('.tb-ws-btn'); await wait(200);
   const ws = await p.evaluate(() => getComputedStyle(document.querySelector('.tb-ws-btn')).backgroundColor);
-  ok('7 工作空间 hover 白底', ws === 'rgb(255, 255, 255)', ws);
+  ok('7 工作空间 hover 提到 rgba(255,255,255,.85)（第 39 轮磨砂白）', ws === 'rgba(255, 255, 255, 0.85)', ws);
   await p.hover('.tb-actions .tb-btn:first-child'); await wait(200);
   const h = await p.evaluate(() => getComputedStyle(document.querySelector('.tb-actions .tb-btn:first-child')).backgroundColor);
-  ok('7 使用帮助 hover 白底', h === 'rgb(255, 255, 255)', h);
+  ok('7 使用帮助 hover 提到 rgba(255,255,255,.85)', h === 'rgba(255, 255, 255, 0.85)', h);
   await p.hover('.tb-actions .tb-btn:last-child'); await wait(200);
   const s = await p.evaluate(() => getComputedStyle(document.querySelector('.tb-actions .tb-btn:last-child')).backgroundColor);
-  ok('7 设置 hover 白底', s === 'rgb(255, 255, 255)', s);
+  ok('7 设置 hover 提到 rgba(255,255,255,.85)', s === 'rgba(255, 255, 255, 0.85)', s);
   ok('7 无 JS 报错', p.__errs.length === 0, p.__errs.join(' | '));
   await p.close();
 }

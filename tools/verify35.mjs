@@ -100,7 +100,7 @@ function arrowGeom(d) {
   /* 2 滚动条：不隐藏、按需 */
   /* 第 36 轮：改成「自绘滚动条」—— 原生收起来（scrollbar-width:none），滚动能力仍在（overflow-x auto）+ 自绘那条按需出现 */
   ok('B1 原生滚动条收起来、滚动仍是 auto（自绘 .ts-prog 接管）', d.overflowX === 'auto' && d.sbWidth === 'none', d.overflowX + ' / ' + d.sbWidth);
-  ok('B2 1440（1102 面板）放得下 → 不出滚动条', d.sw <= d.cw + 1 && d.pmW === 1102, d.sw + '/' + d.cw);
+  ok('B2 1440（第 39 轮去边框后 1104 面板）放得下 → 不出滚动条', d.sw <= d.cw + 1 && d.pmW === 1104, d.sw + '/' + d.cw);
   /* 6 内边距 24 */
   ok('B3 ts-scroll 内边距全部 24', d.trackPad === '0px 24px' && d.itemPadTop === '24px', d.trackPad + ' / ' + d.itemPadTop);
   /* 7 字号 */

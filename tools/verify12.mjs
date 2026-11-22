@@ -172,7 +172,7 @@ async function page(w = 1440, h = 900, openDrawer = true) {
   await p.close();
 }
 
-/* ========== 6 内容列恢复 860 ========== */
+/* ========== 6 内容列 960（第 39 轮） ========== */
 for (const [w, h, open] of [[1440, 900, false], [1440, 900, true], [1366, 768, true], [1280, 800, false], [1920, 1080, false]]) {
   const p = await page(w, h, open);
   const r = await p.evaluate(() => {
@@ -186,7 +186,7 @@ for (const [w, h, open] of [[1440, 900, false], [1440, 900, true], [1366, 768, t
       vOver: s.scrollHeight - s.clientHeight
     };
   });
-  ok(`6 ${w}${open ? '+左栏' : ''} 内容列 860`, r.w === 860, String(r.w));
+  ok(`6 ${w}${open ? '+左栏' : ''} 内容列 960`, r.w === 960, String(r.w));
   ok(`6 ${w}${open ? '+左栏' : ''} 无横向溢出`, !r.hx && r.hOver <= 1, JSON.stringify(r));
   await p.close();
 }

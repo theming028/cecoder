@@ -24,36 +24,37 @@ async function page(w = 1440, h = 900, dw = 320, open = true) {
   return p;
 }
 
-/* ========== 1 会话搜索框激活态 = 任务搜索框 ========== */
+/* ========== 1 会话页签搜索（第 39 轮起与任务共用同一套展开式搜索框） ========== */
 {
   const p = await page();
   await p.click('[data-wd-tab="会话"]');
   await wait(320);
-  await p.click('#wdSessSearchInput');
-  await wait(250);
+  ok('1 会话页签的搜索框占位＝搜索会话关键词', (await p.evaluate(() => document.getElementById('wdSearchInput').placeholder)) === '搜索会话关键词');
+  await p.click('#wdSearchBtn');
+  await wait(400);
   const d = await p.evaluate(() => {
-    const ss = document.getElementById('wdSessSearch');
-    const cs = getComputedStyle(ss);
+    const box = document.getElementById('wdSearch');
+    const cs = getComputedStyle(box);
+    const ico = box.querySelector('.wd-search-ico');
     return {
-      shadow: cs.boxShadow, border: cs.borderColor,
-      ico: getComputedStyle(ss.querySelector('.ico')).color,
-      ph: getComputedStyle(ss.querySelector('input'), '::placeholder').color,
-      ringRef: getComputedStyle(document.querySelector('.wd-search')).boxShadow
+      shadow: cs.boxShadow,
+      visible: cs.visibility === 'visible' && +cs.opacity > 0.9,
+      w: Math.round(box.getBoundingClientRect().width),
+      ico: getComputedStyle(ico).color,
+      ph: getComputedStyle(document.getElementById('wdSearchInput'), '::placeholder').color,
+      searching: document.getElementById('wdTools').classList.contains('is-searching')
     };
   });
-  const norm = s => s.replace(/rgba?\(([^)]+)\)/g, (m, g) => 'rgb(' + g.split(',').slice(0, 3).join(',') + ')').replace(/\s+/g, ' ');
-  ok('1 聚焦后 1.6px 外环', /1\.6px/.test(d.shadow) && /102, 146, 249/.test(d.shadow), d.shadow);
-  ok('1 外环色与任务搜索框一致', norm(d.shadow) === norm(d.ringRef), d.shadow + ' vs ' + d.ringRef);
-  ok('1 聚焦后描边转透明（不叠双层）', d.border.includes('rgba(0, 0, 0, 0)'), d.border);
+  ok('1 点搜索键 → 浮层展开', d.searching && d.visible, JSON.stringify({ s: d.searching, v: d.visible }));
+  ok('1 浮层铺满整行', d.w >= 280, String(d.w));
+  ok('1 聚焦后 1.6px 外环', /1.6px/.test(d.shadow) && /102, 146, 249/.test(d.shadow), d.shadow);
   ok('1 图标转正文色', d.ico === 'rgb(31, 31, 31)', d.ico);
   ok('1 占位文字转正文色', d.ph === 'rgb(31, 31, 31)', d.ph);
-  await p.evaluate(() => document.getElementById('wdSessSearchInput').blur());
-  await wait(200);
-  const off = await p.evaluate(() => {
-    const cs = getComputedStyle(document.getElementById('wdSessSearch'));
-    return { shadow: cs.boxShadow, border: cs.borderColor };
-  });
-  ok('1 失焦回 1px 描边、无外环', off.shadow === 'none' && /229, 229, 229/.test(off.border), JSON.stringify(off));
+  await p.keyboard.press('Escape');
+  await wait(350);
+  const off = await p.evaluate(() => ({ searching: document.getElementById('wdTools').classList.contains('is-searching'),
+    v: document.getElementById('wdSearchInput').value }));
+  ok('1 Esc 收起浮层并清空', !off.searching && off.v === '', JSON.stringify(off));
   ok('1 无 JS 报错', p.__errs.length === 0, p.__errs.join(' | '));
   await p.close();
 }

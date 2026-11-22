@@ -21,7 +21,7 @@
   --cds-seg-track: #D4DDE7;      /* 分段控件轨道 */
   --cds-seg-divider: #C8D3DF;    /* 分段控件分隔线 */
   --cds-page-font: "MiSans", var(--cds-font-family);
-  --cds-stage-max: 860px;        /* 内容列宽上限（稿件 290..1150） */
+  --cds-stage-max: 960px;        /* 第 39 轮：内容列宽上限 860 → 960（用户在稿上提的） */
   --cds-stage-min: 680px;        /* 第 11 轮：内容列占可用宽 50%，但不窄于此值 */
   --cds-gutter: 8px;             /* 面板四周留白 */
   /* 稿件取色（layers/*.json）：主色阶梯 Blue1/3/4 + 选中描边 C7D7FC */
@@ -40,13 +40,19 @@
   --cds-gray-hover: #E6E6E6;
   --cds-gray-active: #DADADA;
   --cds-search-ring: #6692F9;    /* 侧栏搜索框外描边（稿件 paint_1204:26639 · colorPrimaryBlue5） */
+  /* 第 39 轮：页面背景改为稿件渐变（paint_3119:45505），顶栏控件统一「磨砂白」 */
+  --cds-page-grad: linear-gradient(180deg, #B2D0F9 0%, #D4E6FF 58%, #D5D4FD 100%);
+  --cds-glass: rgba(255, 255, 255, .6);
+  --cds-glass-hover: rgba(255, 255, 255, .85);
+  --cds-tb-ink: #455973;         /* 顶栏文字/图标（稿件 textColor paint_3119:45447） */
 }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 html { height: 100%; }
 body {
-  min-height: 100%; background: var(--cds-bg-page);
+  /* 第 39 轮：底色跟着稿件渐变走（露在画框外的那一圈不再是灰白） */
+  min-height: 100%; background: var(--cds-page-grad);
   font-family: var(--cds-page-font); font-size: 14px; line-height: 22px;
   color: var(--cds-text-primary); -webkit-font-smoothing: antialiased;
   overflow: auto;
@@ -66,12 +72,16 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
   position: relative; width: 100%; height: 100vh; min-width: 960px; min-height: 700px;
   overflow: hidden; background: var(--cds-bg-page);
 }
+/* 第 39 轮：稿件背景 = 冷蓝→淡蓝→淡紫的纵向渐变（1440x900 上量得 0/58%/100% 三档） */
+.cds-frame[data-bg="design"] { background: var(--cds-page-grad); }
 
-/* ===== 白色窗口面板：左右下贴边，顶部 48 ===== */
+/* ===== 白色窗口面板：左右下贴边，顶部 48；第 39 轮按稿件去掉 1px 描边 ===== */
 .panel {
   position: absolute; left: var(--cds-gutter); right: var(--cds-gutter); top: 48px; bottom: 0;
   background: var(--cds-bg-container);
-  border: 1px solid var(--cds-fill-active);
+  /* 第 39 轮：稿件里 panel 是纯白无描边（path paint_2960:47102 #FFFFFF，无 stroke/effect）；
+     去掉边框后 panel 内容区 = 8..1432 正好对上稿件，原 49/39 的内部偏移各自 -1 补偿 */
+  border: 0;
   border-radius: 8px 8px 0 0;
   /* 抽屉是 panel 的子元素：裁切保证不越界，flex 让抽屉「挤压」而不是「浮层」 */
   display: flex; overflow: hidden;
@@ -79,11 +89,11 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .panel-main { position: relative; flex: 1 1 auto; min-width: 0; }
 
 /* ============================================================
-   第 19 轮：页面背景方案（可切换、可回退）
-   .cds-frame[data-bg="ai"]    默认 · 极光：冷蓝底 + 蓝/紫/青三团极光 + 点阵
-   .cds-frame[data-bg="grid"]  备选 · 工程网格：细方格 + 顶部蓝带
-   .cds-frame[data-bg="plain"] 原方案 · 纯色（第 18 轮及以前的观感，随时可回退）
-   切换方式：按 B 循环 / URL ?bg=plain / localStorage['cecoder.bg']
+   页面背景方案（可切换、可回退）
+   .cds-frame[data-bg="design"] 默认 · 设计稿渐变：冷蓝 → 淡蓝 → 淡紫（第 39 轮）
+   .cds-frame[data-bg="ai"]     备选 · 极光：冷蓝底 + 蓝/紫/青三团极光 + 点阵
+   .cds-frame[data-bg="grid"]   备选 · 工程网格：细方格 + 顶部蓝带
+   切换方式：按 B 循环 / URL ?bg=design / localStorage['cecoder.bg']
    ============================================================ */
 .cds-frame[data-bg="ai"] {
   background:
@@ -139,19 +149,22 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .tb .cds-dd.tb-ws { position: absolute; left: 88px; top: 8px; }
 .tb-ws-btn {
   display: inline-flex; align-items: center; gap: 8px;
-  /* 第 16 轮：宽度随选中的工作空间名自适应（去掉稿件定宽 178），封顶 272 防撞居中的分段控件 */
-  height: 32px; padding: 0 5px; border-radius: 8px;
-  background: var(--cds-disabled-bg); border: 1px solid var(--cds-border);
+  /* 第 16 轮：宽度随选中的工作空间名自适应（去掉稿件定宽 178），封顶 272 防撞居中的分段控件
+     第 39 轮：按稿件改成「磨砂白胶囊」—— 半透明白 + blur15 + 无描边，文字 #455973 */
+  height: 32px; padding: 0 6px; border-radius: 8px;
+  background: var(--cds-glass); border: 0;
+  -webkit-backdrop-filter: blur(15px); backdrop-filter: blur(15px);
+  color: var(--cds-tb-ink);
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.tb-ws-btn:hover { background: #FFFFFF; }
+.tb-ws-btn:hover { background: var(--cds-glass-hover); }
 .tb-ws-avatar {
   width: 20px; height: 20px; border-radius: 4px; flex: 0 0 20px;
-  background: var(--cds-color-link); color: var(--cds-text-inverse);
+  background: #3491FA; color: var(--cds-text-inverse);
   font-size: 12px; font-weight: 500; line-height: 20px; text-align: center;
 }
-.tb-ws-btn .tb-ws-name { flex: 0 1 auto; max-width: 224px; font-size: 14px; line-height: 22px; text-align: left; white-space: nowrap; overflow: hidden; }
-.tb-ws-caret { color: var(--cds-text-tertiary); margin-left: -4px; }
+.tb-ws-btn .tb-ws-name { flex: 0 1 auto; max-width: 224px; font-size: 14px; line-height: 22px; text-align: left; white-space: nowrap; overflow: hidden; color: var(--cds-tb-ink); }
+.tb-ws-caret { color: #868686; margin-left: -4px; }
 
 /* 分段控件 300x32，水平居中；三按钮 120/88/88（padding 16，无间距，取自任务-3 的 radio-button-group）
    选中底板用独立 .seg-pill 做「滑动」——底板位移动画，按钮本身只换字重，所以切换有滑动感 */
@@ -159,7 +172,8 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
   position: absolute; left: 50%; top: 8px; transform: translateX(-50%);
   width: 300px; height: 32px;
   display: flex; align-items: center; gap: 0; padding: 2px;
-  background: var(--cds-seg-track); border-radius: 8px;
+  /* 第 39 轮：轨道改成稿件里的半透明深蓝 rgba(31,68,118,.12)，压在渐变底上不显脏 */
+  background: rgba(31, 68, 118, .12); border-radius: 8px;
 }
 .seg-pill {
   position: absolute; left: 2px; top: 2px; width: 120px; height: 28px;
@@ -183,12 +197,14 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 /* 右侧按钮：贴面板右缘 */
 .tb-actions { position: absolute; right: var(--cds-gutter); top: 8px; display: flex; gap: 8px; }
 .tb-btn {
-  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 11px;
-  border-radius: 8px; background: var(--cds-disabled-bg); border: 1px solid var(--cds-border);
-  font-size: 14px; font-weight: 500; line-height: 22px; color: var(--cds-text-primary);
+  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px;
+  /* 第 39 轮：同「磨砂白胶囊」—— 半透明白 + blur15 + 无描边，文字 #455973 */
+  border-radius: 8px; background: var(--cds-glass); border: 0;
+  -webkit-backdrop-filter: blur(15px); backdrop-filter: blur(15px);
+  font-size: 14px; font-weight: 500; line-height: 22px; color: var(--cds-tb-ink);
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.tb-btn:hover { background: #FFFFFF; } /* 第 16 轮：顶栏 hover 底色统一改白（工作空间 / 使用帮助 / 设置） */
+.tb-btn:hover { background: var(--cds-glass-hover); } /* 第 16 轮：顶栏 hover 底色统一改白（工作空间 / 使用帮助 / 设置） */
 
 /* ===== 侧边栏折叠按钮：panel 内容区左上 (16,56) 28x28 ===== */
 .menu-btn {
@@ -236,16 +252,16 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
   .menu-btn.has-dot .mb-dot::before, .menu-btn.has-dot .mb-dot::after { animation: none; }
 }
 
-/* ===== 内容列：宽 860 居中，上下按 22vh / 底部锚定 =====
-   panel-main 顶边 = panel top 48 + 1px border = 49，故 top 减去 49 保持与稿件同一绝对位置；
-   宽度以 panel-main 为基准（100%），抽屉展开时内容列在剩余空间里重新居中。 */
+/* ===== 内容列：宽 960 居中，上下按 22vh / 底部锚定 =====
+   panel-main 顶边 = panel top 48（第 39 轮去掉 1px 边框），故 top 直接减 48；
+   宽度以 panel-main 为基准（100%）：够宽时封顶 960，窄窗 / 右栏展开时按可用宽自适应收窄。 */
 .stage {
   position: absolute; left: 50%; transform: translateX(-50%);
-  top: calc(clamp(150px, 22vh, 240px) - 49px); bottom: 8px;
+  top: calc(clamp(150px, 22vh, 240px) - 48px); bottom: 8px;
   /* 第 16 轮：盒宽比内容宽 12px（左右各 6px 内边距）——输入卡 focus 外阴影
      0 0 0 4px 向左右各扩 4px，原先卡贴 stage 内容缘、环被 overflow-x:clip 裁掉。
-     内容宽（= 盒宽 - 12）与原公式逐字相等，版面零位移 */
-  width: min(calc(var(--cds-stage-w, 860px) + 12px), calc(100% - 12px));
+     第 39 轮：上限 860 → 960；下限仍交给「可用宽 - 12」，不设 min-width，宁可收窄也不出横向滚动 */
+  width: min(calc(var(--cds-stage-w, 960px) + 12px), calc(100% - 12px));
   padding: 0 6px;
   display: flex; flex-direction: column; align-items: stretch;
   container-type: inline-size;
@@ -753,7 +769,7 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
    稿：设置/通用设置（左 3107:44277 / 右 3107:44311）
    ============================================================ */
 .stg-panel {
-  position: absolute; left: 50%; top: 39px; bottom: 39px; transform: translateX(-50%);
+  position: absolute; left: 50%; top: 40px; bottom: 40px; transform: translateX(-50%);
   width: min(960px, calc(100% - 80px));
   background: #FFFFFF; border-radius: 8px; box-shadow: 0 12px 40px rgba(0, 0, 0, .18);
   display: flex; flex-direction: column; overflow: hidden;
@@ -1306,32 +1322,6 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .wd-adddir .ico { color: var(--cds-text-secondary); }
 .wd-adddir:hover { background: var(--cds-blue-1); border-color: var(--cds-blue-4); color: var(--cds-color-primary); }
 .wd-adddir:hover .ico { color: var(--cds-color-primary); }
-/* ---- 会话页签的工具行（稿 3083:44433）：内联搜索框 + 排序，没有「添加工作目录」
-   搜索框 248×32（白底 1px #E5E5E5 r4），左 10 起 14 放大镜、8 后文字「搜索会话」14/22 #A9A9A9 ---- */
-.wd-sess-search {
-  display: flex; align-items: center; gap: 8px;
-  flex: 1 1 auto; min-width: 0; height: 32px; padding: 0 12px 0 10px;
-  background: #FFFFFF; border: 1px solid var(--cds-line-strong); border-radius: 4px;
-}
-.wd-sess-search[hidden] { display: none; }
-/* 第 17 轮：激活态与任务页签搜索框一致 —— 1.6px #6692F9 外环、图标与占位文字转正文色 */
-.wd-sess-search:focus-within {
-  border-color: transparent;
-  box-shadow: 0 0 0 1.6px var(--cds-search-ring);
-}
-.wd-sess-search:focus-within .ico { color: var(--cds-text-primary); }
-.wd-sess-search:focus-within .wd-sess-search-input::placeholder { color: var(--cds-text-primary); }
-.wd-sess-search .ico { flex: 0 0 auto; color: var(--cds-text-disabled); }
-.wd-sess-search-input {
-  flex: 1 1 auto; min-width: 0; height: 22px; border: 0; padding: 0; background: transparent;
-  font-family: inherit; font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
-  outline: none;
-}
-.wd-sess-search-input::placeholder { color: var(--cds-text-disabled); }
-/* 会话页签：藏掉「添加工作目录」「点开搜索」与展开式搜索浮层，由内联搜索框替代 */
-.wd-tools.is-session .wd-adddir,
-.wd-tools.is-session #wdSearchBtn,
-.wd-tools.is-session .wd-search { display: none; }
 .wd-tools-r { display: flex; gap: 8px; flex: 0 0 auto; }
 .wd-icon-btn {
   display: inline-flex; align-items: center; justify-content: center;
@@ -1687,8 +1677,8 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 @keyframes cm-fade { from { opacity: 0; } to { opacity: 1; } }
 .cm-panel {
   /* 第 18 轮：高度纵向自适应 —— 距窗口外沿上下各固定 40px，中间撑满（原稿 804 定高）。
-     窗口 .panel 有 1px 边框，模态层从边框内沿起算，故这里写 39 才是视觉上的 40 */
-  position: absolute; left: 50%; top: 39px; bottom: 39px; transform: translateX(-50%);
+     第 39 轮：.panel 已去掉 1px 边框，模态层直接取 40 即视觉 40（原写 39 是给边框让位） */
+  position: absolute; left: 50%; top: 40px; bottom: 40px; transform: translateX(-50%);
   width: min(1080px, calc(100% - 80px));
   background: #FFFFFF; border-radius: 8px; box-shadow: 0 12px 40px rgba(0, 0, 0, .18);
   display: flex; flex-direction: column; overflow: hidden;
