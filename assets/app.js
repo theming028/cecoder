@@ -1077,6 +1077,12 @@
   var wdTools = document.getElementById('wdTools');
   var wdScrollEl = document.getElementById('wdScroll');
   var wdGroups = drawer.querySelector('.wd-groups');
+  /* 第 40 轮：两个页签共用同一个「添加工作目录」按钮，新分组要落到当前可见视图的
+     分组容器里 —— 原先固定塞进第一个 .wd-groups，在会话页签下会加进被隐藏的任务视图 */
+  function activeGroups() {
+    var view = drawer.querySelector('.wd-view:not([hidden])');
+    return (view && view.querySelector('.wd-groups')) || wdGroups;
+  }
 
   /* ---------- 添加工作目录：调起系统文件夹选择器 ---------- */
   var addDirBtn = document.getElementById('wdAddDir');
@@ -1085,6 +1091,10 @@
   function addDirGroup(name) {
     var grp = document.createElement('div');
     grp.className = 'wd-grp is-open';
+    /* 第 40 轮：文件夹图标按色板轮转取色（与静态分组的 data-hue 同一套色） */
+    var host = activeGroups();
+    var HUES = ['blue', 'green', 'red', 'amber', 'purple'];
+    grp.dataset.hue = HUES[host.querySelectorAll(':scope > .wd-grp').length % HUES.length];
 
     var head = document.createElement('div');
     head.className = 'wd-grp-head is-open';
@@ -1127,7 +1137,7 @@
 
     grp.appendChild(head);
     grp.appendChild(sub);
-    wdGroups.appendChild(grp);
+    host.appendChild(grp);
     bindGrpHead(head);
     syncThumb();
     grp.scrollIntoView({ block: 'nearest' });

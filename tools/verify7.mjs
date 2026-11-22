@@ -92,7 +92,7 @@ const gaps = await p.evaluate(() => [...document.querySelectorAll('#wdViewTask .
   const c = h.querySelector('.wd-caret').getBoundingClientRect();
   return +(n.left - c.right).toFixed(1);
 }));
-ok('分组头箭头↔文字间距 4px（全部 5 个）', gaps.every(g => Math.abs(g - 4) <= 0.6), JSON.stringify(gaps));
+ok('分组头图标↔文字间距 2px（第 40 轮：图标 12→14，占位 16 不变，全部 5 个）', gaps.every(g => Math.abs(g - 2) <= 0.6), JSON.stringify(gaps));
 
 const tints = await p.evaluate(() => {
   const q = s => getComputedStyle(document.querySelector(s)).backgroundColor;

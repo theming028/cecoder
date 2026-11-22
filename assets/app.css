@@ -1482,12 +1482,34 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .wd-grp.is-open > .wd-grp-head .wd-grp-name { font-weight: 500; }
-/* 第 25 轮：箭头挪到文字前面（[12x12][4][文字]），间距改成 margin-right */
+/* 第 40 轮：分组标记改成「文件夹 → 箭头」双图标叠合
+   折叠静止 = 彩色文件夹；hover / 键盘聚焦 / 展开 = 原来那枚箭头（折叠指向右、展开转 90° 指向下）。
+   盒子 14×14 + 右 2 —— 占位仍是 16px，文字 x 与旧版逐像素一致，只是图标大了 2px。 */
 .wd-caret {
-  margin-right: 4px; flex: 0 0 auto; color: var(--cds-text-disabled);
-  transition: transform .2s cubic-bezier(.2, .8, .2, 1), color var(--cds-motion-duration) var(--cds-motion-ease);
+  position: relative; display: block; width: 14px; height: 14px;
+  margin-right: 2px; flex: 0 0 auto; color: var(--cds-text-disabled);
+  transition: color var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.wd-grp.is-open .wd-caret { transform: rotate(90deg); }
+.wd-caret-ico {
+  position: absolute; inset: 0; display: block;
+  transition: opacity .17s var(--cds-motion-ease), transform .22s cubic-bezier(.2, .8, .2, 1);
+}
+/* 文件夹配色：Google 标志色的柔和版（降饱和 + 提亮度），按 data-hue 取色 */
+.wd-caret-folder { color: #87A9E3; }
+.wd-grp[data-hue="red"] .wd-caret-folder { color: #E39991; }
+.wd-grp[data-hue="amber"] .wd-caret-folder { color: #E5C68F; }
+.wd-grp[data-hue="green"] .wd-caret-folder { color: #7FC59C; }
+.wd-grp[data-hue="purple"] .wd-caret-folder { color: #B3A1DE; }
+/* 箭头保持原 12px 大小（在 14 盒内居中 1px），观感与旧版完全一致 */
+.wd-caret-chev { inset: 1px; opacity: 0; transform: rotate(var(--wd-chev-rot, 0deg)) scale(.7); }
+.wd-grp-head:hover .wd-caret-folder,
+.wd-grp-head:focus-visible .wd-caret-folder,
+.wd-grp.is-open .wd-caret-folder { opacity: 0; transform: scale(.68); }
+.wd-grp-head:hover .wd-caret-chev,
+.wd-grp-head:focus-visible .wd-caret-chev,
+.wd-grp.is-open .wd-caret-chev { opacity: 1; transform: rotate(var(--wd-chev-rot, 0deg)) scale(1); }
+.wd-grp.is-open .wd-caret { --wd-chev-rot: 90deg; }
+.wd-grp-head:hover .wd-caret { color: var(--cds-text-secondary); }
 .wd-grp.is-open > .wd-grp-head .wd-caret { color: var(--cds-text-primary); }
 .wd-sub { display: none; }
 .wd-grp.is-open .wd-sub { display: block; }
