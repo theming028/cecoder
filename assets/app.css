@@ -779,6 +779,8 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .stg-nav {
   flex: 0 0 256px; width: 256px; padding: 12px;
   display: flex; flex-direction: column; gap: 2px;
+  /* 第 41 轮：左栏补浅灰底，与「云端任务同步」弹窗的 .cm-left 一致 */
+  background: #F7F7F7;
   box-shadow: inset -1px 0 0 0 #EBECED;
 }
 .stg-nav-k { padding: 8px 12px 6px; font-size: 12px; line-height: 18px; color: var(--cds-text-tertiary); }
@@ -1484,24 +1486,23 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .wd-grp.is-open > .wd-grp-head .wd-grp-name { font-weight: 500; }
 /* 第 40 轮：分组标记改成「文件夹 → 箭头」双图标叠合
    折叠静止 = 彩色文件夹；hover / 键盘聚焦 / 展开 = 原来那枚箭头（折叠指向右、展开转 90° 指向下）。
-   盒子 14×14 + 右 2 —— 占位仍是 16px，文字 x 与旧版逐像素一致，只是图标大了 2px。 */
+   第 41 轮：盒子 14×14 + 右 8（图标↔文字 8px）；箭头 12px 在盒内居中。 */
 .wd-caret {
-  position: relative; display: block; width: 14px; height: 14px;
-  margin-right: 2px; flex: 0 0 auto; color: var(--cds-text-disabled);
+  position: relative; top: 1px; display: block; width: 14px; height: 14px;
+  margin-right: 8px; flex: 0 0 auto; color: var(--cds-text-disabled);
   transition: color var(--cds-motion-duration) var(--cds-motion-ease);
 }
+/* 关键：SVG 默认按 inline 基线排版会整体下沉（实测 3.5px），
+   导致「图标与文字不同心」+「旋转时墨迹不在圆心」。必须 display:block。 */
 .wd-caret-ico {
   position: absolute; inset: 0; display: block;
   transition: opacity .17s var(--cds-motion-ease), transform .22s cubic-bezier(.2, .8, .2, 1);
 }
-/* 文件夹配色：Google 标志色的柔和版（降饱和 + 提亮度），按 data-hue 取色 */
-.wd-caret-folder { color: #87A9E3; }
-.wd-grp[data-hue="red"] .wd-caret-folder { color: #E39991; }
-.wd-grp[data-hue="amber"] .wd-caret-folder { color: #E5C68F; }
-.wd-grp[data-hue="green"] .wd-caret-folder { color: #7FC59C; }
-.wd-grp[data-hue="purple"] .wd-caret-folder { color: #B3A1DE; }
-/* 箭头保持原 12px 大小（在 14 盒内居中 1px），观感与旧版完全一致 */
-.wd-caret-chev { inset: 1px; opacity: 0; transform: rotate(var(--wd-chev-rot, 0deg)) scale(.7); }
+.wd-caret-ico > svg { display: block; width: 100%; height: 100%; }
+/* 文件夹配色：柔和版 Google 色板，由 JS 随机取色后写进 --wd-folder-color（会持久化，不再变） */
+.wd-caret-folder { color: var(--wd-folder-color, #87A9E3); }
+/* 箭头保持原 12px 大小（在 14 盒内居中 1px），观感与旧版完全一致；旋转基准＝自身圆心 */
+.wd-caret-chev { inset: 1px; opacity: 0; transform: rotate(var(--wd-chev-rot, 0deg)) scale(.7); transform-origin: 50% 50%; }
 .wd-grp-head:hover .wd-caret-folder,
 .wd-grp-head:focus-visible .wd-caret-folder,
 .wd-grp.is-open .wd-caret-folder { opacity: 0; transform: scale(.68); }

@@ -736,7 +736,18 @@
 
   /* ---------- 侧栏状态记忆（展开/收起 + 宽度） ---------- */
   var WS_KEY = 'cecoder.wsDrawer';
-  var WS_MIN = 300, WS_MAX = 480, WS_DEF = 320;
+  var WS_MIN = 300, WS_MAX = 720, WS_DEF = 320;
+  /* 第 41 轮：左栏上限不再死守 480 —— 原来拖到 480 就停，1440 下左右栏同开时
+     panel-main（is-chat）被卡在 ~392 再也拖不窄。改成「让中间面板至少剩 320」，
+     上限同时封在 720，避免大屏上左栏吃满。 */
+  var CHAT_MIN_PM = 320;
+  function wsMax() {
+    var hostEl = drawer.parentElement;
+    var panelW = hostEl ? hostEl.clientWidth : window.innerWidth;
+    var rd = document.getElementById('rsDrawer');
+    var rsW = (rd && rd.classList.contains('is-open')) ? rd.getBoundingClientRect().width : 0;
+    return Math.max(WS_MIN + 80, Math.min(WS_MAX, Math.round(panelW - rsW - CHAT_MIN_PM)));
+  }
   var resizer = document.getElementById('wsResizer');
   function wsStore() {
     try { return JSON.parse(localStorage.getItem(WS_KEY) || '{}') || {}; } catch (e) { return {}; }
@@ -751,7 +762,7 @@
     return isNaN(v) ? WS_DEF : v;
   }
   function wsSetWidth(w) {
-    w = Math.max(WS_MIN, Math.min(WS_MAX, Math.round(w)));
+    w = Math.max(WS_MIN, Math.min(wsMax(), Math.round(w)));
     drawer.style.setProperty('--ws-w', w + 'px');
     resizer.setAttribute('aria-valuenow', String(w));
     return w;
@@ -799,7 +810,7 @@
     if (e.key === 'ArrowLeft') nw = w - step;
     else if (e.key === 'ArrowRight') nw = w + step;
     else if (e.key === 'Home') nw = WS_MIN;
-    else if (e.key === 'End') nw = WS_MAX;
+    else if (e.key === 'End') nw = wsMax();
     if (nw == null) return;
     e.preventDefault();
     wsSetWidth(nw);
@@ -1084,6 +1095,48 @@
     return (view && view.querySelector('.wd-groups')) || wdGroups;
   }
 
+  /* ---------- 第 41 轮：分组文件夹配色 ----------
+     预置 10 色（柔和版 Google 色板，S≈35~65 / L≈62~78），随机取一枚写进
+     --wd-folder-color；取过的按「分组名」记进 localStorage，之后不再变
+     （同名目录在会话 / 任务两个视图里也保持同色）。 */
+  var FOLDER_COLORS = ['#87A9E3', '#7FC0DC', '#86C6B6', '#7FC59C', '#C6D08E', '#E5C68F', '#EAB79B', '#E39991', '#DFA2C0', '#B3A1DE'];
+  var GRP_COLOR_KEY = 'cecoder.grpColor';
+  function grpColorMap() {
+    try { return JSON.parse(localStorage.getItem(GRP_COLOR_KEY) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function saveGrpColors(map) {
+    try { localStorage.setItem(GRP_COLOR_KEY, JSON.stringify(map)); } catch (e) {}
+  }
+  function pickColor(used) {
+    var pool = FOLDER_COLORS.filter(function (c) { return used.indexOf(c) < 0; });
+    if (!pool.length) pool = FOLDER_COLORS;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function paintGroupColors() {
+    var map = grpColorMap(), dirty = false;
+    drawer.querySelectorAll('.wd-view').forEach(function (view) {
+      /* 两趟：先把该视图里已经记过色的（含同名目录）收进 used，再给新名字挑色，
+         否则「工作台会话」可能挑到还没轮到的 Nutstore 已有的琥珀色，撞色 */
+      var used = [];
+      var list = Array.prototype.slice.call(view.querySelectorAll('.wd-grp'));
+      list.forEach(function (g) {
+        var nm = g.querySelector('.wd-grp-name');
+        if (!nm) return;
+        var k = nm.textContent.trim();
+        if (map[k]) used.push(map[k]);
+      });
+      list.forEach(function (g) {
+        var nm = g.querySelector('.wd-grp-name');
+        if (!nm) return;
+        var key = nm.textContent.trim();
+        if (!map[key]) { map[key] = pickColor(used); used.push(map[key]); dirty = true; }
+        g.style.setProperty('--wd-folder-color', map[key]);
+      });
+    });
+    if (dirty) saveGrpColors(map);
+  }
+  paintGroupColors();
+
   /* ---------- 添加工作目录：调起系统文件夹选择器 ---------- */
   var addDirBtn = document.getElementById('wdAddDir');
   var dirPick = document.getElementById('wdDirPick');
@@ -1091,10 +1144,18 @@
   function addDirGroup(name) {
     var grp = document.createElement('div');
     grp.className = 'wd-grp is-open';
-    /* 第 40 轮：文件夹图标按色板轮转取色（与静态分组的 data-hue 同一套色） */
+    /* 第 41 轮：色板随机取色（同名目录沿用已记下的颜色） */
     var host = activeGroups();
-    var HUES = ['blue', 'green', 'red', 'amber', 'purple'];
-    grp.dataset.hue = HUES[host.querySelectorAll(':scope > .wd-grp').length % HUES.length];
+    var cmap = grpColorMap();
+    var ckey = String(name).trim();
+    if (!cmap[ckey]) {
+      var usedNow = [].map.call(host.querySelectorAll(':scope > .wd-grp'), function (g) {
+        return g.style.getPropertyValue('--wd-folder-color');
+      });
+      cmap[ckey] = pickColor(usedNow);
+      saveGrpColors(cmap);
+    }
+    grp.style.setProperty('--wd-folder-color', cmap[ckey]);
 
     var head = document.createElement('div');
     head.className = 'wd-grp-head is-open';

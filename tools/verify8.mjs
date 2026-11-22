@@ -121,8 +121,9 @@ await p.click('#scFold'); await new Promise(r => setTimeout(r, 420));
 const t2 = await hoverTip('#scFold');
 ok('8 展开看板 tooltip', t2.on && t2.txt === '展开看板', JSON.stringify(t2));
 ok('8 tooltip 在可视区内', t2.l >= 0 && t2.t >= 0 && t2.l + t2.w <= 1440, JSON.stringify(t2));
-await p.evaluate(() => { localStorage.setItem('cecoder.wsDrawer', JSON.stringify({ open: false })); });
+/* 第 41 轮：首页不再认 open:false（永远展开），折叠态基线改成点一次收起 */
 await p.reload({ waitUntil: 'load' }); await new Promise(r => setTimeout(r, 320));
+if (await p.evaluate(() => document.getElementById('wsDrawer').classList.contains('is-open'))) { await p.click('.wd-collapse'); await new Promise(r => setTimeout(r, 460)); }
 const t3 = await hoverTip('.menu-btn');
 ok('8 展开任务列表 tooltip', t3.on && t3.txt === '展开任务列表', JSON.stringify(t3));
 await p.click('.menu-btn'); await new Promise(r => setTimeout(r, 700));
@@ -137,18 +138,29 @@ const iconGeo = await p.evaluate(() => {
 /* 第 34 轮：与工具行「排序」图标同规格（14 网格满版） */
 ok('8 收起图标为箭头 + 竖条', iconGeo.vb === '0 0 14 14' && iconGeo.paths === 1 && iconGeo.rects === 1, JSON.stringify(iconGeo));
 
-/* ---------- 9 分组名与箭头对齐 ---------- */
+/* ---------- 9 分组名与图标对齐（第 41 轮：比的是「墨迹中心」，不是行盒中心） ---------- */
 const align = await p.evaluate(() => {
   const out = [];
   document.querySelectorAll('.wd-grp-head').forEach(h => {
-    const nm = h.querySelector('.wd-grp-name'), cr = h.querySelector('.wd-caret');
+    if (h.offsetParent === null) return;   /* 隐藏视图里的分组量不到，跳过 */
+    const nm = h.querySelector('.wd-grp-name');
+    const cr = h.querySelector('.wd-caret');
+    const ico = h.querySelector('.wd-caret-folder path').getBoundingClientRect();
+    const cs = getComputedStyle(nm);
+    const cv = document.createElement('canvas').getContext('2d');
+    cv.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+    const tm = cv.measureText(nm.textContent);
     const rng = document.createRange(); rng.selectNodeContents(nm);
-    const t = rng.getBoundingClientRect(), c = cr.getBoundingClientRect();
-    out.push(+(((c.top + c.bottom) / 2) - ((t.top + t.bottom) / 2)).toFixed(2));
+    const t = rng.getBoundingClientRect();
+    const lh = parseFloat(cs.lineHeight);
+    const baseline = t.y + (lh - (tm.actualBoundingBoxAscent + tm.actualBoundingBoxDescent)) / 2 + tm.actualBoundingBoxAscent;
+    const textCy = baseline - (tm.actualBoundingBoxAscent - tm.actualBoundingBoxDescent) / 2;
+    out.push(+(((ico.top + ico.bottom) / 2) - textCy).toFixed(2));
+    void cr;
   });
   return out;
 });
-ok('9 文字与箭头中心差 ≤0.75px', align.every(v => Math.abs(v) <= 0.75), JSON.stringify(align));
+ok('9 图标墨迹中心与文字墨迹中心差 ≤0.75px', align.every(v => Math.abs(v) <= 0.75), JSON.stringify(align));
 
 /* ---------- 10 空态文字 ---------- */
 await p.evaluate(() => { const w = document.querySelectorAll('.wd-grp')[4]; if (!w.classList.contains('is-open')) w.querySelector('.wd-grp-head').click(); });

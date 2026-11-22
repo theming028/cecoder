@@ -25,7 +25,7 @@ await wait(700);
 ok('A1 会话页点新建任务 → 回首页', p.url().endsWith('cecoder-home.html'), p.url());
 ok('A2 首页无 query（原始态）', !p.url().includes('?'), p.url());
 ok('A3 首页 body data-page=home', await p.evaluate(()=>document.body.dataset.page)==='home');
-ok('A4 落地时任务列表收起（首屏 hero）', await p.evaluate(()=>!document.getElementById('wsDrawer').classList.contains('is-open')));
+ok('A4 落地时任务列表展开（第 41 轮：首页永远展开）', await p.evaluate(()=>document.getElementById('wsDrawer').classList.contains('is-open')));
 await p.close();
 
 /* B 任务页点新建任务 */

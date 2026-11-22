@@ -8,8 +8,10 @@ const errs=[]; p.on('pageerror',e=>errs.push('pageerror '+e.message)); p.on('con
 await p.setViewport({width:1440,height:900});
 await p.goto(F,{waitUntil:'load'});
 await p.addStyleTag({content:'.stage{width:872px !important}'}); /* 第 11 轮：基线按稿件 860 校验；第 16 轮 stage 盒含左右 6px 内边距，872 盒 = 860 内容 */
-await p.evaluate(()=>localStorage.setItem('cecoder.wsDrawer',JSON.stringify({open:false}))); /* 第 38 轮：左栏默认展开，首页首屏基线要显式收起 */
 await p.reload({waitUntil:'load'});
+/* 第 41 轮：首页改成「永远展开」（不再认 localStorage 的 open:false），折叠态基线改成加载后点一次收起 */
+await p.click('.wd-collapse');
+await new Promise(r=>setTimeout(r,460));
 await p.addStyleTag({content:'.stage{width:872px !important}'});
 let pass=0, fail=[];
 const eq=(name,got,want,tol=1)=>{ const ok=got!=null && Math.abs(got-want)<=tol; ok?pass++:fail.push(name+' got='+got+' want='+want); };
@@ -41,7 +43,7 @@ const rz = await box('.ws-resizer');
 await p.mouse.move(rz[0]+2, rz[1]+300); await p.mouse.down();
 await p.mouse.move(rz[0]+2+400, rz[1]+300, {steps:10}); await p.mouse.up();
 await new Promise(r=>setTimeout(r,200));
-eq('抽屉最大宽', (await box('.ws-drawer'))[2], 480);
+eq('抽屉最大宽（第 41 轮放宽到 720）', (await box('.ws-drawer'))[2], 720);
 const rz2 = await box('.ws-resizer');
 await p.mouse.move(rz2[0]+2, rz2[1]+300); await p.mouse.down();
 await p.mouse.move(rz2[0]+2-600, rz2[1]+300, {steps:10}); await p.mouse.up();
@@ -58,7 +60,8 @@ eq('刷新后宽度记忆', (await box('.ws-drawer'))[2], beforeReload);
 if (await p.evaluate(()=>document.querySelector('.ws-drawer').classList.contains('is-open'))) pass++; else fail.push('刷新后应保持展开');
 await p.click('.wd-collapse'); await new Promise(r=>setTimeout(r,320));
 await p.reload({waitUntil:'load'}); await new Promise(r=>setTimeout(r,250));
-if (!(await p.evaluate(()=>document.querySelector('.ws-drawer').classList.contains('is-open')))) pass++; else fail.push('刷新后应保持收起');
+/* 第 41 轮：首页不再记忆「收起」，重载一律展开（用户要求默认展开） */
+if ((await p.evaluate(()=>document.querySelector('.ws-drawer').classList.contains('is-open')))) pass++; else fail.push('首页重载后应重新展开');
 
 // --- 模态 ---
 await p.click('.menu-btn'); await new Promise(r=>setTimeout(r,300));

@@ -21,6 +21,8 @@ async function page(w = 1440, h = 900, dw = 320, open = true) {
   await p.evaluate(o => localStorage.setItem('cecoder.wsDrawer', JSON.stringify(o)), { open: !!open, w: dw });
   await p.reload({ waitUntil: 'load' });
   await wait(650);
+  /* 第 41 轮：首页不再认 open:false，要折叠得点一次收起 */
+  if (!open && await p.evaluate(() => document.getElementById('wsDrawer').classList.contains('is-open'))) { await p.click('.wd-collapse'); await wait(480); }
   return p;
 }
 

@@ -22,6 +22,8 @@ async function page(w, h, open) {
   await p.evaluate(() => localStorage.setItem('cecoder.wdTab', '任务')); /* 第 38 轮：默认页签＝会话，任务列表基线显式指定 */
   await p.reload({ waitUntil: 'load' });
   await wait(650);
+  /* 第 41 轮：首页不再认 open:false，要折叠得点一次收起 */
+  if (!open && await p.evaluate(() => document.getElementById('wsDrawer').classList.contains('is-open'))) { await p.click('.wd-collapse'); await wait(480); }
   return p;
 }
 

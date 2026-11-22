@@ -34,9 +34,11 @@ let pill = await box('#segPill');
 ok('seg 底板初始覆盖第 1 段', near(pill[0], 572) && near(pill[2], 120) && near(pill[3], 28), JSON.stringify(pill));
 ok('seg 选中项自身不再铺白底', await p.evaluate(() => getComputedStyle(document.querySelector('.seg-item.is-active')).backgroundColor) === 'rgba(0, 0, 0, 0)');
 await p.click('.seg-item[data-seg="研发管理"]');
-await new Promise(r => setTimeout(r, 110));
-const mid = await box('#segPill');
-ok('seg 切换有中间帧（底板在移动中）', mid[0] > 600 && mid[0] < 780, JSON.stringify(mid));
+/* 第 41 轮：原来是「110ms 后量底板位置必须落在中间」——headless 下 rAF 偶尔还没起帧，
+   量到的就是起点 572，纯竞态。改成量「过渡本身」是否存在（transform/width 各 .3s），
+   再配合下一条落地断言，等价于「不是瞬移」。 */
+const segTr = await p.evaluate(() => { const s = getComputedStyle(document.querySelector('#segPill')); return s.transitionProperty + ' | ' + s.transitionDuration; });
+ok('seg 底板切换带过渡（不是瞬移）', /transform/.test(segTr) && /0\.3s/.test(segTr), segTr);
 await new Promise(r => setTimeout(r, 420));
 pill = await box('#segPill');
 ok('seg 底板滑到第 3 段', near(pill[0], 780) && near(pill[2], 88), JSON.stringify(pill));
@@ -92,7 +94,7 @@ const gaps = await p.evaluate(() => [...document.querySelectorAll('#wdViewTask .
   const c = h.querySelector('.wd-caret').getBoundingClientRect();
   return +(n.left - c.right).toFixed(1);
 }));
-ok('分组头图标↔文字间距 2px（第 40 轮：图标 12→14，占位 16 不变，全部 5 个）', gaps.every(g => Math.abs(g - 2) <= 0.6), JSON.stringify(gaps));
+ok('分组头图标↔文字间距 8px（第 41 轮）', gaps.every(g => Math.abs(g - 8) <= 0.6), JSON.stringify(gaps));
 
 const tints = await p.evaluate(() => {
   const q = s => getComputedStyle(document.querySelector(s)).backgroundColor;

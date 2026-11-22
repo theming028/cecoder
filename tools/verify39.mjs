@@ -27,7 +27,7 @@ ok('A1 首页空 localStorage → 左栏展开', await drawerOpen(p));
 await p.close();
 
 p = await mk('cecoder-home.html', 1440, 900, () => { localStorage.clear(); localStorage.setItem('cecoder.wsDrawer', JSON.stringify({ open: false })); });
-ok('A2 首页手动收过 → 保持收起', !(await drawerOpen(p)));
+ok('A2 首页存着 open:false 也照样展开（第 41 轮：首页永远展开）', await drawerOpen(p));
 await p.close();
 
 p = await mk('cecoder-session.html?id=0', 1440, 900, () => { localStorage.clear(); localStorage.setItem('cecoder.wsDrawer', JSON.stringify({ open: false })); });
@@ -93,7 +93,10 @@ const stageBox = p => p.evaluate(() => {
   return { stage: Math.round(sr.width), main: Math.round(mr.width), scrollW: s.scrollWidth, clientW: s.clientWidth };
 });
 
-p = await mk('cecoder-home.html', 1440, 900, () => { localStorage.clear(); localStorage.setItem('cecoder.wsDrawer', JSON.stringify({ open: false })); localStorage.setItem('cecoder.wdTab', '任务'); });
+p = await mk('cecoder-home.html', 1440, 900, () => { localStorage.clear(); localStorage.setItem('cecoder.wsDrawer', JSON.stringify({ open: true })); localStorage.setItem('cecoder.wdTab', '任务'); });
+/* 第 41 轮：首页不再认 open:false，折叠态基线改成加载后点一次收起 */
+await p.evaluate(() => document.querySelector('.menu-btn').click());
+await wait(520);
 let sb = await stageBox(p);
 ok('C1 1440 抽屉收起 → 内容列 960', sb.stage - 12 === 960, JSON.stringify(sb));
 ok('C2 无横向溢出', sb.scrollW <= sb.clientW + 1, JSON.stringify(sb));

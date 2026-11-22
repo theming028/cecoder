@@ -54,7 +54,7 @@ await wait(400);
 ok('B1 点收起键 → 收起', !(await drawerOpen(p)));
 ok('B2 写入 open:false', await p.evaluate(() => JSON.parse(localStorage.getItem('cecoder.wsDrawer') || '{}').open) === false);
 await p.reload({ waitUntil: 'load' }); await wait(500);
-ok('B3 重载后仍收起（记忆优先于默认展开）', !(await drawerOpen(p)));
+ok('B3 重载后重新展开（第 41 轮：首页不再记忆收起）', await drawerOpen(p));
 /* 再展开一次 → 记忆为 true */
 await p.evaluate(() => document.querySelector('.menu-btn').click());
 await wait(400);
@@ -67,7 +67,7 @@ p = await mk('cecoder-session.html?tab=%E4%BC%9A%E8%AF%9D&id=1', 1440, 900, () =
 await p.evaluate(() => document.querySelector('.wd-link[data-action="新建任务"]').click());
 await wait(750);
 ok('C1 回首页', p.url().endsWith('cecoder-home.html'), p.url());
-ok('C2 落地首页左栏收起（hero 首屏不受默认展开影响）', !(await drawerOpen(p)), p.url());
+ok('C2 落地首页左栏展开（第 41 轮：首页永远展开）', await drawerOpen(p), p.url());
 await p.close();
 
 /* ============ D 页签顺序互换 ============ */

@@ -27,7 +27,7 @@ const read = (p, sel) => p.evaluate(sel => [...document.querySelectorAll(sel)].m
   const m = cs.transform.match(/matrix\(([^)]+)\)/);
   const v = m ? m[1].split(',').map(Number) : [1, 0, 0, 1, 0, 0];
   return {
-    hue: g.dataset.hue || '', open: g.classList.contains('is-open'),
+    hue: (g.style.getPropertyValue('--wd-folder-color') || '').trim(), open: g.classList.contains('is-open'),
     color: fs.color, fOp: +fs.opacity, cOp: +cs.opacity,
     /* 旋转角 = atan2(b, a)，0° 指右、90° 指下 */
     rot: +(Math.atan2(v[1], v[0]) * 180 / Math.PI).toFixed(1),
@@ -47,11 +47,13 @@ ok('A3 展开行：文件夹透明、箭头可见', rows.filter(r => r.open).eve
 ok('A4 展开行箭头转 90°（指向下）', rows.filter(r => r.open).every(r => r.rot === 90), JSON.stringify(rows.map(r => r.rot)));
 ok('A5 折叠行箭头 0°（指向右）', rows.filter(r => !r.open).every(r => r.rot === 0), JSON.stringify(rows.map(r => r.rot)));
 ok('A6 图标盒 14×14，行高 36 不变', rows.every(r => r.box[0] === 14 && r.box[1] === 14 && r.headH === 36), JSON.stringify(rows[0]));
-ok('A7 文字左缘仍在 48（图标变大不挤文字）', rows.every(r => r.nameX === 48), JSON.stringify(rows.map(r => r.nameX)));
+ok('A7 文字左缘 54（14 图标 + 8 间距，第 41 轮）', rows.every(r => r.nameX === 54), JSON.stringify(rows.map(r => r.nameX)));
 
-/* ============ B 五色文件夹：彼此不同 + 柔和（HSL 饱和度/亮度落在温和区间） ============ */
+/* ============ B 彩色文件夹：随机取色、彼此不同、柔和（HSL 落在温和区间） ============ */
 const hues = rows.map(r => r.hue);
-ok('B1 五个分组都有 data-hue 且不重复', new Set(hues).size === 5 && hues.every(Boolean), JSON.stringify(hues));
+ok('B1 五个分组都取到了颜色（内联 --wd-folder-color）', hues.every(h => /^#[0-9A-Fa-f]{6}$/.test(h)) && new Set(hues).size === 5, JSON.stringify(hues));
+const PALETTE = ['#87A9E3', '#7FC0DC', '#86C6B6', '#7FC59C', '#C6D08E', '#E5C68F', '#EAB79B', '#E39991', '#DFA2C0', '#B3A1DE'];
+ok('B1b 颜色都来自 10 色预置色板', hues.every(h => PALETTE.includes(h.toUpperCase())), JSON.stringify(hues));
 const toHsl = rgb => {
   const [r, g, bl] = rgb.match(/\d+/g).map(Number).map(v => v / 255);
   const mx = Math.max(r, g, bl), mn = Math.min(r, g, bl), d = mx - mn;
@@ -101,7 +103,7 @@ const tHue = Object.fromEntries((await p.evaluate(() => [...document.querySelect
 ok('E2 同名目录两个页签同色（Nutstore / AI Native Factory）',
   sHue['Nutstore'] === tHue['Nutstore'] && sHue['AI Native Factory'] === tHue['AI Native Factory'],
   JSON.stringify({ sHue, tHue }));
-ok('E3 会话页签同样是五色分配', new Set(sess.map(r => r.hue)).size >= 4, JSON.stringify(sess.map(r => r.hue)));
+ok('E3 会话页签也各自取到颜色（≥4 种不同）', new Set(sess.map(r => r.hue)).size >= 4 && sess.every(r => /^#[0-9A-Fa-f]{6}$/.test(r.hue)), JSON.stringify(sess.map(r => r.hue)));
 
 /* ============ F 新增工作目录：新分组带色、结构与静态分组一致 ============ */
 await p.evaluate(() => { window.showDirectoryPicker = async () => ({ name: '验收目录' }); document.getElementById('wdAddDir').click(); });
@@ -111,14 +113,14 @@ const added = await p.evaluate(() => {
   const c = g.querySelector('.wd-caret');
   return {
     name: g.querySelector('.wd-grp-name').textContent.trim(),
-    hue: g.dataset.hue || '',
+    hue: (g.style.getPropertyValue('--wd-folder-color') || '').trim(),
     dual: !!g.querySelector('.wd-caret-folder') && !!g.querySelector('.wd-caret-chev'),
     box: [Math.round(c.getBoundingClientRect().width), Math.round(c.getBoundingClientRect().height)],
     folderColor: g.querySelector('.wd-caret-folder') ? getComputedStyle(g.querySelector('.wd-caret-folder')).color : ''
   };
 });
 ok('F1 新分组自动落到新目录名下', added.name === '验收目录', added.name);
-ok('F2 新分组带 data-hue 且取到彩色', ['blue', 'green', 'red', 'amber', 'purple'].includes(added.hue) && added.folderColor !== 'rgb(31, 31, 31)', JSON.stringify(added));
+ok('F2 新分组取到色板里的颜色', /^#[0-9A-Fa-f]{6}$/.test(added.hue) && added.folderColor !== 'rgb(31, 31, 31)', JSON.stringify(added));
 ok('F3 新分组同样是「文件夹 + 箭头」双层、14×14', added.dual && added.box[0] === 14 && added.box[1] === 14, JSON.stringify(added));
 ok('F4 无脚本报错', p.__e.length === 0, p.__e.join(' | '));
 await p.close();
