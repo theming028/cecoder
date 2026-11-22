@@ -2205,7 +2205,8 @@
     else if (PAGE === 'task') tab = '任务';
     else if (!tab) {
       try { tab = localStorage.getItem('cecoder.wdTab') || ''; } catch (err) { tab = ''; }
-      if (tab !== '会话' && tab !== '任务') tab = '';
+      /* 第 38 轮：页签互换（会话在前）后，首次进入默认落在「会话」 */
+      if (tab !== '会话' && tab !== '任务') tab = '会话';
     }
     var id = parseInt(QS.get('id') || '', 10);
     if (isNaN(id)) id = -1;

@@ -15,6 +15,7 @@ async function page(w = 1440, h = 900, open = false) {
   await p.setViewport({ width: w, height: h, deviceScaleFactor: 2 });
   await p.goto(F, { waitUntil: 'load' });
   await p.evaluate(o => localStorage.setItem('cecoder.wsDrawer', JSON.stringify(o)), { open, w: 320 });
+  await p.evaluate(() => localStorage.setItem('cecoder.wdTab', '任务')); /* 第 38 轮：默认页签＝会话，任务列表基线显式指定 */
   await p.reload({ waitUntil: 'load' });
   await wait(700);
   p.__errs = errs;

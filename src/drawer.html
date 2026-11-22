@@ -10,8 +10,8 @@
     </header>
 
     <div class="wd-tabs" role="tablist" aria-label="任务列表视图">
-      <button class="wd-tab is-active" role="tab" aria-selected="true" data-wd-tab="任务">任务</button>
       <button class="wd-tab" role="tab" aria-selected="false" data-wd-tab="会话">会话<span class="wd-tab-num">12</span></button>
+      <button class="wd-tab is-active" role="tab" aria-selected="true" data-wd-tab="任务">任务</button>
     </div>
 
     <div class="wd-tools" id="wdTools">
@@ -393,7 +393,9 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
     var w = Math.min(480, Math.max(300, st.w || 320));
     var d = document.getElementById('wsDrawer');
     if (st.w) d.style.setProperty('--ws-w', w + 'px');
-    if (st.open) {
+    /* 第 38 轮：默认展开 —— 只有用户手动收过（open:false）才收着；
+       新建任务回首页那条路径也会显式写 open:false，仍然生效 */
+    if (st.open !== false) {
       d.classList.add('is-open', 'no-anim');
       d.setAttribute('aria-hidden', 'false');
       d.dataset.restored = '1';

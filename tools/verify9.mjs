@@ -10,6 +10,7 @@ p.on('console', m => { if (m.type() === 'error') errs.push('console ' + m.text()
 await p.setViewport({ width: 1440, height: 900 });
 await p.goto(F, { waitUntil: 'load' });
 await p.evaluate(() => localStorage.removeItem('cecoder.wsDrawer'));
+await p.evaluate(() => localStorage.setItem('cecoder.wdTab', '任务')); /* 第 38 轮：默认页签＝会话，任务列表基线显式指定 */
 await p.reload({ waitUntil: 'load' });
 await new Promise(r => setTimeout(r, 400));
 

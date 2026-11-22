@@ -9,8 +9,11 @@ const page = await browser.newPage();
 await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 2 });
 await page.goto(FILE, { waitUntil: 'load' });
 await new Promise(r => setTimeout(r, 400));
-await page.click('.menu-btn');
-await new Promise(r => setTimeout(r, 500));
+/* 第 38 轮：左栏改为默认展开，展开态就不必再点菜单键（点了会收起） */
+if (!(await page.evaluate(() => document.getElementById('wsDrawer').classList.contains('is-open')))) {
+  await page.click('.menu-btn');
+  await new Promise(r => setTimeout(r, 500));
+}
 /* 第 20 轮：AI Native Factory 默认收起，展开它才能量空态基线 */
 await page.evaluate(() => {
   /* 第 21 轮：只展开 AI Native Factory（Nutstore 现在也是空态分组，展开会推低后续基线） */
@@ -18,6 +21,11 @@ await page.evaluate(() => {
   if (h && h.getAttribute('aria-expanded') === 'false') h.click();
 });
 await new Promise(r => setTimeout(r, 320));
+/* 第 38 轮：默认落在「会话」页签，任务视图基线要先切回来 */
+if (await page.evaluate(() => { const t = document.querySelector('.wd-tab.is-active'); return !t || t.dataset.wdTab !== '任务'; })) {
+  await page.evaluate(() => document.querySelector('[data-wd-tab="任务"]').click());
+  await new Promise(r => setTimeout(r, 350));
+}
 
 /* 第 11 轮：卡片新增常驻「更多操作」按钮（hover/选中才显示，但占 20px），
    第 2 张卡标题由 1 行变 2 行，纵向基线整体下移 20。 */
@@ -28,8 +36,9 @@ const EXP = [
   ['link新建',      '.wd-link',      120, 11, 72, 22],
   ['link云端',      '.wd-sync',      204, 11, 56, 22],
   ['collapse',     '.wd-collapse',  276, 8, 28, 28],
-  ['tab任务',       '.wd-tab',        16, 52, 142, 32],
-  ['tab会话',       '.wd-tab:nth-of-type(2)', 162, 52, 142, 32],
+  /* 第 38 轮：页签顺序互换 —— 会话在左（仍是任务选中态） */
+  ['tab会话',       '.wd-tab',        16, 52, 142, 32],
+  ['tab任务',       '.wd-tab:nth-of-type(2)', 162, 52, 142, 32],
   ['adddir',       '.wd-adddir',     16, 100, 208, 32],
   ['search',       '.wd-icon-btn',   232, 100, 32, 32],
   ['sort',         '.wd-icon-btn:nth-of-type(2)', 272, 100, 32, 32],

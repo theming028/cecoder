@@ -9,7 +9,7 @@ p.on('pageerror', e => errs.push('pageerror ' + e.message));
 p.on('console', m => { if (m.type() === 'error') errs.push('console ' + m.text()); });
 await p.setViewport({ width: 1440, height: 900 });
 await p.goto(F, { waitUntil: 'load' });
-await p.evaluate(() => localStorage.removeItem('cecoder.wsDrawer'));
+await p.evaluate(() => { localStorage.setItem('cecoder.wsDrawer', JSON.stringify({ open: false })); localStorage.setItem('cecoder.wdTab', '任务'); }); /* 第 38 轮：默认展开/默认会话页签，折叠态 + 任务页签基线显式指定 */
 await p.reload({ waitUntil: 'load' });
 await new Promise(r => setTimeout(r, 350));
 
@@ -121,7 +121,7 @@ await p.click('#scFold'); await new Promise(r => setTimeout(r, 420));
 const t2 = await hoverTip('#scFold');
 ok('8 展开看板 tooltip', t2.on && t2.txt === '展开看板', JSON.stringify(t2));
 ok('8 tooltip 在可视区内', t2.l >= 0 && t2.t >= 0 && t2.l + t2.w <= 1440, JSON.stringify(t2));
-await p.evaluate(() => { localStorage.removeItem('cecoder.wsDrawer'); });
+await p.evaluate(() => { localStorage.setItem('cecoder.wsDrawer', JSON.stringify({ open: false })); });
 await p.reload({ waitUntil: 'load' }); await new Promise(r => setTimeout(r, 320));
 const t3 = await hoverTip('.menu-btn');
 ok('8 展开任务列表 tooltip', t3.on && t3.txt === '展开任务列表', JSON.stringify(t3));

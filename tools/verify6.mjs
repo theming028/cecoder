@@ -8,7 +8,7 @@ const errs=[]; p.on('pageerror',e=>errs.push('pageerror '+e.message)); p.on('con
 await p.setViewport({width:1440,height:900});
 await p.goto(F,{waitUntil:'load'});
 await p.addStyleTag({content:'.stage{width:872px !important}'}); /* 第 11 轮：基线按稿件 860 校验；第 16 轮 stage 盒含左右 6px 内边距，872 盒 = 860 内容 */
-await p.evaluate(()=>localStorage.removeItem('cecoder.wsDrawer'));
+await p.evaluate(()=>localStorage.setItem('cecoder.wsDrawer',JSON.stringify({open:false}))); /* 第 38 轮：左栏默认展开，首页首屏基线要显式收起 */
 await p.reload({waitUntil:'load'});
 await p.addStyleTag({content:'.stage{width:872px !important}'});
 let pass=0, fail=[];

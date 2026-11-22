@@ -13,6 +13,7 @@ const ok = (n, c, x) => { if (c) pass++; else fail.push(n + (x !== undefined ? '
   await p.setViewport({ width: 1440, height: 900 });
   await p.goto(F, { waitUntil: 'load' });
   await p.evaluate(() => localStorage.setItem('cecoder.wsDrawer', JSON.stringify({ open: true, w: 320 })));
+  await p.evaluate(() => localStorage.setItem('cecoder.wdTab', '任务')); /* 第 38 轮：默认页签＝会话，任务列表基线显式指定 */
   await p.reload({ waitUntil: 'load' });
   await new Promise(r => setTimeout(r, 900));
   const moreOp = () => p.evaluate(() => getComputedStyle(document.querySelector('.wd-card .wd-more')).opacity);

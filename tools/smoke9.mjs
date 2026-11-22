@@ -8,7 +8,7 @@ for (const [w,h] of [[1920,1080],[1440,900],[1280,800],[1024,768],[960,700]]) {
   const errs=[]; p.on('pageerror',e=>errs.push('pageerror '+e.message)); p.on('console',m=>{if(m.type()==='error')errs.push('console '+m.text());});
   await p.setViewport({width:w,height:h});
   await p.goto(F,{waitUntil:'load'});
-  await p.evaluate(()=>localStorage.removeItem('cecoder.wsDrawer'));
+  await p.evaluate(()=>{localStorage.setItem('cecoder.wsDrawer',JSON.stringify({open:false}));localStorage.setItem('cecoder.wdTab','任务');}); /* 第 38 轮：默认展开/默认会话页签，这里要收起 + 任务基线 */
   await p.reload({waitUntil:'load'});
   await new Promise(r=>setTimeout(r,300));
   // 交互冒烟：看板 → 折叠 → 点空白展开；抽屉 → 搜索 → 过滤 → 清 → 排序 → 折叠组

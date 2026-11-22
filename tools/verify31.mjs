@@ -39,7 +39,7 @@ await p.close();
 p=await mk('cecoder-home.html');
 await p.evaluate(()=>localStorage.removeItem('cecoder.wdTab'));
 await p.reload({waitUntil:'load'}); await wait(500);
-ok('C1 首次进入默认「任务」', await p.evaluate(()=>document.querySelector('.wd-tab.is-active').dataset.wdTab)==='任务');
+ok('C1 首次进入默认「会话」', await p.evaluate(()=>document.querySelector('.wd-tab.is-active').dataset.wdTab)==='会话');
 await p.evaluate(()=>document.querySelector('[data-wd-tab="会话"]').click());
 await wait(200);
 ok('C2 切到会话后写入记忆', await p.evaluate(()=>localStorage.getItem('cecoder.wdTab'))==='会话');
