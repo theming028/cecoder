@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 软件工厂 · Cecoder 重绘（真实组件 · 可交互）</title>
+<!--
+  转译方式（标准流程）：用真实 React 组件，客户端运行时挂载（可点击切换/选择），
+  叠加官方预编译样式 semi.css（2.105.0）与 Cecoder 双层 token。
+  规范：① 卡片圆角固定 8px（--cds-radius-card）；② 控件统一默认常规尺寸（高 32px）；
+  ③ 所有组件可交互，缺数据用假数据填充。切 theme-mode="dark" 即深色。
+-->
+<link rel="stylesheet" href="cecoder-tokens.css" />
+<link rel="stylesheet" href="semi.css" />
+<link rel="stylesheet" href="component-overrides.css" />
+<link rel="stylesheet" href="page.css" />
+</head>
+<body>
+<div id="root"></div>
+<script src="app.js"></script>
+</body>
+</html>

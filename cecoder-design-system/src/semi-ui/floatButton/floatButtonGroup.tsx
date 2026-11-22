@@ -1,0 +1,105 @@
+import React from 'react';
+import { cssClassesGroup, strings } from '@douyinfe/semi-foundation/floatButton/constants';
+import '@douyinfe/semi-foundation/floatButton/floatButton.scss';
+import BaseComponent from '../_base/baseComponent';
+import { ArrayElement } from '../_base/base';
+import Badge, { BadgeProps } from '../badge';
+import cls from 'classnames';
+import { FloatButtonProps } from './interface';
+
+const prefixCls = cssClassesGroup.PREFIX;
+
+export interface FloatButtonGroupItem extends FloatButtonProps {
+    value?: string;
+    content?: string | React.ReactNode
+}
+
+export interface FloatButtonGroupProps {
+    disabled?: boolean;
+    items: FloatButtonGroupItem[];
+    className?: string;
+    style?: React.CSSProperties;
+    children?: React.ReactNode;
+    onClick?: (value: string, e: React.MouseEvent) => void
+}
+
+interface FloatButtonGroupState {
+}
+
+export default class FloatButtonGroup extends BaseComponent<FloatButtonGroupProps, FloatButtonGroupState> {
+
+    static defaultProps = {
+        shape: 'round',
+        type: 'default',
+        size: 'medium',
+    };
+
+    constructor(props: FloatButtonGroupProps) {
+        super(props);
+    }
+
+    handleClick = (e) => {
+        if (this.props.disabled) {
+            return;
+        }
+        const item = e.target.closest(`.${prefixCls}-item`);
+        if (!item || !e.currentTarget.contains(item)) {
+            return;
+        }
+        const value = item.dataset.value;
+        this.props.onClick?.(value, e);
+    }
+
+    handleItemClick = (item: FloatButtonGroupItem, e: React.MouseEvent) => {
+        if (this.props.disabled || item.disabled) {
+            e.stopPropagation();
+            return;
+        }
+        if (item.href) {
+            if (item.target === '_blank') {
+                window.open(item.href, '_blank');
+            } else {
+                window.location.href = item.href;
+            }
+        }
+        item.onClick?.(e);
+    }
+
+    render(): JSX.Element {
+        const { className, style, disabled, items } = this.props;
+        return (
+            <div 
+                className={cls(prefixCls, className, {
+                    [`${prefixCls}-disabled`]: disabled,
+                })}
+                style={style}
+                onClick={this.handleClick}
+            >
+                {items.map((item, index) => {
+                    if (item.badge) {
+                        return (
+                            <Badge key={index} {...item.badge}>
+                                <div className={cls(`${prefixCls}-item`, item.className)} style={item.style} data-value={item.value} onClick={e => this.handleItemClick(item, e)}>
+                                    {item.icon}
+                                    {item.content}
+                                </div>
+                            </Badge>
+                        );
+                    }
+                    return (
+                        <div
+                            key={index} 
+                            className={cls(`${prefixCls}-item`, item.className)}
+                            style={item.style}
+                            data-value={item.value}
+                            onClick={e => this.handleItemClick(item, e)}
+                        >
+                            {item.icon}
+                            {item.content}
+                        </div>
+                    );}
+                )}
+            </div>
+        );
+    }
+}

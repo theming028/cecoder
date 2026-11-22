@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GienCoder AI 研发工作台 · Cecoder 转译（真实组件 · 可交互）</title>
+<!--
+  转译方式（标准 AI 消费流程）：
+  1. ai-prompt.md 铁律 + DESIGN.md 固定规范（卡片8px圆角 / 控件32px / 单一主按钮 / 表格36px行高含padding /
+      表头12px / <strong>默认字重500 / 官方图标库 / 禁用态仅Tooltip / 代码12px /
+      AI气泡8px且用户浅蓝底黑字 / 对话栏标题12px / 步骤节点居中+连接线 / 左右两栏可拖拽调宽 /
+      忠实原型交互与布局）
+  2. tokens.css 双层真值 + component-overrides.css 全局覆盖（§8 strong=500）+ 官方 semi.css(2.105.0)
+  3. 真实 React 组件（含 AIChatDialogue / AIChatInput）客户端挂载，全部可交互，缺数据用假数据
+  源文件：_build/ssr/workbench.jsx + workbench.css（esbuild 打包为 app-workbench.js）
+-->
+<link rel="stylesheet" href="cecoder-tokens.css?v=20261124" />
+<link rel="stylesheet" href="semi.css" />
+<link rel="stylesheet" href="component-overrides.css?v=20261124" />
+<link rel="stylesheet" href="page.css?v=20261124" />
+<link rel="stylesheet" href="workbench.css?v=20261124" />
+</head>
+<body>
+<div id="root"></div>
+<script src="app-workbench.js?v=20261124"></script>
+</body>
+</html>

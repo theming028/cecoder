@@ -1,0 +1,74 @@
+[FRAME] "任务 - 3" @(0,0) 1440x900 fill=["#E5EDF5"]
+  [FRAME] "容器 849" @(1252,8) 180x32
+    [FRAME] "Link" @(0,0) 100x32 fill=["#F3F6F9"] r="8px"
+      [FRAME] "tips/question-circle" @(12,9) 14x14 fill=[]
+        [PATH] "Vector" @(0,0) 13.999958992004395x14
+      [TEXT] "使用帮助" @(32,5) 56x22 fill=["#1F1F1F"] tc=[{"start":0,"end":4,"color":"paint_1204:24031"}] TEXT="使用帮助" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+    [FRAME] "Link" @(108,0) 72x32 fill=["#F3F6F9"] r="8px"
+      [FRAME] "容器" @(12,9) 14x14
+        [PATH] "路径" @(0.0155029296875,0) 13.904553413391113x14
+      [TEXT] "设置" @(32,5) 28x22 fill=["#1F1F1F"] tc=[{"start":0,"end":2,"color":"paint_1204:24031"}] TEXT="设置" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+  [PATH] "矩形 481" @(8,48) 1424x852
+  [PATH] "矩形 522" @(8,48) 320x852
+  [FRAME] "容器 1654" @(8,48) 320x44
+    [PATH] "矩形 521" @(0,0) 320x44
+    [INSTANCE] "text/title" @(16,11) 56x22
+      [TEXT] "中电金信" @(0,0) 56x22 fill=["#1F1F1F"] tc=[{"start":0,"end":4,"color":"paint_1204:24031"}] TEXT="任务列表" font={"family":"MiSans","size":14,"style":"Medium","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+    [FRAME] "容器 1653" @(188,8) 116x28
+      [INSTANCE] "Link" @(0,3) 72x22 r="4px"
+        [INSTANCE] "tips/plus" @(0,4) 14x14 fill=[]
+          [PATH] "Vector" @(1.4583332538604736,1.4583332538604736) 11.083333015441895x11.083333015441895
+        [TEXT] "文字链接" @(16,0) 56x22 fill=["#3770F7"] tc=[{"start":0,"end":4,"color":"paint_1204:23101"}] TEXT="新建任务" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+      [PATH] "直线 98" @(?,?) 16x?
+      [FRAME] "容器 575" @(88,0) 28x28
+        [LAYER] "矩形 226" @(0,0) 28x28 fill=["#FFFFFF"] r="4px"
+        [INSTANCE] "icon-wrapper" @(7,7) 14x14
+          [INSTANCE] "direction/to-left" @(0,0) 14x14
+            [PATH] "联集 5" @(2.31,2.94) 9.333333969116211x8.125096321105957
+  [FRAME] "容器 1354" @(1352,812) 56x56
+  [FRAME] "容器 1673" @(16,8) 250x32
+    [INSTANCE] "🚥 Window Controls" @(0,10) 52x12
+    [FRAME] "容器 71" @(72,0) 178x32 fill=["#F3F6F9"] r="8px"
+      [GROUP] "组 9438" @(6,6) 20x20
+        [LAYER] "矩形 243" @(0,0) 20x20 fill=["#3491FA"] r="4px"
+        [INSTANCE] "text/text" @(6,2) 8x16 fill=["#3491FA"]
+          [TEXT] "中电金信" @(0,0) 8x16 fill=["#FFFFFF"] tc=[{"start":0,"end":1,"color":"paint_7:0709"}] TEXT="P" font={"family":"MiSans","size":12,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"auto","letterSpacing":"auto","weight":"500"}
+      [FRAME] "Link" @(34,5) 138x22 r="4px"
+        [TEXT] "PAA团队工作空间..." @(0,0) 122x22 fill=["#1F1F1F"] tc=[{"start":0,"end":12,"color":"paint_1204:26804"}] TEXT="PAA团队工作空间..." font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Regular\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+        [FRAME] "容器" @(126,5) 12x12
+          [PATH] "路径" @(3,1) 6.21999979019165x9.922791481018066
+  [FRAME] "radio-button-group" @(570,8) 300x32 fill=["#D4DDE7"] r="8px"
+    [FRAME] "components/radio-button" @(2,2) 120x28 fill=["#FFFFFF"] r="6px"
+      [FRAME] "容器" @(16,7) 14x14
+        [PATH] "路径" @(1.16668701171875,1.166092872619629) 12.25x11.667243957519531
+      [TEXT] "研发工作台" @(34,3) 70x22 fill=["#1F1F1F"] tc=[{"start":0,"end":5,"color":"paint_1204:24031"}] TEXT="研发工作台" font={"family":"MiSans","size":14,"style":"Medium","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+    [FRAME] "components/radio-button" @(122,3) 88x26 r="8px"
+      [TEXT] "研发作业" @(16,2) 56x22 fill=["#1F1F1F"] tc=[{"start":0,"end":4,"color":"paint_1204:24031"}] TEXT="研发作业" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+    [PATH] "直线 53" @(202,16) 16x0
+    [FRAME] "components/radio-button" @(210,3) 88x26 r="8px"
+      [TEXT] "研发管理" @(16,2) 56x22 fill=["#1F1F1F"] tc=[{"start":0,"end":4,"color":"paint_1204:24031"}] TEXT="研发管理" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+  [FRAME] "容器 1651" @(8,92) 320x40
+    [PATH] "矩形 542" @(0,0) 320x40
+    [FRAME] "tabs/card-gutter" @(16,8) 288x32
+      [FRAME] "_components/tab-card-gutter" @(0,0) 142x32 fill=["#FFFFFF"] r="4px 4px 0px 0px"
+        [TEXT] "标签" @(57,5) 28x22 fill=["#3770F7"] tc=[{"start":0,"end":2,"color":"paint_1204:23101"}] TEXT="任务" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+      [FRAME] "_components/tab-card-gutter" @(146,0) 142x32 fill=["#F7F7F7"] r="4px 4px 0px 0px"
+        [TEXT] "标签" @(47,5) 28x22 fill=["#1F1F1F"] tc=[{"start":0,"end":2,"color":"paint_1204:24031"}] TEXT="会话" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+        [TEXT] "12" @(83,5) 12x22 fill=["#A9A9A9"] tc=[{"start":0,"end":2,"color":"paint_1204:26645"}] TEXT="12" font={"family":"MiSans","size":12,"style":"{\"fontStyle\":\"Regular\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+  [FRAME] "容器 1577" @(24,148) 288x32
+    [FRAME] "Button" @(0,0) 208x32 fill=["#FFFFFF"] r="4px"
+      [INSTANCE] "general/folder-plus" @(52,9) 14x14
+      [TEXT] "添加工作目录" @(72,5) 84x22 fill=["#6B6B6B"] tc=[{"start":0,"end":6,"color":"paint_1204:26804"}] TEXT="添加工作目录" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+    [FRAME] "容器 1574" @(216,0) 72x32
+      [INSTANCE] "icon-wrapper" @(0,0) 32x32 fill=["#F7F7F7"] r="4px"
+        [INSTANCE] "interactive-button/search" @(9,9) 14x14 fill=[]
+          [PATH] "Vector" @(1.095809817314148,1.0959208011627197) 11.437182426452637x11.437182426452637
+      [INSTANCE] "icon-wrapper" @(40,0) 32x32 fill=["#F7F7F7"] r="4px"
+        [INSTANCE] "direction/sort" @(9,9) 14x14
+  [FRAME] "容器 1672" @(136,360) 64x64
+  [INSTANCE] "text/title" @(119,436) 98x24
+    [TEXT] "中电金信" @(0,0) 98x24 fill=["#868686"] tc=[{"start":0,"end":7,"color":"paint_1204:23117"}] TEXT="还没有开发任务" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Regular\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"24","letterSpacing":"auto","weight":"400"}
+  [GROUP] "组 10264" @(327,410) 4x128
+    [LAYER] "矩形 547" @(0,0) 3x128 fill=["#6692F9"]
+  [INSTANCE] "移动边/East West" @(321,471) 16x12
+    [GROUP] "left right" @(0,0) 16x12

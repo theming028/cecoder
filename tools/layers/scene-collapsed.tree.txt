@@ -1,0 +1,23 @@
+[FRAME] "容器 1539" @(0,0) 860x60
+  [PATH] "矩形 526" @(0,0) 860x60
+  [FRAME] "容器 1538" @(20,16) 820x28
+    [FRAME] "容器 1537" @(0,2) 370x24
+      [INSTANCE] "text/title" @(0,0) 96x24
+        [TEXT] "中电金信" @(0,0) 96x24 fill=["#1F1F1F"] tc=[{"start":0,"end":6,"color":"paint_1204:24031"}] TEXT="用户洞察看板" font={"family":"MiSans","size":16,"style":"Medium","decoration":"none","case":"none","lineHeight":"24","letterSpacing":"auto","weight":"500"}
+      [INSTANCE] "text/text" @(108,2) 262x20
+        [TEXT] "中电金信" @(0,0) 262x20 fill=["#868686"] tc=[{"start":0,"end":32,"color":"paint_1204:23117"}] TEXT="基于 11 个任务 · 23 / 52 个工序节点 · 仅你可见" font={"family":"MiSans","size":12,"style":"Regular","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+    [FRAME] "容器 1535" @(596,0) 224x28
+      [FRAME] "Button" @(0,0) 90x28 fill=["#FFFFFF"] r="4px"
+        [FRAME] "容器" @(8,7) 14x14
+          [PATH] "路径" @(1.4500000476837158,0.550000011920929) 11.03631591796875x12.880000114440918
+        [TEXT] "分身建议" @(26,4) 56x20 fill=["#1F1F1F"] tc=[{"start":0,"end":4,"color":"paint_1204:24031"}] TEXT="分身建议" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+      [FRAME] "Button" @(98,0) 90x28 fill=["#FFFFFF"] r="4px"
+        [INSTANCE] "icon-wrapper" @(8,7) 14x14
+          [INSTANCE] "direction/expand" @(0,0) 14x14
+            [PATH] "联集 13" @(1.75,1.75) 10.499836921691895x10.49998950958252
+        [TEXT] "更多数据" @(26,4) 56x20 fill=["#1F1F1F"] tc=[{"start":0,"end":4,"color":"paint_1204:24031"}] TEXT="更多数据" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+      [FRAME] "容器 1534" @(196,0) 28x28
+        [LAYER] "矩形 543" @(0,0) 28x27.999998092651367 fill=["#FFFFFF"] r="4px"
+        [INSTANCE] "icon-wrapper" @(7,7) 14x14
+          [INSTANCE] "direction/up" @(0,0) 14x14
+            [PATH] "路径" @(8,14) 32.72713088989258x20

@@ -1,0 +1,147 @@
+{
+ "styles": {
+  "font_73:3750": {
+   "value": {
+    "family": "MiSans",
+    "size": 14,
+    "style": "Regular",
+    "decoration": "none",
+    "case": "none",
+    "lineHeight": "22",
+    "letterSpacing": "auto",
+    "weight": "400"
+   }
+  },
+  "paint_1204:23101": {
+   "value": [
+    "#3770F7"
+   ],
+   "token": "主色/@colorPrimaryBlue6"
+  },
+  "paint_1204:23117": {
+   "value": [
+    "#868686"
+   ],
+   "token": "文本/@color-text-3"
+  },
+  "paint_1204:39048": {
+   "value": [
+    "#F5F8FF"
+   ],
+   "token": "主色/@colorPrimaryBlue1"
+  },
+  "paint_1415:23489": {
+   "value": [
+    "#8EAEFA"
+   ],
+   "token": "主色/@colorPrimaryBlue4"
+  }
+ },
+ "nodes": [
+  {
+   "type": "INSTANCE",
+   "id": "nk2868:57925",
+   "name": "Link",
+   "layoutStyle": {
+    "width": 66,
+    "height": 32,
+    "relativeX": 0,
+    "relativeY": 0
+   },
+   "borderRadius": "4px",
+   "flexContainerInfo": {
+    "flexDirection": "row",
+    "alignItems": "center",
+    "mainSizing": "auto",
+    "crossSizing": "auto",
+    "gap": "4px",
+    "padding": "5px 0px"
+   },
+   "fill": "paint_1204:39048",
+   "_color": "#F5F8FF",
+   "_token": "主色/@colorPrimaryBlue1",
+   "strokeColor": "paint_1415:23489",
+   "strokeType": "dashed",
+   "strokeAlign": "inside",
+   "strokeWidth": "1px",
+   "componentInfo": {
+    "componentSetDescription": "链接",
+    "properties": {
+     "类型": "默认",
+     "状态": "默认"
+    }
+   },
+   "children": [
+    {
+     "type": "INSTANCE",
+     "id": "nk2868:57925/1204:37533",
+     "name": "tips/plus",
+     "layoutStyle": {
+      "width": 14,
+      "height": 14,
+      "relativeX": 10,
+      "relativeY": 9,
+      "preserveRatio": true
+     },
+     "componentInfo": {},
+     "children": [
+      {
+       "type": "PATH",
+       "id": "nk2868:57925/1204:37533/1204:34018",
+       "name": "Vector",
+       "layoutStyle": {
+        "width": 11.083333015441895,
+        "height": 11.083333015441895,
+        "relativeX": 1.4583332538604736,
+        "relativeY": 1.4583332538604736,
+        "constraint": {
+         "horizontal": "SCALE",
+         "vertical": "SCALE"
+        }
+       },
+       "path": [
+        {
+         "fill": "paint_1204:23101",
+         "data": "M22,21.015514C22,18.011985,22,8.9880152,22,5.98448521C22,5.43220019,22.467018,5,23.019302,5C23.620695,5,24.379303,5,24.980696,5C25.532982,5,25.999998,5.43220019,25.999998,5.98448503C26,8.9880147,26,18.011985,26,21.015514C25.999998,21.567799,26.432199,22,26.984484,22C29.988014,22,39.011986,22,42.015514,22C42.567799,22,42.999996,22.467018,42.999996,23.019302C43,23.620695,43,24.379303,43,24.980696C42.999996,25.532982,42.567799,25.999998,42.015514,25.999998C39.011986,26,29.988016,26,26.984486,26C26.432199,25.999998,25.999998,26.432199,25.999998,26.984484C26,29.988014,26,39.011986,26,42.015514C25.999998,42.567799,25.532982,42.999996,24.980698,42.999996C24.379305,43,23.620697,43,23.019304,43C22.467018,42.999996,22,42.567799,22,42.015514C22,39.011986,22,29.988016,22,26.984486C22,26.432199,21.567799,25.999998,21.015514,25.999998C18.011985,26,8.9880152,26,5.98448521,26C5.43220019,25.999998,5,25.532982,5,24.980698C5,24.379305,5,23.620697,5,23.019304C5,22.467018,5.43220019,22,5.98448503,22C8.9880147,22,18.011985,22,21.015514,22C21.567799,22,22,21.567799,22,21.015514",
+         "fillType": 1
+        }
+       ]
+      }
+     ],
+     "componentId": "1204:34017"
+    },
+    {
+     "type": "TEXT",
+     "id": "nk2868:57925/1204:37529",
+     "name": "文字链接",
+     "layoutStyle": {
+      "width": 28,
+      "height": 22,
+      "relativeX": 28,
+      "relativeY": 5
+     },
+     "fill": "paint_1204:23117",
+     "_color": "#868686",
+     "_token": "文本/@color-text-3",
+     "text": [
+      {
+       "text": "新建",
+       "font": "font_73:3750"
+      }
+     ],
+     "textColor": [
+      {
+       "start": 0,
+       "end": 2,
+       "color": "paint_1204:23101"
+      }
+     ],
+     "textAlign": "left",
+     "textMode": "single-line"
+    }
+   ],
+   "componentId": "1204:37528"
+  }
+ ],
+ "components": []
+}

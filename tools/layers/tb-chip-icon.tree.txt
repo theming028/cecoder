@@ -1,0 +1,25 @@
+[FRAME] "容器 1589" @(0,0) 416x32
+  [FRAME] "Link" @(0,0) 66x32 fill=["#F5F8FF"] r="4px"
+    [FRAME] "容器" @(10,9) 14x14
+      [PATH] "路径" @(0.583343505859375,0) 13.416666984558105x12.833333015441895
+    [TEXT] "通用" @(28,5) 28x22 fill=["#3770F7"] tc=[{"start":0,"end":2,"color":"paint_1204:23101"}] TEXT="通用" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+  [FRAME] "Link" @(70,0) 66x32 fill=["#F5F8FF"] r="4px"
+    [FRAME] "容器" @(10,9) 14x14
+      [PATH] "路径" @(0.875,0.875) 12.25x12.250001907348633
+    [TEXT] "文字链接" @(28,5) 28x22 fill=["#3770F7"] tc=[{"start":0,"end":2,"color":"paint_1204:23101"}] TEXT="需求" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+  [FRAME] "Link" @(140,0) 66x32 fill=["#F5F8FF"] r="4px"
+    [FRAME] "容器" @(10,9) 14x14
+      [PATH] "路径" @(1,1) 12x12.012505531311035
+    [TEXT] "文字链接" @(28,5) 28x22 fill=["#3770F7"] tc=[{"start":0,"end":2,"color":"paint_1204:23101"}] TEXT="架构" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+  [FRAME] "Link" @(210,0) 66x32 fill=["#F5F8FF"] r="4px"
+    [FRAME] "容器" @(10,9) 14x14
+      [PATH] "路径" @(1,1) 12x12.656758308410645
+    [TEXT] "文字链接" @(28,5) 28x22 fill=["#3770F7"] tc=[{"start":0,"end":2,"color":"paint_1204:23101"}] TEXT="交互" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+  [FRAME] "Link" @(280,0) 66x32 fill=["#F5F8FF"] r="4px"
+    [FRAME] "容器" @(10,9) 14x14
+      [PATH] "路径" @(0.5,1) 12.880000114440918x11.592000007629395
+    [TEXT] "文字链接" @(28,5) 28x22 fill=["#3770F7"] tc=[{"start":0,"end":2,"color":"paint_1204:23101"}] TEXT="开发" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+  [FRAME] "Link" @(350,0) 66x32 fill=["#F5F8FF"] r="4px"
+    [FRAME] "容器" @(10,9) 14x14
+      [PATH] "路径" @(1,0) 12.204645156860352x12.880000114440918
+    [TEXT] "文字链接" @(28,5) 28x22 fill=["#3770F7"] tc=[{"start":0,"end":2,"color":"paint_1204:23101"}] TEXT="测试" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}

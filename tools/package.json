@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@mastergo/magic-mcp": "^0.2.22",
+    "puppeteer-core": "^23.11.1"
+  }
+}

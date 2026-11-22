@@ -1,0 +1,144 @@
+/* Cecoder page layout — 容器与自定义部分；标准控件由真实 semi.css 负责 */
+body{
+  --cds-color-ai:rgba(var(--cds-color-ai),1);
+  --cds-color-ai-bg:rgba(var(--semi-ai-purple-0),1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--cds-bg-page);color:var(--cds-text-primary);font-family:var(--cds-font-family);font-size:var(--cds-font-sm);line-height:var(--cds-line-sm);-webkit-font-smoothing:antialiased;overflow:hidden}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--cds-fill-active);border-radius:var(--cds-radius-full);border:2px solid transparent;background-clip:content-box}
+.cds-app{display:flex;flex-direction:column;height:100vh}
+
+/* topbar */
+.cds-topbar{height:52px;flex:0 0 52px;display:flex;align-items:center;gap:var(--cds-space-3);padding:0 var(--cds-space-4);background:var(--cds-bg-container);border-bottom:1px solid var(--cds-border);z-index:10}
+.cds-brand{display:flex;align-items:center;gap:var(--cds-space-3);font-weight:var(--cds-font-weight-bold);white-space:nowrap;color:var(--cds-text-primary);font-size:var(--cds-font-h6)}
+.cds-brand .logo{width:26px;height:26px;border-radius:var(--cds-radius-md);background:var(--cds-color-primary);display:grid;place-items:center;color:var(--cds-text-inverse);font-size:14px}
+.cds-brand small{color:var(--cds-text-tertiary);font-weight:var(--cds-font-weight-regular);font-size:var(--cds-font-xs)}
+.cds-workdir{color:var(--cds-text-secondary)!important;font-size:var(--cds-font-xs)!important}
+.cds-spacer{flex:1}
+.cds-theme{margin-left:0}
+
+/* main columns */
+.cds-main{flex:1;display:flex;min-height:0}
+.cds-col{display:flex;flex-direction:column;min-height:0;background:var(--cds-bg-container)}
+#col-left{width:300px;flex:0 0 auto;border-right:1px solid var(--cds-border)}
+#col-mid{flex:1 1 auto;min-width:340px;background:var(--cds-bg-page)}
+#col-right{width:380px;flex:0 0 auto;border-left:1px solid var(--cds-border)}
+.cds-col-head{height:46px;flex:0 0 46px;display:flex;align-items:center;gap:var(--cds-space-3);padding:0 var(--cds-space-4);border-bottom:1px solid var(--cds-border)}
+.cds-list-actions{padding:var(--cds-space-3) var(--cds-space-4)}
+.cds-task-list{flex:1;overflow-y:auto;padding:var(--cds-space-1) var(--cds-space-4) var(--cds-space-4)}
+
+/* task cards */
+.cds-task{background:var(--cds-bg-container)!important;border:1px solid var(--cds-border)!important;border-radius:var(--cds-radius-card)!important;padding:var(--cds-space-4)!important;margin-bottom:var(--cds-space-3)!important;cursor:pointer;transition:.15s}
+.cds-task:hover{border-color:var(--cds-color-primary)!important;box-shadow:var(--cds-shadow-2)}
+.cds-task.sel{border-color:var(--cds-color-primary)!important;background:var(--cds-color-primary-bg)!important}
+.cds-task.is-error{border-left:3px solid var(--cds-color-danger)!important}
+.cds-task-top{display:flex;align-items:center;gap:var(--cds-space-2);margin-bottom:var(--cds-space-2);flex-wrap:wrap}
+.cds-task-title{font-weight:var(--cds-font-weight-bold);font-size:var(--cds-font-h6);line-height:1.35;flex:1;min-width:0}
+.cds-task-meta{font-size:var(--cds-font-xs);color:var(--cds-text-tertiary);margin-bottom:var(--cds-space-3)}
+.cds-stages{display:flex;gap:var(--cds-space-1)}
+.cds-stages .s{height:5px;flex:1;border-radius:var(--cds-radius-full);background:var(--cds-fill-active)}
+.cds-stages .s.done{background:var(--cds-color-success)}.cds-stages .s.now{background:var(--cds-color-primary)}.cds-stages .s.att{background:var(--cds-color-warning)}.cds-stages .s.err{background:var(--cds-color-danger)}
+
+/* mid */
+.cds-mid-head{min-height:56px;flex:0 0 auto;display:flex;align-items:center;gap:var(--cds-space-4);padding:var(--cds-space-3) var(--cds-space-5);border-bottom:1px solid var(--cds-border);flex-wrap:wrap;background:var(--cds-bg-container)}
+.cds-mid-title{font-weight:var(--cds-font-weight-bold);font-size:var(--cds-font-h5)}
+.cds-mid-sub{font-size:var(--cds-font-xs);color:var(--cds-text-tertiary)}
+.cds-mid-body{flex:1;overflow-y:auto;padding:var(--cds-space-4) var(--cds-space-5);background:var(--cds-fill)}
+.cds-sec-h{font-size:var(--cds-font-xs);font-weight:var(--cds-font-weight-bold);letter-spacing:.4px;color:var(--cds-text-tertiary);text-transform:uppercase;margin:var(--cds-space-4) 0 var(--cds-space-3)}
+.cds-mid-foot{min-height:52px;flex:0 0 auto;display:flex;align-items:center;gap:var(--cds-space-3);padding:var(--cds-space-3) var(--cds-space-5);border-top:1px solid var(--cds-border);background:var(--cds-bg-container)}
+.cds-hint{font-size:var(--cds-font-xs);color:var(--cds-text-tertiary)}
+
+/* attention cards */
+.cds-inbox{display:flex;gap:var(--cds-space-3);overflow-x:auto;padding-bottom:var(--cds-space-3)}
+.cds-att{flex:0 0 auto;width:300px;background:var(--cds-bg-container)!important;border:1px solid var(--cds-border)!important;border-radius:var(--cds-radius-card)!important;padding:var(--cds-space-4)!important}
+.cds-att.decision{border-top:3px solid var(--cds-color-ai)!important}
+.cds-att.hesitate{border-top:3px solid var(--cds-color-warning)!important}
+.cds-att.review{border-top:3px solid var(--cds-color-success)!important}
+.cds-att-k{font-size:var(--cds-font-xs);font-weight:var(--cds-font-weight-bold);margin-bottom:var(--cds-space-2)}
+.cds-att.decision .cds-att-k{color:var(--cds-color-ai)}.cds-att.hesitate .cds-att-k{color:var(--cds-color-warning)}.cds-att.review .cds-att-k{color:var(--cds-color-success)}
+.cds-att-t{font-weight:var(--cds-font-weight-bold);font-size:var(--cds-font-sm);margin-bottom:var(--cds-space-2)}
+.cds-att-b{font-size:var(--cds-font-xs);color:var(--cds-text-secondary);line-height:1.5;margin-bottom:var(--cds-space-3)}
+.cds-att-row{display:flex;gap:var(--cds-space-2);flex-wrap:wrap}
+
+/* pipeline */
+.cds-pipe{display:flex;align-items:center;flex-wrap:wrap;row-gap:var(--cds-space-3)}
+.cds-node{flex:0 0 auto;min-width:104px;background:var(--cds-bg-container)!important;border:1px solid var(--cds-border)!important;border-radius:var(--cds-radius-card)!important;padding:var(--cds-space-3)!important}
+.cds-node:hover{border-color:var(--cds-color-primary)!important}
+.cds-node.running{border-color:var(--cds-color-ai)!important;box-shadow:0 0 0 1px var(--cds-color-ai)}
+.cds-node.done{border-color:var(--cds-color-success)!important}
+.cds-node.pending{opacity:.62}
+.cds-node-name{font-weight:var(--cds-font-weight-bold);font-size:var(--cds-font-sm)}
+.cds-node-status{display:inline-flex;align-items:center;gap:var(--cds-space-2);font-size:10.5px;padding:1px var(--cds-space-3);border-radius:var(--cds-radius-full);margin-top:var(--cds-space-2)}
+.cds-node-status .d{width:7px;height:7px;border-radius:var(--cds-radius-circle)}
+.st-idle{color:var(--cds-text-tertiary);background:var(--cds-fill)}.st-idle .d{background:var(--cds-text-tertiary)}
+.st-run{color:var(--cds-color-ai);background:var(--cds-color-ai-bg)}.st-run .d{background:var(--cds-color-ai);animation:cds-pulse 1.1s infinite}
+.st-done{color:var(--cds-color-success);background:var(--cds-color-success-bg)}.st-done .d{background:var(--cds-color-success)}
+.st-att{color:var(--cds-color-warning);background:var(--cds-color-warning-bg)}.st-att .d{background:var(--cds-color-warning)}
+.cds-parr{flex:0 0 20px;display:grid;place-items:center;color:var(--cds-text-disabled)}
+@keyframes cds-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* viewer */
+.cds-viewer{border:1px solid var(--cds-border)!important;border-radius:var(--cds-radius-card)!important;overflow:hidden;background:var(--cds-bg-container)!important;padding:0!important;margin-top:var(--cds-space-5)}
+.cds-vd-hd{display:flex;align-items:center;gap:var(--cds-space-3);padding:var(--cds-space-3) var(--cds-space-5);border-bottom:1px solid var(--cds-border);font-weight:var(--cds-font-weight-bold)}
+.cds-vd-body{padding:var(--cds-space-4) var(--cds-space-5)}
+
+/* right copilot */
+.cds-ai-head{height:46px;flex:0 0 46px;display:flex;align-items:center;gap:var(--cds-space-3);padding:0 var(--cds-space-4);border-bottom:1px solid var(--cds-border)}
+.cds-ai-head .nm{font-weight:var(--cds-font-weight-bold);font-size:var(--cds-font-sm)}
+.cds-ai-head .st{font-size:10.5px;color:var(--cds-text-tertiary)}
+.cds-ai-scope{margin-left:auto;font-size:10.5px;color:var(--cds-color-primary);border:1px solid var(--cds-color-primary);padding:1px var(--cds-space-3);border-radius:var(--cds-radius-full);background:var(--cds-color-primary-bg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.cds-ai-msgs{flex:1;overflow-y:auto;padding:var(--cds-space-4)}
+.cds-msg{margin-bottom:var(--cds-space-4);display:flex;gap:var(--cds-space-3)}
+.cds-msg.me{flex-direction:row-reverse}
+.cds-bubble{background:var(--cds-bg-container)!important;border:1px solid var(--cds-border)!important;border-radius:var(--cds-radius-card)!important;padding:var(--cds-space-3) var(--cds-space-4)!important;font-size:var(--cds-font-sm);line-height:1.65;max-width:86%}
+.cds-msg.me .cds-bubble{background:var(--cds-color-primary-bg)!important;border-color:var(--cds-color-primary)!important}
+.cds-ai-input{border-top:1px solid var(--cds-border);padding:var(--cds-space-3);background:var(--cds-bg-container)}
+.cds-chatbox{margin-bottom:var(--cds-space-2)}
+.cds-sendrow{display:flex;justify-content:flex-end;gap:var(--cds-space-2);margin-top:var(--cds-space-2)}
+.cds-sugg{display:flex;gap:var(--cds-space-2);margin-top:var(--cds-space-3);flex-wrap:wrap}
+
+@media (max-width:1180px){#col-right{display:none}}
+@media (max-width:900px){#col-left{display:none}}
+
+/* interactive additions */
+.cds-themewrap{display:inline-flex;align-items:center}
+.cds-autorun{display:inline-flex;align-items:center}
+.cds-node.focus{outline:2px solid var(--cds-color-primary);outline-offset:1px}
+.cds-sug{cursor:pointer;transition:.12s}
+.cds-sug:hover{border-color:var(--cds-color-primary);color:var(--cds-text-primary)}
+
+/* 规范：表格表头 12px；默认行高 36px = 含 padding 的总高（垂直 padding 压到 8px 配合 border-box height） */
+.semi-table .semi-table-row-head{font-size:var(--cds-table-header-font-size)!important}
+.semi-table-tbody>.semi-table-row>.semi-table-row-cell,.semi-table-thead>.semi-table-row>.semi-table-row-head{box-sizing:border-box!important;height:var(--cds-table-row-height)!important;padding-top:var(--cds-space-3)!important;padding-bottom:var(--cds-space-3)!important;line-height:18px}
+/* 规范：AI 消息操作栏默认不显示 */
+.semi-ai-chat-dialogue-action,.semi-ai-chat-dialogue-action-show{display:none!important}
+/* 规范：AI 建议条用小一号尺寸 */
+.semi-ai-chat-dialogue-hints .semi-ai-chat-dialogue-hint-item{padding:4px var(--cds-space-3)}
+.semi-ai-chat-dialogue-hints .semi-ai-chat-dialogue-hint-content{font-size:var(--cds-font-xs)}
+.semi-ai-chat-dialogue-hints{row-gap:6px;margin-top:var(--cds-space-2);margin-bottom:var(--cds-space-3)}
+
+/* 规范：禁用态 hover 无任何样式变化 */
+.semi-button[aria-disabled="true"]:hover,.semi-button.semi-button-disabled:hover,button:disabled:hover{filter:none;box-shadow:none;transform:none}
+
+/* 真实 AIChatDialogue / AIChatInput 适配右栏 */
+.cds-ai-msgs{display:flex;flex-direction:column}
+.cds-ai-msgs .semi-ai-chat-dialogue-container{flex:1;min-height:0;width:100%}
+.cds-ai-input{display:block}
+.cds-ai-input .semi-ai-chat-input,.cds-ai-input [class*="aiChatInput"],.cds-ai-input [class*="ai-chat-input"]{width:100%}
+
+/* ===== Cecoder 规范补充（本轮）===== */
+/* 规范：下拉/选择器选项列表容器内边距统一 8px（--cds-space-3） */
+.semi-select-option-list-wrapper{padding:var(--cds-space-3)}
+/* 规范：AI 对话气泡圆角固定 8px（--cds-radius-card） */
+.semi-ai-chat-dialogue-content-bubble,
+.semi-ai-chat-dialogue-content-userBubble{border-radius:var(--cds-radius-card)}
+/* 规范：用户发送的气泡使用蓝色系（primary 底 + 反白文字）。
+   运行时用户气泡的真实类名是 .semi-ai-chat-dialogue-content-user（mode=bubble 下与助手共用 -bubble）；
+   .semi-ai-chat-dialogue-content-userBubble 仅在 mode=userBubble 时出现，一并覆盖。 */
+.semi-ai-chat-dialogue-content-bubble.semi-ai-chat-dialogue-content-user,
+.semi-ai-chat-dialogue-content-userBubble{background:var(--cds-color-primary);color:var(--cds-text-inverse)}
+.semi-ai-chat-dialogue-content-bubble.semi-ai-chat-dialogue-content-user .semi-markdown-body,
+.semi-ai-chat-dialogue-content-bubble.semi-ai-chat-dialogue-content-user *,
+.semi-ai-chat-dialogue-content-userBubble .semi-markdown-body,
+.semi-ai-chat-dialogue-content-userBubble *{color:var(--cds-text-inverse)}

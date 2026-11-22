@@ -1,0 +1,1610 @@
+{
+ "styles": {
+  "effect_6:097": {
+   "value": [
+    "box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);"
+   ],
+   "token": "shadow/@shadow-special"
+  },
+  "font_2815:45570": {
+   "value": {
+    "family": "MiSans",
+    "size": 20,
+    "style": "{\"fontStyle\":\"Semibold\",\"opsz\":\"auto\"}",
+    "decoration": "none",
+    "case": "none",
+    "lineHeight": "28",
+    "letterSpacing": "auto",
+    "weight": "600"
+   }
+  },
+  "font_406:06539": {
+   "value": {
+    "family": "MiSans",
+    "size": 14,
+    "style": "Regular",
+    "decoration": "none",
+    "case": "none",
+    "lineHeight": "20",
+    "letterSpacing": "auto",
+    "weight": "400"
+   }
+  },
+  "font_6:334": {
+   "value": {
+    "family": "MiSans",
+    "size": 16,
+    "style": "Medium",
+    "decoration": "none",
+    "case": "none",
+    "lineHeight": "24",
+    "letterSpacing": "auto",
+    "weight": "500"
+   }
+  },
+  "font_73:5972": {
+   "value": {
+    "family": "MiSans",
+    "size": 12,
+    "style": "Regular",
+    "decoration": "none",
+    "case": "none",
+    "lineHeight": "20",
+    "letterSpacing": "auto",
+    "weight": "400"
+   }
+  },
+  "font_7:0592": {
+   "value": {
+    "family": "MiSans",
+    "size": 12,
+    "style": "{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}",
+    "decoration": "none",
+    "case": "none",
+    "lineHeight": "20",
+    "letterSpacing": "auto",
+    "weight": "500"
+   }
+  },
+  "paint_1204:23101": {
+   "value": [
+    "#3770F7"
+   ],
+   "token": "主色/@colorPrimaryBlue6"
+  },
+  "paint_1204:23117": {
+   "value": [
+    "#868686"
+   ],
+   "token": "文本/@color-text-3"
+  },
+  "paint_1204:24031": {
+   "value": [
+    "#1F1F1F"
+   ],
+   "token": "文本/@color-text-1"
+  },
+  "paint_1204:26639": {
+   "value": [
+    "#6692F9"
+   ],
+   "token": "主色/@colorPrimaryBlue5"
+  },
+  "paint_1204:26804": {
+   "value": [
+    "#6B6B6B"
+   ],
+   "token": "文本/@color-text-2"
+  },
+  "paint_1204:39048": {
+   "value": [
+    "#F5F8FF"
+   ],
+   "token": "主色/@colorPrimaryBlue1"
+  },
+  "paint_2452:37443": {
+   "value": [
+    "#EEEEEE"
+   ],
+   "token": "线条/@color-border-1"
+  },
+  "paint_43:1511": {
+   "value": [
+    "#FFFFFF"
+   ]
+  },
+  "paint_5:7": {
+   "value": [
+    "#FFFFFF"
+   ],
+   "token": "填充/@colorFillWhite"
+  },
+  "paint_7:2422": {
+   "value": [
+    "#F53F3F"
+   ],
+   "token": "错误/@colorDanger-6"
+  },
+  "paint_nk2868:43756": {
+   "value": [
+    "#F7F7F7"
+   ]
+  },
+  "paint_nk2868:49802": {
+   "value": [
+    "rgba(102, 146, 249, 0.1)"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "type": "FRAME",
+   "id": "2960:48845",
+   "name": "容器 1536",
+   "layoutStyle": {
+    "width": 860,
+    "height": 192,
+    "relativeX": 0,
+    "relativeY": 0
+   },
+   "children": [
+    {
+     "type": "PATH",
+     "id": "nk2868:57986",
+     "name": "矩形 526",
+     "layoutStyle": {
+      "width": 860,
+      "height": 192,
+      "relativeX": 0,
+      "relativeY": 0
+     },
+     "path": [
+      {
+       "fill": "paint_nk2868:43756",
+       "data": "M0,8.0000019L0,184C0,188.41827,3.5817208,192,7.9999971,192L852.00006,192C856.41833,192,860.00006,188.41827,860.00006,184L860.00006,8C860.00006,3.5817213,856.41833,0,852.00006,0L7.9999995,0C3.5817208,0,0,3.5817213,0,8.0000019Z"
+      },
+      {
+       "fill": "paint_2452:37443",
+       "data": "M0,8.0000019L0,184C0,188.41827,3.5817208,192,7.9999971,192L852.00006,192C856.41833,192,860.00006,188.41827,860.00006,184L860.00006,8C860.00006,3.5817213,856.41833,0,852.00006,0L7.9999995,0C3.5817208,0,0,3.5817213,0,8.0000019ZM1,8.0000019L1,184Q1,186.89951,3.050252,188.94975Q5.100503,191,7.9999976,191L852.00012,191Q854.89954,191,856.94983,188.94975Q859.00012,186.89948,859.00012,184L859.00012,8Q859.00012,5.1005359,856.94983,3.0502548Q854.89954,1.0000005,852.00012,1.0000007L7.9999995,1Q5.1005039,1,3.0502524,3.0502524Q1.0000008,5.1005044,1,8.0000019Z"
+      }
+     ]
+    },
+    {
+     "type": "FRAME",
+     "id": "nk2868:57987",
+     "name": "容器 1374",
+     "layoutStyle": {
+      "width": 262,
+      "height": 48,
+      "relativeX": 20,
+      "relativeY": 20
+     },
+     "children": [
+      {
+       "type": "INSTANCE",
+       "id": "nk2868:57988",
+       "name": "text/title",
+       "layoutStyle": {
+        "width": 96,
+        "height": 24,
+        "relativeX": 0,
+        "relativeY": 0
+       },
+       "componentInfo": {},
+       "children": [
+        {
+         "type": "TEXT",
+         "id": "nk2868:57988/1204:35260",
+         "name": "中电金信",
+         "layoutStyle": {
+          "width": 96,
+          "height": 24,
+          "relativeX": 0,
+          "relativeY": 0
+         },
+         "fill": "paint_1204:24031",
+         "_color": "#1F1F1F",
+         "_token": "文本/@color-text-1",
+         "text": [
+          {
+           "text": "用户洞察看板",
+           "font": "font_6:334"
+          }
+         ],
+         "textColor": [
+          {
+           "start": 0,
+           "end": 6,
+           "color": "paint_1204:24031"
+          }
+         ],
+         "textAlign": "left",
+         "textMode": "single-line"
+        }
+       ],
+       "componentId": "1204:35259"
+      },
+      {
+       "type": "INSTANCE",
+       "id": "nk2868:57996",
+       "name": "text/text",
+       "layoutStyle": {
+        "width": 262,
+        "height": 20,
+        "relativeX": 0,
+        "relativeY": 28
+       },
+       "componentInfo": {
+        "componentSetDescription": "文本",
+        "properties": {
+         "层级": "主要",
+         "标记": "False",
+         "块引用": "False",
+         "复制": "false",
+         "编辑": "false"
+        }
+       },
+       "children": [
+        {
+         "type": "TEXT",
+         "id": "nk2868:57996/1204:35210",
+         "name": "中电金信",
+         "layoutStyle": {
+          "width": 262,
+          "height": 20,
+          "relativeX": 0,
+          "relativeY": 0
+         },
+         "fill": "paint_1204:23117",
+         "_color": "#868686",
+         "_token": "文本/@color-text-3",
+         "text": [
+          {
+           "text": "基于 11 个任务 · 23 / 52 个工序节点 · 仅你可见",
+           "font": "font_73:5972"
+          }
+         ],
+         "textColor": [
+          {
+           "start": 0,
+           "end": 32,
+           "color": "paint_1204:23117"
+          }
+         ],
+         "textAlign": "left",
+         "textMode": "single-line"
+        }
+       ],
+       "componentId": "1204:35209"
+      }
+     ],
+     "flexContainerInfo": {
+      "flexDirection": "column",
+      "mainSizing": "auto",
+      "crossSizing": "auto",
+      "gap": "4px"
+     }
+    },
+    {
+     "type": "FRAME",
+     "id": "2960:48828",
+     "name": "容器 1533",
+     "layoutStyle": {
+      "width": 820,
+      "height": 88,
+      "relativeX": 20,
+      "relativeY": 84
+     },
+     "children": [
+      {
+       "type": "FRAME",
+       "id": "nk2868:58019",
+       "name": "容器 1466",
+       "layoutStyle": {
+        "width": 143,
+        "height": 88,
+        "relativeX": 155,
+        "relativeY": 0
+       },
+       "children": [
+        {
+         "type": "LAYER",
+         "id": "nk2868:58020",
+         "name": "矩形 528",
+         "layoutStyle": {
+          "width": 143,
+          "height": 88,
+          "relativeX": 0,
+          "relativeY": 0
+         },
+         "borderRadius": "8px",
+         "fill": "paint_43:1511",
+         "_color": "#FFFFFF",
+         "effect": "effect_6:097"
+        },
+        {
+         "type": "FRAME",
+         "id": "nk2868:58021",
+         "name": "容器 1376",
+         "layoutStyle": {
+          "width": 48,
+          "height": 72,
+          "relativeX": 20,
+          "relativeY": 8
+         },
+         "children": [
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58022",
+           "name": "text/text",
+           "layoutStyle": {
+            "width": 36,
+            "height": 20,
+            "relativeX": 0,
+            "relativeY": 0
+           },
+           "componentInfo": {
+            "componentSetDescription": "文本",
+            "properties": {
+             "层级": "主要",
+             "标记": "False",
+             "块引用": "False",
+             "复制": "false",
+             "编辑": "false"
+            }
+           },
+           "children": [
+            {
+             "type": "TEXT",
+             "id": "nk2868:58022/1204:35210",
+             "name": "中电金信",
+             "layoutStyle": {
+              "width": 36,
+              "height": 20,
+              "relativeX": 0,
+              "relativeY": 0
+             },
+             "fill": "paint_1204:26804",
+             "_color": "#6B6B6B",
+             "_token": "文本/@color-text-2",
+             "text": [
+              {
+               "text": "进行中",
+               "font": "font_7:0592"
+              }
+             ],
+             "textColor": [
+              {
+               "start": 0,
+               "end": 3,
+               "color": "paint_1204:26804"
+              }
+             ],
+             "textAlign": "left",
+             "textMode": "single-line"
+            }
+           ],
+           "componentId": "1204:35209"
+          },
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58027",
+           "name": "text/title",
+           "layoutStyle": {
+            "width": 13,
+            "height": 28,
+            "relativeX": 0,
+            "relativeY": 22
+           },
+           "componentInfo": {},
+           "children": [
+            {
+             "type": "TEXT",
+             "id": "nk2868:58027/1204:35260",
+             "name": "中电金信",
+             "layoutStyle": {
+              "width": 13,
+              "height": 28,
+              "relativeX": 0,
+              "relativeY": 0
+             },
+             "fill": "paint_1204:24031",
+             "_color": "#1F1F1F",
+             "_token": "文本/@color-text-1",
+             "text": [
+              {
+               "text": "2",
+               "font": "font_2815:45570"
+              }
+             ],
+             "textColor": [
+              {
+               "start": 0,
+               "end": 1,
+               "color": "paint_1204:24031"
+              }
+             ],
+             "textAlign": "left",
+             "textMode": "single-line"
+            }
+           ],
+           "componentId": "1204:35259"
+          },
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58035",
+           "name": "text/text",
+           "layoutStyle": {
+            "width": 48,
+            "height": 20,
+            "relativeX": 0,
+            "relativeY": 52
+           },
+           "componentInfo": {
+            "componentSetDescription": "文本",
+            "properties": {
+             "层级": "主要",
+             "标记": "False",
+             "块引用": "False",
+             "复制": "false",
+             "编辑": "false"
+            }
+           },
+           "children": [
+            {
+             "type": "TEXT",
+             "id": "nk2868:58035/1204:35210",
+             "name": "中电金信",
+             "layoutStyle": {
+              "width": 48,
+              "height": 20,
+              "relativeX": 0,
+              "relativeY": 0
+             },
+             "fill": "paint_1204:23117",
+             "_color": "#868686",
+             "_token": "文本/@color-text-3",
+             "text": [
+              {
+               "text": "正在推进",
+               "font": "font_73:5972"
+              }
+             ],
+             "textColor": [
+              {
+               "start": 0,
+               "end": 4,
+               "color": "paint_1204:23117"
+              }
+             ],
+             "textAlign": "left",
+             "textMode": "single-line"
+            }
+           ],
+           "componentId": "1204:35209"
+          }
+         ],
+         "flexContainerInfo": {
+          "flexDirection": "column",
+          "mainSizing": "auto",
+          "crossSizing": "auto",
+          "gap": "2px"
+         }
+        }
+       ]
+      },
+      {
+       "type": "FRAME",
+       "id": "nk2868:58040",
+       "name": "容器 1467",
+       "layoutStyle": {
+        "width": 143,
+        "height": 88,
+        "relativeX": 310,
+        "relativeY": 0
+       },
+       "children": [
+        {
+         "type": "LAYER",
+         "id": "nk2868:58041",
+         "name": "矩形 529",
+         "layoutStyle": {
+          "width": 143,
+          "height": 88,
+          "relativeX": 0,
+          "relativeY": 0
+         },
+         "borderRadius": "8px",
+         "fill": "paint_43:1511",
+         "_color": "#FFFFFF",
+         "effect": "effect_6:097"
+        },
+        {
+         "type": "FRAME",
+         "id": "nk2868:58042",
+         "name": "容器 1376",
+         "layoutStyle": {
+          "width": 48,
+          "height": 72,
+          "relativeX": 20,
+          "relativeY": 8
+         },
+         "children": [
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58043",
+           "name": "text/text",
+           "layoutStyle": {
+            "width": 48,
+            "height": 20,
+            "relativeX": 0,
+            "relativeY": 0
+           },
+           "componentInfo": {
+            "componentSetDescription": "文本",
+            "properties": {
+             "层级": "主要",
+             "标记": "False",
+             "块引用": "False",
+             "复制": "false",
+             "编辑": "false"
+            }
+           },
+           "children": [
+            {
+             "type": "TEXT",
+             "id": "nk2868:58043/1204:35210",
+             "name": "中电金信",
+             "layoutStyle": {
+              "width": 48,
+              "height": 20,
+              "relativeX": 0,
+              "relativeY": 0
+             },
+             "fill": "paint_1204:26804",
+             "_color": "#6B6B6B",
+             "_token": "文本/@color-text-2",
+             "text": [
+              {
+               "text": "风险任务",
+               "font": "font_7:0592"
+              }
+             ],
+             "textColor": [
+              {
+               "start": 0,
+               "end": 4,
+               "color": "paint_1204:26804"
+              }
+             ],
+             "textAlign": "left",
+             "textMode": "single-line"
+            }
+           ],
+           "componentId": "1204:35209"
+          },
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58048",
+           "name": "text/title",
+           "layoutStyle": {
+            "width": 10,
+            "height": 28,
+            "relativeX": 0,
+            "relativeY": 22
+           },
+           "componentInfo": {},
+           "children": [
+            {
+             "type": "TEXT",
+             "id": "nk2868:58048/1204:35260",
+             "name": "中电金信",
+             "layoutStyle": {
+              "width": 10,
+              "height": 28,
+              "relativeX": 0,
+              "relativeY": 0
+             },
+             "fill": "paint_7:2422",
+             "_color": "#F53F3F",
+             "_token": "错误/@colorDanger-6",
+             "text": [
+              {
+               "text": "1",
+               "font": "font_2815:45570"
+              }
+             ],
+             "textColor": [
+              {
+               "start": 0,
+               "end": 1,
+               "color": "paint_7:2422"
+              }
+             ],
+             "textAlign": "left",
+             "textMode": "single-line"
+            }
+           ],
+           "componentId": "1204:35259"
+          },
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58056",
+           "name": "text/text",
+           "layoutStyle": {
+            "width": 36,
+            "height": 20,
+            "relativeX": 0,
+            "relativeY": 52
+           },
+           "componentInfo": {
+            "componentSetDescription": "文本",
+            "properties": {
+             "层级": "主要",
+             "标记": "False",
+             "块引用": "False",
+             "复制": "false",
+             "编辑": "false"
+            }
+           },
+           "children": [
+            {
+             "type": "TEXT",
+             "id": "nk2868:58056/1204:35210",
+             "name": "中电金信",
+             "layoutStyle": {
+              "width": 36,
+              "height": 20,
+              "relativeX": 0,
+              "relativeY": 0
+             },
+             "fill": "paint_1204:23117",
+             "_color": "#868686",
+             "_token": "文本/@color-text-3",
+             "text": [
+              {
+               "text": "需关注",
+               "font": "font_73:5972"
+              }
+             ],
+             "textColor": [
+              {
+               "start": 0,
+               "end": 3,
+               "color": "paint_1204:23117"
+              }
+             ],
+             "textAlign": "left",
+             "textMode": "single-line"
+            }
+           ],
+           "componentId": "1204:35209"
+          }
+         ],
+         "flexContainerInfo": {
+          "flexDirection": "column",
+          "mainSizing": "auto",
+          "crossSizing": "auto",
+          "gap": "2px"
+         }
+        }
+       ]
+      },
+      {
+       "type": "FRAME",
+       "id": "nk2868:58061",
+       "name": "容器 1468",
+       "layoutStyle": {
+        "width": 143,
+        "height": 88,
+        "relativeX": 465,
+        "relativeY": 0
+       },
+       "children": [
+        {
+         "type": "LAYER",
+         "id": "nk2868:58062",
+         "name": "矩形 530",
+         "layoutStyle": {
+          "width": 143,
+          "height": 88,
+          "relativeX": 0,
+          "relativeY": 0
+         },
+         "borderRadius": "8px",
+         "fill": "paint_43:1511",
+         "_color": "#FFFFFF",
+         "effect": "effect_6:097"
+        },
+        {
+         "type": "FRAME",
+         "id": "nk2868:58063",
+         "name": "容器 1376",
+         "layoutStyle": {
+          "width": 82,
+          "height": 72,
+          "relativeX": 20,
+          "relativeY": 8
+         },
+         "children": [
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58064",
+           "name": "text/text",
+           "layoutStyle": {
+            "width": 60,
+            "height": 20,
+            "relativeX": 0,
+            "relativeY": 0
+           },
+           "componentInfo": {
+            "componentSetDescription": "文本",
+            "properties": {
+             "层级": "主要",
+             "标记": "False",
+             "块引用": "False",
+             "复制": "false",
+             "编辑": "false"
+            }
+           },
+           "children": [
+            {
+             "type": "TEXT",
+             "id": "nk2868:58064/1204:35210",
+             "name": "中电金信",
+             "layoutStyle": {
+              "width": 60,
+              "height": 20,
+              "relativeX": 0,
+              "relativeY": 0
+             },
+             "fill": "paint_1204:26804",
+             "_color": "#6B6B6B",
+             "_token": "文本/@color-text-2",
+             "text": [
+              {
+               "text": "工序完成率",
+               "font": "font_7:0592"
+              }
+             ],
+             "textColor": [
+              {
+               "start": 0,
+               "end": 5,
+               "color": "paint_1204:26804"
+              }
+             ],
+             "textAlign": "left",
+             "textMode": "single-line"
+            }
+           ],
+           "componentId": "1204:35209"
+          },
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58069",
+           "name": "text/title",
+           "layoutStyle": {
+            "width": 41,
+            "height": 28,
+            "relativeX": 0,
+            "relativeY": 22
+           },
+           "componentInfo": {},
+           "children": [
+            {
+             "type": "TEXT",
+             "id": "nk2868:58069/1204:35260",
+             "name": "中电金信",
+             "layoutStyle": {
+              "width": 41,
+              "height": 28,
+              "relativeX": 0,
+              "relativeY": 0
+             },
+             "fill": "paint_1204:24031",
+             "_color": "#1F1F1F",
+             "_token": "文本/@color-text-1",
+             "text": [
+              {
+               "text": "51%",
+               "font": "font_2815:45570"
+              }
+             ],
+             "textColor": [
+              {
+               "start": 0,
+               "end": 3,
+               "color": "paint_1204:24031"
+              }
+             ],
+             "textAlign": "left",
+             "textMode": "single-line"
+            }
+           ],
+           "componentId": "1204:35259"
+          },
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58077",
+           "name": "text/text",
+           "layoutStyle": {
+            "width": 82,
+            "height": 20,
+            "relativeX": 0,
+            "relativeY": 52
+           },
+           "componentInfo": {
+            "componentSetDescription": "文本",
+            "properties": {
+             "层级": "主要",
+             "标记": "False",
+             "块引用": "False",
+             "复制": "false",
+             "编辑": "false"
+            }
+           },
+           "children": [
+            {
+             "type": "TEXT",
+             "id": "nk2868:58077/1204:35210",
+             "name": "中电金信",
+             "layoutStyle": {
+              "width": 82,
+              "height": 20,
+              "relativeX": 0,
+              "relativeY": 0
+             },
+             "fill": "paint_1204:23117",
+             "_color": "#868686",
+             "_token": "文本/@color-text-3",
+             "text": [
+              {
+               "text": "23 / 52 个节点",
+               "font": "font_73:5972"
+              }
+             ],
+             "textColor": [
+              {
+               "start": 0,
+               "end": 11,
+               "color": "paint_1204:23117"
+              }
+             ],
+             "textAlign": "left",
+             "textMode": "single-line"
+            }
+           ],
+           "componentId": "1204:35209"
+          }
+         ],
+         "flexContainerInfo": {
+          "flexDirection": "column",
+          "mainSizing": "auto",
+          "crossSizing": "auto",
+          "gap": "2px"
+         }
+        }
+       ]
+      },
+      {
+       "type": "FRAME",
+       "id": "nk2868:58082",
+       "name": "容器 1465",
+       "layoutStyle": {
+        "width": 143,
+        "height": 88,
+        "relativeX": 0,
+        "relativeY": 0
+       },
+       "children": [
+        {
+         "type": "LAYER",
+         "id": "nk2868:58083",
+         "name": "矩形 527",
+         "layoutStyle": {
+          "width": 143,
+          "height": 88,
+          "relativeX": 0,
+          "relativeY": 0
+         },
+         "borderRadius": "8px",
+         "fill": "paint_43:1511",
+         "_color": "#FFFFFF",
+         "effect": "effect_6:097"
+        },
+        {
+         "type": "FRAME",
+         "id": "nk2868:58084",
+         "name": "容器 1376",
+         "layoutStyle": {
+          "width": 60,
+          "height": 72,
+          "relativeX": 20,
+          "relativeY": 8
+         },
+         "children": [
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58085",
+           "name": "text/text",
+           "layoutStyle": {
+            "width": 48,
+            "height": 20,
+            "relativeX": 0,
+            "relativeY": 0
+           },
+           "componentInfo": {
+            "componentSetDescription": "文本",
+            "properties": {
+             "层级": "主要",
+             "标记": "False",
+             "块引用": "False",
+             "复制": "false",
+             "编辑": "false"
+            }
+           },
+           "children": [
+            {
+             "type": "TEXT",
+             "id": "nk2868:58085/1204:35210",
+             "name": "中电金信",
+             "layoutStyle": {
+              "width": 48,
+              "height": 20,
+              "relativeX": 0,
+              "relativeY": 0
+             },
+             "fill": "paint_1204:26804",
+             "_color": "#6B6B6B",
+             "_token": "文本/@color-text-2",
+             "text": [
+              {
+               "text": "任务总数",
+               "font": "font_7:0592"
+              }
+             ],
+             "textColor": [
+              {
+               "start": 0,
+               "end": 4,
+               "color": "paint_1204:26804"
+              }
+             ],
+             "textAlign": "left",
+             "textMode": "single-line"
+            }
+           ],
+           "componentId": "1204:35209"
+          },
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58090",
+           "name": "text/title",
+           "layoutStyle": {
+            "width": 22,
+            "height": 28,
+            "relativeX": 0,
+            "relativeY": 22
+           },
+           "componentInfo": {},
+           "children": [
+            {
+             "type": "TEXT",
+             "id": "nk2868:58090/1204:35260",
+             "name": "中电金信",
+             "layoutStyle": {
+              "width": 22,
+              "height": 28,
+              "relativeX": 0,
+              "relativeY": 0
+             },
+             "fill": "paint_1204:24031",
+             "_color": "#1F1F1F",
+             "_token": "文本/@color-text-1",
+             "text": [
+              {
+               "text": "12",
+               "font": "font_2815:45570"
+              }
+             ],
+             "textColor": [
+              {
+               "start": 0,
+               "end": 2,
+               "color": "paint_1204:24031"
+              }
+             ],
+             "textAlign": "left",
+             "textMode": "single-line"
+            }
+           ],
+           "componentId": "1204:35259"
+          },
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58098",
+           "name": "text/text",
+           "layoutStyle": {
+            "width": 60,
+            "height": 20,
+            "relativeX": 0,
+            "relativeY": 52
+           },
+           "componentInfo": {
+            "componentSetDescription": "文本",
+            "properties": {
+             "层级": "主要",
+             "标记": "False",
+             "块引用": "False",
+             "复制": "false",
+             "编辑": "false"
+            }
+           },
+           "children": [
+            {
+             "type": "TEXT",
+             "id": "nk2868:58098/1204:35210",
+             "name": "中电金信",
+             "layoutStyle": {
+              "width": 60,
+              "height": 20,
+              "relativeX": 0,
+              "relativeY": 0
+             },
+             "fill": "paint_1204:23117",
+             "_color": "#868686",
+             "_token": "文本/@color-text-3",
+             "text": [
+              {
+               "text": "当前工作台",
+               "font": "font_73:5972"
+              }
+             ],
+             "textColor": [
+              {
+               "start": 0,
+               "end": 5,
+               "color": "paint_1204:23117"
+              }
+             ],
+             "textAlign": "left",
+             "textMode": "single-line"
+            }
+           ],
+           "componentId": "1204:35209"
+          }
+         ],
+         "flexContainerInfo": {
+          "flexDirection": "column",
+          "mainSizing": "auto",
+          "crossSizing": "auto",
+          "gap": "2px"
+         }
+        }
+       ]
+      },
+      {
+       "type": "FRAME",
+       "id": "nk2868:58103",
+       "name": "容器 1416",
+       "layoutStyle": {
+        "width": 200,
+        "height": 88,
+        "relativeX": 620,
+        "relativeY": 0
+       },
+       "children": [
+        {
+         "type": "LAYER",
+         "id": "nk2868:58104",
+         "name": "矩形 531",
+         "layoutStyle": {
+          "width": 200,
+          "height": 88,
+          "relativeX": 0,
+          "relativeY": 0
+         },
+         "borderRadius": "8px",
+         "fill": "paint_43:1511",
+         "_color": "#FFFFFF",
+         "effect": "effect_6:097"
+        },
+        {
+         "type": "INSTANCE",
+         "id": "nk2868:58105",
+         "name": "text/text",
+         "layoutStyle": {
+          "width": 88,
+          "height": 20,
+          "relativeX": 20,
+          "relativeY": 8
+         },
+         "componentInfo": {
+          "componentSetDescription": "文本",
+          "properties": {
+           "层级": "主要",
+           "标记": "False",
+           "块引用": "False",
+           "复制": "false",
+           "编辑": "false"
+          }
+         },
+         "children": [
+          {
+           "type": "TEXT",
+           "id": "nk2868:58105/1204:35210",
+           "name": "中电金信",
+           "layoutStyle": {
+            "width": 88,
+            "height": 20,
+            "relativeX": 0,
+            "relativeY": 0
+           },
+           "fill": "paint_1204:26804",
+           "_color": "#6B6B6B",
+           "_token": "文本/@color-text-2",
+           "text": [
+            {
+             "text": "近 7 天工序推进",
+             "font": "font_7:0592"
+            }
+           ],
+           "textColor": [
+            {
+             "start": 0,
+             "end": 9,
+             "color": "paint_1204:26804"
+            }
+           ],
+           "textAlign": "left",
+           "textMode": "single-line"
+          }
+         ],
+         "componentId": "1204:35209"
+        },
+        {
+         "type": "PATH",
+         "id": "nk2868:58110",
+         "name": "直线 102",
+         "layoutStyle": {
+          "width": 160,
+          "height": 35.5,
+          "relativeX": 20,
+          "relativeY": 40,
+          "preserveRatio": true
+         },
+         "path": [
+          {
+           "fill": "paint_2452:37443",
+           "data": "M180,39.5L20,39.5L20,40.5L180,40.5L180,39.5ZM180,51L20,51L20,52L180,52L180,51ZM180,63L20,63L20,64L180,64L180,63ZM180,75L20,75L20,76L180,76L180,75Z"
+          }
+         ]
+        },
+        {
+         "type": "GROUP",
+         "id": "nk2868:58111",
+         "name": "组 9442",
+         "layoutStyle": {
+          "width": 160,
+          "height": 36,
+          "relativeX": 20,
+          "relativeY": 40
+         },
+         "path": [
+          {
+           "fill": "paint_2452:37443",
+           "data": "M0,-1L36,-1L36,0L0,0L0,-1Z",
+           "transform": "matrix(0,1,-1,0,0,0)"
+          },
+          {
+           "fill": "paint_2452:37443",
+           "data": "M28,-1L64,-1L64,0L28,0L28,-1Z",
+           "transform": "matrix(0,1,-1,0,28,-28)"
+          },
+          {
+           "fill": "paint_2452:37443",
+           "data": "M54,-1L90,-1L90,0L54,0L54,-1Z",
+           "transform": "matrix(0,1,-1,0,54,-54)"
+          },
+          {
+           "fill": "paint_2452:37443",
+           "data": "M80,-1L116,-1L116,0L80,0L80,-1Z",
+           "transform": "matrix(0,1,-1,0,80,-80)"
+          },
+          {
+           "fill": "paint_2452:37443",
+           "data": "M106,-1L142,-1L142,0L106,0L106,-1Z",
+           "transform": "matrix(0,1,-1,0,106,-106)"
+          },
+          {
+           "fill": "paint_2452:37443",
+           "data": "M132,-1L168,-1L168,0L132,0L132,-1Z",
+           "transform": "matrix(0,1,-1,0,132,-132)"
+          },
+          {
+           "fill": "paint_2452:37443",
+           "data": "M160,-1L196,-1L196,0L160,0L160,-1Z",
+           "transform": "matrix(0,1,-1,0,160,-160)"
+          }
+         ],
+         "_mergedVector": true
+        },
+        {
+         "type": "PATH",
+         "id": "nk2868:58119",
+         "name": "路径 2",
+         "layoutStyle": {
+          "width": 160.5,
+          "height": 32,
+          "relativeX": 21,
+          "relativeY": 43.5
+         },
+         "path": [
+          {
+           "fill": "paint_1204:26639",
+           "data": "M48.76693,61.676007999999996L21.071145557,59.20317L20.928854443,60.796829L49.23307,63.323992000000004L74.695213,44.35219944L100.281647,49.2726665L126.63217,59.216262L152.25778,76.299999L181.5,76.299999L181.5,74.700001L152.74222,74.700001L127.36783,57.783738L100.718353,47.7273321L74.304787,42.64780051L48.76693,61.676007999999996Z"
+          }
+         ]
+        },
+        {
+         "type": "PATH",
+         "id": "nk2868:58120",
+         "name": "路径 3",
+         "layoutStyle": {
+          "width": 131.5,
+          "height": 32,
+          "relativeX": 20.5,
+          "relativeY": 44
+         },
+         "path": [
+          {
+           "fill": "paint_nk2868:49802",
+           "data": "M20.5,60L20.5,76L152,76L127,59L100.5,49L74.5,44L49,62L20.5,60Z"
+          }
+         ]
+        },
+        {
+         "type": "SVG_ELLIPSE",
+         "id": "nk2868:58121",
+         "name": "圆形 2",
+         "layoutStyle": {
+          "width": 4,
+          "height": 4,
+          "relativeX": 73,
+          "relativeY": 41,
+          "preserveRatio": true
+         },
+         "fill": "paint_1204:39048",
+         "_color": "#F5F8FF",
+         "_token": "主色/@colorPrimaryBlue1",
+         "strokeColor": "paint_1204:23101",
+         "strokeType": "solid",
+         "strokeAlign": "outside",
+         "strokeWidth": "1.600000023841858px"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "FRAME",
+     "id": "2960:48844",
+     "name": "容器 1535",
+     "layoutStyle": {
+      "width": 224,
+      "height": 28,
+      "relativeX": 616,
+      "relativeY": 20
+     },
+     "children": [
+      {
+       "type": "FRAME",
+       "id": "nk2868:58002",
+       "name": "Button",
+       "layoutStyle": {
+        "width": 90,
+        "height": 28,
+        "relativeX": 0,
+        "relativeY": 0
+       },
+       "fill": "paint_5:7",
+       "_color": "#FFFFFF",
+       "_token": "填充/@colorFillWhite",
+       "children": [
+        {
+         "type": "FRAME",
+         "id": "nk2868:58004",
+         "name": "容器",
+         "layoutStyle": {
+          "width": 14,
+          "height": 14,
+          "relativeX": 8,
+          "relativeY": 7,
+          "preserveRatio": true
+         },
+         "children": [
+          {
+           "type": "PATH",
+           "id": "nk2868:58005",
+           "name": "路径",
+           "layoutStyle": {
+            "width": 11.03631591796875,
+            "height": 12.880000114440918,
+            "relativeX": 1.4500000476837158,
+            "relativeY": 0.550000011920929,
+            "constraint": {
+             "horizontal": "SCALE",
+             "vertical": "CENTER"
+            },
+            "preserveRatio": true
+           },
+           "path": [
+            {
+             "fill": "paint_1204:24031",
+             "data": "M6.988754947683716,13.43000001192093C5.103876847683716,13.43000001192093,3.4284298476837156,12.17341601192093,2.9048526476837155,10.497968511920929L2.590706447683716,10.812115011920929C2.381275537683716,11.02154501192093,1.9624137876837158,11.02154501192093,1.6482674076837158,10.812115011920929C1.334121017683716,10.602683011920929,1.4388364836837158,10.183822411920929,1.6482674076837158,9.869675411920928L2.6954218476837157,8.822521011920928L2.6954218476837157,7.984796811920929C2.2765598876837156,7.670650811920929,2.067129017683716,7.147073111920929,2.067129017683716,6.623495911920929L2.067129017683716,3.586747711920929C2.067129017683716,2.539593411920929,2.9048526476837155,1.701869811920929,3.952006847683716,1.701869811920929L6.360462447683716,1.701869811920929L6.360462447683716,1.1782926319209288C6.360462447683716,0.8641463219209289,6.674608947683716,0.550000011920929,6.988754947683716,0.550000011920929C7.302901547683716,0.550000011920929,7.617047547683716,0.8641463219209289,7.617047547683716,1.1782926319209288L7.617047547683716,1.701869811920929L10.025503347683715,1.701869811920929C11.072657847683717,1.701869811920929,11.910381047683716,2.539593411920929,11.910381047683716,3.586747711920929L11.910381047683716,6.623495911920929C11.910381047683716,7.147073111920929,11.700949047683716,7.670649811920929,11.282088547683715,7.984796811920929L11.282088547683715,8.822521011920928L12.329243047683716,9.869675411920928C12.538674047683715,10.079107111920928,12.538674047683715,10.497968511920929,12.329243047683716,10.812115011920929C12.119811047683715,11.126262011920929,11.700951047683716,11.02154501192093,11.386802947683716,10.812115011920929L11.072657847683717,10.497968511920929C10.549079147683717,12.17341601192093,8.873632647683717,13.43000001192093,6.988754947683716,13.43000001192093ZM3.9520075476837158,9.13666611192093C3.9520075476837158,10.81211401192093,5.313308247683716,12.173413011920928,6.988754947683716,12.173413011920928C8.664201947683715,12.173413011920928,10.025503347683715,10.81211401192093,10.025503347683715,9.13666611192093L10.025503347683715,8.50837351192093L3.9520075476837158,8.50837351192093L3.9520075476837158,9.13666611192093ZM3.9520075476837158,3.063170711920929C3.6378612476837158,3.063170711920929,3.3237144476837157,3.2726017119209287,3.3237144476837157,3.586747911920929L3.3237144476837157,6.623495911920929C3.3237144476837157,6.937641911920929,3.6378610476837157,7.251788411920929,3.952006847683716,7.251788411920929L10.025502447683715,7.251788411920929C10.339648447683716,7.251788411920929,10.549078247683715,7.042357311920929,10.549078247683715,6.728210711920929L10.549078247683715,3.586747511920929C10.549078247683715,3.272601211920929,10.339647547683716,3.0631702119209288,10.025502447683715,3.0631702119209288L3.9520075476837158,3.063170711920929ZM8.873633647683715,6.099919111920929C8.559487547683716,6.099919111920929,8.245341047683716,5.785772111920929,8.245341047683716,5.471626611920929L8.245341047683716,4.843334011920929C8.140625747683716,4.424471911920929,8.454771747683715,4.1103256119209295,8.873633647683715,4.1103256119209295C9.292495947683715,4.1103256119209295,9.501925747683716,4.424471911920929,9.501925747683716,4.738618211920929L9.501925747683716,5.366911211920929C9.501925747683716,5.785772111920929,9.187779647683715,6.099919111920929,8.873633647683715,6.099919111920929ZM5.103877547683716,6.099919111920929C4.789731547683716,6.099919111920929,4.475585247683716,5.785772111920929,4.475585247683716,5.471626611920929L4.475585247683716,4.843334011920929C4.475585247683716,4.424471911920929,4.789731547683716,4.1103256119209295,5.103877547683716,4.1103256119209295C5.418023847683716,4.1103256119209295,5.732170347683716,4.424471911920929,5.732170347683716,4.738618211920929L5.732170347683716,5.366911211920929C5.836885647683716,5.785772111920929,5.5227391476837155,6.099919111920929,5.103877547683716,6.099919111920929Z"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "type": "TEXT",
+         "id": "nk2868:58006",
+         "name": "分身建议",
+         "layoutStyle": {
+          "width": 56,
+          "height": 20,
+          "relativeX": 26,
+          "relativeY": 4
+         },
+         "fill": "paint_1204:24031",
+         "_color": "#1F1F1F",
+         "_token": "文本/@color-text-1",
+         "text": [
+          {
+           "text": "分身建议",
+           "font": "font_406:06539"
+          }
+         ],
+         "textColor": [
+          {
+           "start": 0,
+           "end": 4,
+           "color": "paint_1204:24031"
+          }
+         ],
+         "textAlign": "left",
+         "textMode": "single-line"
+        }
+       ],
+       "effect": "effect_6:097",
+       "flexContainerInfo": {
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "alignItems": "center",
+        "mainSizing": "auto",
+        "crossSizing": "auto",
+        "gap": "4px",
+        "padding": "4px 8px"
+       },
+       "borderRadius": "4px"
+      },
+      {
+       "type": "FRAME",
+       "id": "nk2868:58011",
+       "name": "Button",
+       "layoutStyle": {
+        "width": 90,
+        "height": 28,
+        "relativeX": 98,
+        "relativeY": 0
+       },
+       "fill": "paint_5:7",
+       "_color": "#FFFFFF",
+       "_token": "填充/@colorFillWhite",
+       "children": [
+        {
+         "type": "INSTANCE",
+         "id": "nk2868:58013",
+         "name": "icon-wrapper",
+         "layoutStyle": {
+          "width": 14,
+          "height": 14,
+          "relativeX": 8,
+          "relativeY": 7
+         },
+         "componentInfo": {
+          "componentSetDescription": "图标包裹",
+          "properties": {
+           "尺寸": "14"
+          }
+         },
+         "children": [
+          {
+           "type": "INSTANCE",
+           "id": "nk2868:58013/1204:32318",
+           "name": "direction/expand",
+           "layoutStyle": {
+            "width": 14,
+            "height": 14,
+            "relativeX": 0,
+            "relativeY": 0,
+            "constraint": {
+             "horizontal": "LEFT_RIGHT",
+             "vertical": "TOP_BOTTOM"
+            },
+            "preserveRatio": true
+           },
+           "componentInfo": {},
+           "children": [
+            {
+             "type": "PATH",
+             "id": "nk2868:58013/1204:32318/1204:32229",
+             "name": "联集 13",
+             "layoutStyle": {
+              "width": 10.500081062316895,
+              "height": 10.49998950958252,
+              "relativeX": 1.75,
+              "relativeY": 1.75
+             },
+             "path": [
+              {
+               "fill": "paint_1204:24031",
+               "data": "M38,10L38,24C38,25.10457,38.895432,26,40,26C41.104568,26,42,25.10457,42,24L42,8C42,6.89543045,41.104568,6,40,6L24,6C22.89543,6,22,6.89543045,22,8C22,9.104569399999999,22.89543,10,24,10L38,10ZM10,38L10,24C10,22.89543,9.104569399999999,22,8,22C6.89543045,22,6,22.89543,6,24L6,40C6,41.104568,6.89543045,42,8,42L24,42C25.10457,42,26,41.104568,26,40C26,38.895432,25.10457,38,24,38L10,38Z"
+              }
+             ]
+            }
+           ],
+           "componentId": "1204:32228"
+          }
+         ],
+         "componentId": "1204:32317"
+        },
+        {
+         "type": "TEXT",
+         "id": "nk2868:58014",
+         "name": "全屏",
+         "layoutStyle": {
+          "width": 56,
+          "height": 20,
+          "relativeX": 26,
+          "relativeY": 4
+         },
+         "fill": "paint_1204:24031",
+         "_color": "#1F1F1F",
+         "_token": "文本/@color-text-1",
+         "text": [
+          {
+           "text": "更多数据",
+           "font": "font_406:06539"
+          }
+         ],
+         "textColor": [
+          {
+           "start": 0,
+           "end": 4,
+           "color": "paint_1204:24031"
+          }
+         ],
+         "textAlign": "left",
+         "textMode": "single-line"
+        }
+       ],
+       "effect": "effect_6:097",
+       "flexContainerInfo": {
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "alignItems": "center",
+        "mainSizing": "auto",
+        "crossSizing": "auto",
+        "gap": "4px",
+        "padding": "4px 8px"
+       },
+       "borderRadius": "4px"
+      },
+      {
+       "type": "FRAME",
+       "id": "2960:48843",
+       "name": "容器 1534",
+       "layoutStyle": {
+        "width": 28,
+        "height": 28,
+        "relativeX": 196,
+        "relativeY": 0
+       },
+       "children": [
+        {
+         "type": "LAYER",
+         "id": "2960:48829",
+         "name": "矩形 543",
+         "layoutStyle": {
+          "width": 28,
+          "height": 27.999998092651367,
+          "relativeX": 0,
+          "relativeY": 0,
+          "preserveRatio": true
+         },
+         "borderRadius": "4px",
+         "fill": "paint_5:7",
+         "_color": "#FFFFFF",
+         "_token": "填充/@colorFillWhite",
+         "effect": "effect_6:097"
+        },
+        {
+         "type": "INSTANCE",
+         "id": "2960:48834",
+         "name": "icon-wrapper",
+         "layoutStyle": {
+          "width": 14,
+          "height": 14,
+          "relativeX": 7,
+          "relativeY": 7
+         },
+         "componentInfo": {
+          "componentSetDescription": "图标包裹",
+          "properties": {
+           "尺寸": "14"
+          }
+         },
+         "children": [
+          {
+           "type": "INSTANCE",
+           "id": "2960:48834/1204:32318",
+           "name": "direction/up",
+           "layoutStyle": {
+            "width": 14,
+            "height": 14,
+            "relativeX": 0,
+            "relativeY": 0,
+            "constraint": {
+             "horizontal": "LEFT_RIGHT",
+             "vertical": "TOP_BOTTOM"
+            },
+            "preserveRatio": true
+           },
+           "componentInfo": {},
+           "children": [
+            {
+             "type": "PATH",
+             "id": "2960:48834/1204:32318/1204:38167",
+             "name": "路径",
+             "layoutStyle": {
+              "width": 32.72713088989258,
+              "height": 20,
+              "relativeX": 8,
+              "relativeY": 14,
+              "constraint": {
+               "horizontal": "SCALE",
+               "vertical": "SCALE"
+              },
+              "preserveRatio": true
+             },
+             "path": [
+              {
+               "fill": "paint_1204:26804",
+               "data": "M24.363449,21.2726326L11.636341999999999,34L8,30.363684L24.363449,14L40.727131,30.363684L37.090815,34L24.363449,21.2726326Z"
+              }
+             ]
+            }
+           ],
+           "componentId": "1204:38166"
+          }
+         ],
+         "componentId": "1204:32317"
+        }
+       ]
+      }
+     ],
+     "flexContainerInfo": {
+      "flexDirection": "row",
+      "mainSizing": "auto",
+      "crossSizing": "auto",
+      "gap": "8px"
+     }
+    }
+   ]
+  }
+ ],
+ "components": []
+}

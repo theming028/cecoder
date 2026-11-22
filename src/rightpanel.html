@@ -1,0 +1,78 @@
+  <!-- ============================================================
+       第 31 轮：会话页右栏（与左侧任务列表同构 —— 挤压布局 + 拖拽宽度 + 状态记忆）
+       ============================================================ -->
+  <aside class="rs-drawer" id="rsDrawer" tabindex="-1" aria-label="会话上下文" aria-hidden="true">
+    <div class="rs-resizer" id="rsResizer" role="separator" aria-orientation="vertical"
+        aria-label="拖动调整右栏宽度" aria-valuemin="280" aria-valuemax="960" aria-valuenow="560" tabindex="0"></div>
+    <div class="rs-in">
+      <!-- 第 35 轮：「上下文」标题栏退场，「变更 / 文件」页签上移占住这一行（少一行 44 的高度），
+           收起键挪到页签行右端 -->
+      <div class="rs-top">
+        <div class="rs-tabs" role="tablist" aria-label="上下文视图">
+          <button class="rs-tab is-active" type="button" role="tab" aria-selected="true" data-rs-tab="change">变更</button>
+          <button class="rs-tab" type="button" role="tab" aria-selected="false" data-rs-tab="file">文件</button>
+        </div>
+        <button class="rs-collapse" data-rs-close aria-label="收起右栏" data-tip="收起右栏"><span class="ico ico14"><svg viewBox="0 0 14 14" width="100%" height="100%" fill="none" aria-hidden="true"><rect x="10.2" y="2.4" width="1.4" height="9.2" rx="0.7" fill="currentColor"/><path d="M2.1 2.9L6.3 7L2.1 11.1" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+      </div>
+
+      <div class="rs-body" id="rsBody">
+        <div class="rs-pane" data-rs-pane="change">
+          <div class="rs-grp">本次改动<span class="rs-grp-num">3 个文件</span></div>
+          <button class="rs-row is-sel" type="button">
+            <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.6 1.9h4.1l2.7 2.7v7.5H3.6z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M7.7 2.2v2.6h2.6" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>
+            <span class="rs-name">app/main.ts</span>
+            <span class="rs-diff"><i class="rs-add">+18</i><i class="rs-del">−4</i></span>
+          </button>
+          <button class="rs-row" type="button">
+            <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.6 1.9h4.1l2.7 2.7v7.5H3.6z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M7.7 2.2v2.6h2.6" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>
+            <span class="rs-name">styles/tokens.css</span>
+            <span class="rs-diff"><i class="rs-add">+6</i><i class="rs-del">−2</i></span>
+          </button>
+          <button class="rs-row" type="button">
+            <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.6 1.9h4.1l2.7 2.7v7.5H3.6z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M7.7 2.2v2.6h2.6" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>
+            <span class="rs-name">README.md</span>
+            <span class="rs-diff"><i class="rs-add">+1</i></span>
+          </button>
+        </div>
+
+        <div class="rs-pane" data-rs-pane="file" hidden>
+          <div class="rs-grp">工作目录<span class="rs-grp-num">~/cecoder/workspace</span></div>
+          <button class="rs-row" type="button">
+            <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1.9 4.2h3.8l1.2 1.4h5.2v6H1.9z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>
+            <span class="rs-name">assets</span>
+          </button>
+          <button class="rs-row" type="button">
+            <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1.9 4.2h3.8l1.2 1.4h5.2v6H1.9z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>
+            <span class="rs-name">src</span>
+          </button>
+          <button class="rs-row" type="button">
+            <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.6 1.9h4.1l2.7 2.7v7.5H3.6z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M7.7 2.2v2.6h2.6" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>
+            <span class="rs-name">cecoder-home.html</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <script>
+  /* 右栏状态（展开 / 宽度）在解析阶段还原，避免首屏「先收后开」的闪动。
+     第 32 轮：没有拖拽记录时，默认宽度 = panel-main（= panel 内容宽 - 左栏）的一半 */
+  (function () {
+    var st = {};
+    try { st = JSON.parse(localStorage.getItem('cecoder.rsDrawer') || '{}') || {}; } catch (e) {}
+    var d = document.getElementById('rsDrawer');
+    if (!d) return;
+    var panel = d.parentElement;
+    var base = panel ? panel.clientWidth : 0;
+    var ws = document.getElementById('wsDrawer');
+    if (ws && ws.classList.contains('is-open')) base -= ws.offsetWidth;
+    /* 第 34 轮：只有用户拖过（manual）才用手改宽度，否则一律「panel-main 的一半」 */
+    var def = Math.max(280, Math.min(960, Math.round(base / 2)));
+    var w = st.manual && st.w ? Math.max(280, Math.min(960, st.w)) : def;
+    d.style.setProperty('--rs-w', w + 'px');
+    if (st.open) {
+      d.classList.add('is-open', 'no-anim');
+      d.setAttribute('aria-hidden', 'false');
+      d.dataset.restored = '1';
+    }
+  })();
+  </script>

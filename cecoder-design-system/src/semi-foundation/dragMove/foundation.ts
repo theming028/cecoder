@@ -1,0 +1,309 @@
+import BaseFoundation, { DefaultAdapter } from '../base/foundation';
+
+export function clampValueInRange(value: number, min: number, max: number) {
+    return Math.min(Math.max(value, min), max);
+}
+
+export interface DragMoveAdapter<P = Record<string, any>, S = Record<string, any>> extends DefaultAdapter<P, S> {
+    getDragElement: () => HTMLElement;
+    getConstrainer: () => HTMLElement | null;
+    getHandler: () => HTMLElement;
+    notifyMouseDown?: (e: MouseEvent) => void;
+    notifyMouseMove?: (e: MouseEvent) => void;
+    notifyMouseUp?: (e: MouseEvent) => void;
+    notifyTouchStart?: (e: TouchEvent) => void;
+    notifyTouchMove?: (e: TouchEvent) => void;
+    notifyTouchEnd?: (e: TouchEvent) => void;
+    notifyTouchCancel?: (e: TouchEvent) => void
+}
+
+export default class DragMoveFoundation<P = Record<string, any>, S = Record<string, any>> extends BaseFoundation<DragMoveAdapter<P, S>, P, S> {
+    element: HTMLElement;
+    handlerElement: HTMLElement;
+    handlerCursor: string;
+    destroyed = false;
+    animationFrames = new Map<number, () => void>();
+    xMax: number;
+    xMin: number;
+    yMax: number;
+    yMin: number;
+    startOffsetX: number;
+    startOffsetY: number;
+    startClientX: number;
+    startClientY: number;
+    startLeft: number;
+    startTop: number;
+
+    get constrainer() {
+        return this._adapter.getConstrainer();
+    }
+
+    get handler() {
+        return this._adapter.getHandler();
+    }
+    
+    constructor(adapter: DragMoveAdapter<P, S>) {
+        super({ ...adapter });
+    }
+
+    init() {
+        const element = this._adapter.getDragElement();
+        if (!element) {
+            throw new Error('drag element must be a valid element');
+        }
+        this.destroyed = false;
+        this._bind(element, this.handler);
+    }
+
+    _bind(element: HTMLElement, handler: HTMLElement) {
+        this.element = element;
+        this.handlerElement = handler;
+        this.handlerCursor = handler.style.cursor;
+        this.updatePositionStrategy();
+        handler.style.cursor = 'move';
+        this._registerStartEvent();
+    }
+
+    _restoreHandlerCursor() {
+        if (this.handlerElement?.style.cursor === 'move') {
+            this.handlerElement.style.cursor = this.handlerCursor;
+        }
+    }
+
+    /**
+     * Move the start listeners to the current element/handler. Document-level listeners and
+     * pending frames are left alone so a drag in progress can still finish.
+     */
+    rebind() {
+        this._unRegisterStartEvent();
+        this._restoreHandlerCursor();
+        const element = this._adapter.getDragElement();
+        const handler = element ? this.handler : null;
+        if (element && handler) {
+            this._bind(element, handler);
+        } else {
+            this.element = element;
+            this.handlerElement = handler;
+        }
+    }
+
+    updatePositionStrategy = () => {
+        this.element.style.position = this.getProp('positionStrategy') === 'relative' ? 'relative' : 'absolute';
+    }
+
+    _registerStartEvent = () => {
+        this.handlerElement.addEventListener('mousedown', this.onMouseDown);
+        this.handlerElement.addEventListener('touchstart', this.onTouchStart);
+    }
+
+    _unRegisterStartEvent = () => {
+        this.handlerElement?.removeEventListener('mousedown', this.onMouseDown);
+        this.handlerElement?.removeEventListener('touchstart', this.onTouchStart);
+    }
+
+    destroy() {
+        this.destroyed = true;
+        this._unRegisterStartEvent();
+        this._unRegisterEvent();
+        this.animationFrames.forEach((update, frame) => cancelAnimationFrame(frame));
+        this.animationFrames.clear();
+        this._restoreHandlerCursor();
+    }
+
+    _registerDocMouseEvent = () => {
+        document.addEventListener('mousemove', this._onMouseMove);
+        document.addEventListener('mouseup', this._onMouseUp);
+    }
+
+    _unRegisterDocMouseEvent = () => {
+        document.removeEventListener('mousemove', this._onMouseMove);
+        document.removeEventListener('mouseup', this._onMouseUp);
+    }
+
+    _registerDocTouchEvent = () => {
+        document.addEventListener('touchend', this._onTouchEnd);
+        document.addEventListener('touchmove', this._onTouchMove);
+        document.addEventListener('touchcancel', this._onTouchCancel);
+    }
+
+    _unRegisterDocTouchEvent = () => {
+        document.removeEventListener('touchend', this._onTouchEnd);
+        document.removeEventListener('touchmove', this._onTouchMove);
+        document.removeEventListener('touchcancel', this._onTouchCancel);
+    }
+
+    _unRegisterEvent() {
+        this._unRegisterDocMouseEvent();
+
+        this._unRegisterDocTouchEvent();
+    }
+
+    _calcMoveRange() {
+        // Calculate the range within which an element can move
+        if (this.constrainer) {
+            if (this.getProp('positionStrategy') === 'relative') {
+                const elementRect = this.element.getBoundingClientRect();
+                const constrainerRect = this.constrainer.getBoundingClientRect();
+                const style = window.getComputedStyle(this.element);
+                const currentLeft = parseFloat(style.left) || 0;
+                const currentTop = parseFloat(style.top) || 0;
+                this.xMin = currentLeft + constrainerRect.left - elementRect.left;
+                this.xMax = currentLeft + constrainerRect.right - elementRect.right;
+                this.yMin = currentTop + constrainerRect.top - elementRect.top;
+                this.yMax = currentTop + constrainerRect.bottom - elementRect.bottom;
+                return;
+            }
+            let node = this.element.offsetParent as HTMLElement;
+            let startX = 0;
+            let startY = 0;
+            while (node !== this.constrainer && node !== null) {
+                startX -= node.offsetLeft;
+                startY -= node.offsetTop;
+                node = node.offsetParent as any;
+            }
+            this.xMin = startX;
+            this.xMax = startX + this.constrainer.offsetWidth - this.element.offsetWidth;
+            this.yMin = startY;
+            this.yMax = startY + this.constrainer.offsetHeight - this.element.offsetHeight;
+        }
+    }
+
+    _allowMove(e: MouseEvent | TouchEvent) {
+        const { allowMove, allowInputDrag } = this.getProps();
+        // When the clicked object is an input or textarea, clicking should be allowed but dragging should not be allowed.
+        if (!allowInputDrag) {
+            let target = (e.target as HTMLElement).tagName.toLowerCase();
+            if (target === 'input' || target === 'textarea') {
+                return;
+            }
+        }
+        if (allowMove) {
+            return allowMove(e, this.element);
+        }
+        return true;
+    }
+
+    _calcOffset = (e: Touch | MouseEvent) => {
+        if (this.getProp('positionStrategy') === 'relative') {
+            const style = window.getComputedStyle(this.element);
+            this.startClientX = e.clientX;
+            this.startClientY = e.clientY;
+            this.startLeft = parseFloat(style.left) || 0;
+            this.startTop = parseFloat(style.top) || 0;
+            return;
+        }
+        this.startOffsetX = e.clientX - this.element.offsetLeft;
+        this.startOffsetY = e.clientY - this.element.offsetTop;
+    }
+
+    _preventDefault = (e: MouseEvent | TouchEvent) => {
+        // prevent default behavior, avoid other element(like img, text) be selected
+        e.preventDefault();
+    }
+
+    onMouseDown = (e: MouseEvent) => {
+        this._calcMoveRange();
+        this._adapter.notifyMouseDown(e);
+        if (this.destroyed) {
+            return;
+        }
+        if (!this._allowMove(e) || this.destroyed) {
+            return;
+        }
+        this._registerDocMouseEvent();
+        // store origin offset
+        this._calcOffset(e);
+        this._preventDefault(e);
+    }
+
+    onTouchStart = (e: TouchEvent) => {
+        this._calcMoveRange();
+        this._adapter.notifyTouchStart(e);
+        if (this.destroyed) {
+            return;
+        }
+        if (!this._allowMove(e) || this.destroyed) {
+            return;
+        }
+        this._registerDocTouchEvent();
+        const touch = e.targetTouches[0];
+        this._calcOffset(touch);
+        this._preventDefault(e);
+    }
+
+    _changePos = (e: Touch | MouseEvent) => {
+        if (this.destroyed) {
+            return;
+        }
+        const { customMove } = this.getProps();
+        const useRelativePosition = this.getProp('positionStrategy') === 'relative';
+        let newLeft = useRelativePosition ?
+            this.startLeft + e.clientX - this.startClientX :
+            e.clientX - this.startOffsetX;
+        let newTop = useRelativePosition ?
+            this.startTop + e.clientY - this.startClientY :
+            e.clientY - this.startOffsetY;
+        if (this.constrainer) {
+            newLeft = clampValueInRange(newLeft, this.xMin, this.xMax);
+            newTop = clampValueInRange(newTop, this.yMin, this.yMax); 
+        }
+
+        let frame: number;
+        const updatePosition = () => {
+            this.animationFrames.delete(frame);
+            if (customMove) {
+                customMove(this.element, newTop, newLeft);
+                return;
+            }
+            this.element.style.top = newTop + 'px';
+            this.element.style.left = newLeft + 'px';
+        };
+        frame = requestAnimationFrame(updatePosition);
+        this.animationFrames.set(frame, updatePosition);
+    }
+
+    _onMouseMove = (e: MouseEvent) => {
+        this._adapter.notifyMouseMove(e);
+        this._changePos(e); 
+    }
+
+    _onTouchMove = (e: TouchEvent) => {
+        this._adapter.notifyTouchMove(e);
+        const touch = e.targetTouches[0];
+        this._changePos(touch);
+    }
+
+    _flushAnimationFrames = () => {
+        this.animationFrames.forEach((update, frame) => {
+            cancelAnimationFrame(frame);
+            update();
+        });
+    }
+
+    _onMouseUp = (e: MouseEvent) => {
+        this._flushAnimationFrames();
+        if (this.destroyed) {
+            return;
+        }
+        this._adapter.notifyMouseUp(e);
+        this._unRegisterDocMouseEvent();
+    }
+
+    _onTouchEnd = (e: TouchEvent) => {
+        this._flushAnimationFrames();
+        if (this.destroyed) {
+            return;
+        }
+        this._adapter.notifyTouchEnd(e);
+        this._unRegisterDocTouchEvent();
+    }
+
+    _onTouchCancel = (e: TouchEvent) => {
+        this._flushAnimationFrames();
+        if (this.destroyed) {
+            return;
+        }
+        this._adapter.notifyTouchCancel(e);
+        this._unRegisterDocTouchEvent();
+    }
+}

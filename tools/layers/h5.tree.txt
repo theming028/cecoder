@@ -1,0 +1,66 @@
+[FRAME] "首页 - 5" @(0,0) 1440x900 fill=["#E5EDF5"]
+  [PATH] "矩形 481" @(8,48) 1424x852
+  [FRAME] "容器 1588" @(16,8) 250x32
+    [INSTANCE] "🚥 Window Controls" @(0,10) 52x12
+    [FRAME] "容器 1421" @(72,0) 178x32
+      [FRAME] "容器 71" @(0,0) 178x32 fill=["#F3F6F9"] r="8px"
+        [GROUP] "组 9438" @(6,6) 20x20
+          [LAYER] "矩形 243" @(0,0) 20x20 fill=["#3491FA"] r="4px"
+          [INSTANCE] "text/text" @(6,2) 8x16 fill=["#3491FA"]
+            [TEXT] "中电金信" @(0,0) 8x16 fill=["#FFFFFF"] tc=[{"start":0,"end":1,"color":"paint_7:0709"}] TEXT="P" font={"family":"MiSans","size":12,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"auto","letterSpacing":"auto","weight":"500"}
+        [FRAME] "Link" @(34,5) 138x22 r="4px"
+          [TEXT] "PAA团队工作空间..." @(0,0) 122x22 fill=["#1F1F1F"] tc=[{"start":0,"end":12,"color":"paint_1204:26804"}] TEXT="PAA团队工作空间..." font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Regular\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+          [FRAME] "容器" @(126,5) 12x12
+            [PATH] "路径" @(3,1) 6.21999979019165x9.922791481018066
+  [FRAME] "容器 849" @(1252,8) 180x32
+    [FRAME] "Link" @(0,0) 100x32 fill=["#F3F6F9"] r="8px"
+      [FRAME] "tips/question-circle" @(12,9) 14x14 fill=[]
+        [PATH] "Vector" @(0,0) 13.999958992004395x14
+      [TEXT] "使用帮助" @(32,5) 56x22 fill=["#1F1F1F"] tc=[{"start":0,"end":4,"color":"paint_1204:24031"}] TEXT="使用帮助" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+    [FRAME] "Link" @(108,0) 72x32 fill=["#F3F6F9"] r="8px"
+      [FRAME] "容器" @(12,9) 14x14
+        [PATH] "路径" @(0.0155029296875,0) 13.904553413391113x14
+      [TEXT] "设置" @(32,5) 28x22 fill=["#1F1F1F"] tc=[{"start":0,"end":2,"color":"paint_1204:24031"}] TEXT="设置" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+  [FRAME] "容器 1354" @(1352,792) 56x56
+  [FRAME] "text/text" @(1357,840) 45x20 fill=["#F5F8FF"] r="24px"
+    [TEXT] "托管中" @(6,2.5) 33x15 fill=["#3770F7"] tc=[{"start":0,"end":3,"color":"paint_1204:23101"}] TEXT="托管中" font={"family":"MiSans","size":11,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"auto","letterSpacing":"auto","weight":"500"}
+  [PATH] "矩形 539" @(290,80) 860x284
+  [FRAME] "容器 1559" @(290,744) 860x156
+    [FRAME] "容器 1490" @(0,0) 860x128
+      [PATH] "矩形 207" @(0,0) 860x128
+      [INSTANCE] "text/text" @(12,12) 224x22
+        [TEXT] "中电金信" @(0,0) 224x22 fill=["#A9A9A9"] tc=[{"start":0,"end":16,"color":"paint_1204:26645"}] TEXT="描述要解决的问题、目标或验收标准" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+      [FRAME] "容器 895" @(12,84) 154x32
+        [GROUP] "组 9153" @(0,0) 32x32
+          [LAYER] "矩形 200" @(0,0) 32x32 r="32px"
+          [FRAME] "icon-wrapper" @(9,9) 14x14
+            [PATH] "Vector" @(1,1) 12x12
+        [FRAME] "dropdown-trigger" @(40,0) 114x32 r="32px"
+          [FRAME] "容器" @(12,9) 14x14
+            [PATH] "路径" @(1.399999976158142,0.550000011920929) 11.218775749206543x12.880000114440918
+          [TEXT] "默认权限" @(30,6.5) 56x19 fill=["#6B6B6B"] tc=[{"start":0,"end":4,"color":"paint_1204:26804"}] TEXT="默认权限" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"auto","letterSpacing":"auto","weight":"400"}
+          [INSTANCE] "direction/down" @(90,10) 12x12
+            [PATH] "路径" @(1.75,3.5) 8.181761741638184x5
+      [GROUP] "组 9415" @(649,84) 199x32
+        [FRAME] "容器 62" @(167,0) 32x32
+          [LAYER] "矩形 15" @(0,0) 32x32 fill=["#3770F7"] r="32px"
+          [PATH] "路径" @(11,10) 10x12
+        [INSTANCE] "dropdown-trigger" @(0,0) 159x32 r="32px"
+          [TEXT] "默认" @(8,6.5) 129x19 fill=["#6B6B6B"] tc=[{"start":0,"end":17,"color":"paint_1204:26804"}] TEXT="DeepSeek-V4-Flash" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"auto","letterSpacing":"auto","weight":"400"}
+          [INSTANCE] "direction/down" @(38,10) 12x12
+            [PATH] "路径" @(1.75,3.5) 8.181761741638184x5
+    [INSTANCE] "text/text" @(110,128) 640x28
+      [TEXT] "中电金信" @(0,0) 640x28 fill=["#A9A9A9"] tc=[{"start":0,"end":104,"color":"paint_1204:26645"}] TEXT="2 轮 · 27 步 · LLM 3m36s · 工具调用 7.2s · 首 token 平均 0.8s · 159 tok/s · 缓存命中 96% · 输入 1M tok · 输出 31.1K token" font={"family":"MiSans","size":11,"style":"Regular","decoration":"none","case":"none","lineHeight":"28","letterSpacing":"auto","weight":"400"}
+  [INSTANCE] "icon-wrapper" @(16,56) 28x28 r="4px"
+    [INSTANCE] "general/menu" @(7,7) 14x14
+      [PATH] "Vector" @(1.4583332538604736,2.3333332538604736) 11.083333015441895x9.333333015441895
+  [FRAME] "radio-button-group" @(570,8) 300x32 fill=["#D4DDE7"] r="8px"
+    [FRAME] "components/radio-button" @(2,2) 120x28 fill=["#FFFFFF"] r="6px"
+      [FRAME] "容器" @(16,7) 14x14
+        [PATH] "路径" @(1.16668701171875,1.166092872619629) 12.25x11.667243957519531
+      [TEXT] "研发工作台" @(34,3) 70x22 fill=["#1F1F1F"] tc=[{"start":0,"end":5,"color":"paint_1204:24031"}] TEXT="研发工作台" font={"family":"MiSans","size":14,"style":"Medium","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+    [FRAME] "components/radio-button" @(122,3) 88x26 r="8px"
+      [TEXT] "研发作业" @(16,2) 56x22 fill=["#1F1F1F"] tc=[{"start":0,"end":4,"color":"paint_1204:24031"}] TEXT="研发作业" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+    [PATH] "直线 53" @(202,16) 16x0
+    [FRAME] "components/radio-button" @(210,3) 88x26 r="8px"
+      [TEXT] "研发管理" @(16,2) 56x22 fill=["#1F1F1F"] tc=[{"start":0,"end":4,"color":"paint_1204:24031"}] TEXT="研发管理" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}

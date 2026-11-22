@@ -1,0 +1,95 @@
+# Cecoder 组件契约（组件文档）
+
+每个 `*.md` 是 **Cecoder 设计系统 官方组件文档的逐字副本**（含 说明 / 何时使用 / 代码演示用法 / API 参考 / Methods / ARIA / 设计变量），并在开头列出该组件 **真实源码文件指针**（DOM/JS/类型/样式/示例）。
+
+> 源码已打包进本交付目录 `../src/`（semi-ui / semi-foundation / semi-theme-default / semi-icons）；每篇文档开头列出该组件的真实源码文件路径。
+
+| 组件 | 中文名 | 分类 | 文档 | 主要源码 |
+| --- | --- | --- | --- | --- |
+| **AIChatDialogue** | AI对话 | AI | [AIChatDialogue.md](./AIChatDialogue.md) | `aiChatDialogue/` |
+| **AIChatInput** | 聊天输入框 | AI | [AIChatInput.md](./AIChatInput.md) | `aiChatInput/` |
+| **Anchor** | 锚点 | 导航 | [Anchor.md](./Anchor.md) | `anchor/` |
+| **AudioPlayer** | 音频播放器 | 增强 | [AudioPlayer.md](./AudioPlayer.md) | `audioPlayer/` |
+| **AutoComplete** | 自动完成 | 输入 | [AutoComplete.md](./AutoComplete.md) | `autoComplete/` |
+| **Avatar** | 头像 | 展示 | [Avatar.md](./Avatar.md) | `avatar/` |
+| **BackTop** | 回到顶部 | 导航 | [BackTop.md](./BackTop.md) | `backtop/` |
+| **Badge** | 徽章 | 展示 | [Badge.md](./Badge.md) | `badge/` |
+| **Banner** | 通知横幅 | 反馈 | [Banner.md](./Banner.md) | `banner/` |
+| **Breadcrumb** | 面包屑 | 导航 | [Breadcrumb.md](./Breadcrumb.md) | `breadcrumb/` |
+| **Button** | 按钮 | 基础 | [Button.md](./Button.md) | `button/` |
+| **Calendar** | 日历 | 展示 | [Calendar.md](./Calendar.md) | `calendar/` |
+| **Card** | 卡片 | 展示 | [Card.md](./Card.md) | `card/` |
+| **Carousel** | 轮播图 | 展示 | [Carousel.md](./Carousel.md) | `carousel/` |
+| **Cascader** | 级联选择 | 输入 | [Cascader.md](./Cascader.md) | `cascader/` |
+| **Chat** | 对话 | 增强 | [Chat.md](./Chat.md) | `chat/` |
+| **Checkbox** | 复选框 | 输入 | [Checkbox.md](./Checkbox.md) | `checkbox/` |
+| **CodeHighlight** | 代码高亮 | 增强 | [CodeHighlight.md](./CodeHighlight.md) | `codeHighlight/` |
+| **Collapse** | 折叠面板 | 展示 | [Collapse.md](./Collapse.md) | `collapse/` |
+| **Collapsible** | 折叠 | 展示 | [Collapsible.md](./Collapsible.md) | `collapsible/` |
+| **ColorPicker** | 颜色选择器 | 输入 | [ColorPicker.md](./ColorPicker.md) | `colorPicker/` |
+| **ConfigProvider** | 全局配置 | 其他 | [ConfigProvider.md](./ConfigProvider.md) | `configProvider/` |
+| **Cropper** | 图片裁切 | 展示 | [Cropper.md](./Cropper.md) | `cropper/` |
+| **DatePicker** | 日期选择器 | 输入 | [DatePicker.md](./DatePicker.md) | `datePicker/` |
+| **Descriptions** | 描述列表 | 展示 | [Descriptions.md](./Descriptions.md) | `descriptions/` |
+| **Divider** | 分割线 | 基础 | [Divider.md](./Divider.md) | `divider/` |
+| **DragMove** | 拖拽移动 | 增强 | [DragMove.md](./DragMove.md) | `dragMove/` |
+| **Dropdown** | 下拉框 | 展示 | [Dropdown.md](./Dropdown.md) | `dropdown/` |
+| **Empty** | 空状态 | 展示 | [Empty.md](./Empty.md) | `empty/` |
+| **Feedback** | 反馈 | 反馈 | [Feedback.md](./Feedback.md) | `feedback/` |
+| **FloatButton** | 悬浮按钮 | 基础 | [FloatButton.md](./FloatButton.md) | `floatButton/` |
+| **Form** | 表单 | 输入 | [Form.md](./Form.md) | `form/` |
+| **Grid** | 栅格 | 基础 | [Grid.md](./Grid.md) | `grid/` |
+| **Highlight** | 高亮文本 | 展示 | [Highlight.md](./Highlight.md) | `highlight/` |
+| **HotKeys** | 快捷键 | 增强 | [HotKeys.md](./HotKeys.md) | `hotKeys/` |
+| **Icon** | 图标 | 基础 | [Icon.md](./Icon.md) | `icons/` |
+| **Image** | 图片 | 展示 | [Image.md](./Image.md) | `image/` |
+| **Input** | 输入框 | 输入 | [Input.md](./Input.md) | `input/` |
+| **InputNumber** | 数字输入框 | 输入 | [InputNumber.md](./InputNumber.md) | `inputNumber/` |
+| **JsonViewer** | Json编辑器 | 增强 | [JsonViewer.md](./JsonViewer.md) | `jsonViewer/` |
+| **Layout** | 布局 | 基础 | [Layout.md](./Layout.md) | `layout/` |
+| **List** | 列表 | 展示 | [List.md](./List.md) | `list/` |
+| **LocaleProvider** | 多语言 | 其他 | [LocaleProvider.md](./LocaleProvider.md) | `locale/` |
+| **Lottie** | 动画 | 增强 | [Lottie.md](./Lottie.md) | `lottie/` |
+| **Markdown** | 渲染器 | 增强 | [Markdown.md](./Markdown.md) | `markdownRender/` |
+| **Modal** | 模态对话框 | 展示 | [Modal.md](./Modal.md) | `modal/` |
+| **Navigation** | 导航 | 导航 | [Navigation.md](./Navigation.md) | `navigation/` |
+| **Notification** | 通知 | 反馈 | [Notification.md](./Notification.md) | `notification/` |
+| **OverflowList** | 折叠列表 | 展示 | [OverflowList.md](./OverflowList.md) | `overflowList/` |
+| **Pagination** | 翻页器 | 导航 | [Pagination.md](./Pagination.md) | `pagination/` |
+| **PinCode** | 验证码输入 | 输入 | [PinCode.md](./PinCode.md) | `pincode/` |
+| **Popconfirm** | 气泡确认框 | 反馈 | [Popconfirm.md](./Popconfirm.md) | `popconfirm/` |
+| **Popover** | 气泡卡片 | 展示 | [Popover.md](./Popover.md) | `popover/` |
+| **Progress** | 进度条 | 反馈 | [Progress.md](./Progress.md) | `progress/` |
+| **Radio** | 单选框 | 输入 | [Radio.md](./Radio.md) | `radio/` |
+| **Rating** | 评分 | 输入 | [Rating.md](./Rating.md) | `rating/` |
+| **Resizable** | 伸缩框 | 基础 | [Resizable.md](./Resizable.md) | `resizable/` |
+| **ScrollList** | 滚动列表 | 展示 | [ScrollList.md](./ScrollList.md) | `scrollList/` |
+| **Select** | 选择器 | 输入 | [Select.md](./Select.md) | `select/` |
+| **SideSheet** | 滑动侧边栏 | 展示 | [SideSheet.md](./SideSheet.md) | `sideSheet/` |
+| **Sidebar** | 侧边信息栏 | AI | [Sidebar.md](./Sidebar.md) | `sideBar/` |
+| **Skeleton** | 骨架屏 | 反馈 | [Skeleton.md](./Skeleton.md) | `skeleton/` |
+| **Slider** | 滑动选择器 | 输入 | [Slider.md](./Slider.md) | `slider/` |
+| **Space** | 间距 | 基础 | [Space.md](./Space.md) | `space/` |
+| **Spin** | 加载器 | 反馈 | [Spin.md](./Spin.md) | `spin/` |
+| **Steps** | 步骤 | 导航 | [Steps.md](./Steps.md) | `steps/` |
+| **Switch** | 开关 | 输入 | [Switch.md](./Switch.md) | `switch/` |
+| **Table** | 表格 | 展示 | [Table.md](./Table.md) | `table/` |
+| **Tabs** | 标签栏 | 导航 | [Tabs.md](./Tabs.md) | `tabs/` |
+| **Tag** | 标签 | 展示 | [Tag.md](./Tag.md) | `tag/` |
+| **TagInput** | 标签输入框 | 输入 | [TagInput.md](./TagInput.md) | `tagInput/` |
+| **TimePicker** | 时间选择器 | 输入 | [TimePicker.md](./TimePicker.md) | `timePicker/` |
+| **Timeline** | 时间轴 | 展示 | [Timeline.md](./Timeline.md) | `timeline/` |
+| **Toast** | 提示 | 反馈 | [Toast.md](./Toast.md) | `toast/` |
+| **Tooltip** | 工具提示 | 展示 | [Tooltip.md](./Tooltip.md) | `tooltip/` |
+| **Transfer** | 穿梭框 | 输入 | [Transfer.md](./Transfer.md) | `transfer/` |
+| **Tree** | 树形控件 | 导航 | [Tree.md](./Tree.md) | `tree/` |
+| **TreeSelect** | 树选择器 | 输入 | [TreeSelect.md](./TreeSelect.md) | `treeSelect/` |
+| **Typography** | 版式 | 基础 | [Typography.md](./Typography.md) | `typography/` |
+| **Upload** | 上传 | 输入 | [Upload.md](./Upload.md) | `upload/` |
+| **UserGuide** | 用户引导 | 展示 | [UserGuide.md](./UserGuide.md) | `userGuide/` |
+| **VideoPlayer** | 视频播放器 | 增强 | [VideoPlayer.md](./VideoPlayer.md) | `videoPlayer/` |
+| **iconButton** | — | 内部/无独立文档 | [iconButton.md](./iconButton.md) | `iconButton/` |
+| **resizeObserver** | — | 内部/无独立文档 | [resizeObserver.md](./resizeObserver.md) | `resizeObserver/` |
+| **trigger** | — | 内部/无独立文档 | [trigger.md](./trigger.md) | `trigger/` |
+
+共 85 个组件。配套官方指南见 `../guides/`，设计变量见 `../tokens/`。

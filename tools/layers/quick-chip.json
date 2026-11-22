@@ -1,0 +1,105 @@
+{
+ "styles": {
+  "font_73:3621": {
+   "value": {
+    "family": "MiSans",
+    "size": 14,
+    "style": "{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}",
+    "decoration": "none",
+    "case": "none",
+    "lineHeight": "22",
+    "letterSpacing": "auto",
+    "weight": "500"
+   }
+  },
+  "paint_1204:24031": {
+   "value": [
+    "#1F1F1F"
+   ],
+   "token": "文本/@color-text-1"
+  },
+  "paint_2960:44209": {
+   "value": [
+    "#5B58FF"
+   ]
+  },
+  "paint_2960:44216": {
+   "value": [
+    "rgba(91, 88, 255, 0.16)"
+   ]
+  },
+  "paint_2960:44221": {
+   "value": [
+    "rgba(91, 88, 255, 0.08)"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "type": "INSTANCE",
+   "id": "nk2868:58658",
+   "name": "Link",
+   "layoutStyle": {
+    "width": 76,
+    "height": 32,
+    "relativeX": 0,
+    "relativeY": 0
+   },
+   "borderRadius": "4px",
+   "flexContainerInfo": {
+    "flexDirection": "row",
+    "alignItems": "center",
+    "mainSizing": "auto",
+    "crossSizing": "auto",
+    "gap": "4px",
+    "padding": "5px 0px"
+   },
+   "fill": "paint_2960:44221",
+   "_color": "rgba(91, 88, 255, 0.08)",
+   "strokeColor": "paint_2960:44216",
+   "strokeType": "solid",
+   "strokeAlign": "inside",
+   "strokeWidth": "1px",
+   "componentInfo": {
+    "componentSetDescription": "链接",
+    "properties": {
+     "类型": "默认",
+     "状态": "默认"
+    }
+   },
+   "children": [
+    {
+     "type": "TEXT",
+     "id": "nk2868:58658/1204:37529",
+     "name": "文字链接",
+     "layoutStyle": {
+      "width": 56,
+      "height": 22,
+      "relativeX": 10,
+      "relativeY": 5
+     },
+     "fill": "paint_1204:24031",
+     "_color": "#1F1F1F",
+     "_token": "文本/@color-text-1",
+     "text": [
+      {
+       "text": "技术任务",
+       "font": "font_73:3621"
+      }
+     ],
+     "textColor": [
+      {
+       "start": 0,
+       "end": 4,
+       "color": "paint_2960:44209"
+      }
+     ],
+     "textAlign": "left",
+     "textMode": "single-line"
+    }
+   ],
+   "componentId": "1204:37528"
+  }
+ ],
+ "components": []
+}

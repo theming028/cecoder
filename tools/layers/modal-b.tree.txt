@@ -1,0 +1,157 @@
+[FRAME] "云端任务同步 - 2" @(0,0) 1440x900 fill=["#FFFFFF"]
+  [LAYER] "image" @(0,0) 1440x900 fill=[{"url":"https://image-resource.mastergo.com/75774807915321/193158739112673/ef41d31453ae7d3adb3763f80605182f.png"}]
+  [PATH] "矩形 1" @(8,48) 1424x852
+  [PATH] "矩形 203" @(180,48) 1080x804
+  [PATH] "矩形 204" @(180,48) 1080x48
+  [FRAME] "容器 2" @(1200,58) 40x28
+    [PATH] "直线 38" @(?,?) 16x?
+    [INSTANCE] "icon-wrapper" @(12,0) 28x28 r="4px"
+      [INSTANCE] "tips/close" @(6,6) 16x16 fill=[]
+        [PATH] "Vector" @(2.8145501613616943,2.8145503997802734) 10.37090015411377x10.37090015411377
+  [FRAME] "容器 1171" @(200,60) 350x24
+    [FRAME] "容器" @(0,3) 18x18
+      [PATH] "路径" @(1.125,1.5780715942382812) 15.75x14.219160079956055
+    [FRAME] "容器 1169" @(26,0) 324x24
+      [INSTANCE] "text/text" @(0,0) 96x24
+        [TEXT] "中电金信" @(0,0) 96x24 fill=["#1F1F1F"] tc=[{"start":0,"end":6,"color":"paint_1204:24031"}] TEXT="云端任务同步" font={"family":"MiSans","size":16,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"24","letterSpacing":"auto","weight":"500"}
+      [INSTANCE] "text/text" @(108,2) 216x20
+        [TEXT] "中电金信" @(0,0) 216x20 fill=["#868686"] tc=[{"start":0,"end":18,"color":"paint_1204:23117"}] TEXT="从云端同步我负责执行或参与协作的任务" font={"family":"MiSans","size":12,"style":"{\"fontStyle\":\"Regular\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+  [PATH] "矩形 221" @(180,796) 1080x56
+  [LAYER] "矩形 540" @(1250,100) 6x200 fill=["rgba(0, 0, 0, 0.16)"] r="6px"
+  [LAYER] "矩形 541" @(180,96) 320x700 fill=["#F7F7F7"]
+  [LAYER] "矩形 480" @(490,100) 6x300 fill=["rgba(0, 0, 0, 0.16)"] r="6px"
+  [FRAME] "容器 1208" @(180,748) 320x48
+    [LAYER] "矩形 542" @(0,0) 320x48 fill=["#FFFFFF"]
+    [INSTANCE] "text/text" @(84,13) 121x22
+      [TEXT] "中电金信" @(0,0) 121x22 fill=["#868686"] tc=[{"start":0,"end":12,"color":"paint_1204:23117"}] TEXT="共 5 项，已选 5 项" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+    [INSTANCE] "Button" @(20,10) 52x28 fill=["#FFFFFF"]
+      [TEXT] "取消" @(12,4) 28x20 fill=["#1F1F1F"] tc=[{"start":0,"end":2,"color":"paint_1204:24031"}] TEXT="反选" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+  [FRAME] "容器 1189" @(200,116) 280x400
+    [INSTANCE] "divider" @(0,0) 280x22
+      [INSTANCE] "text/text" @(0,0) 42x22
+        [TEXT] "中电金信" @(0,0) 56x22 fill=["#868686"] tc=[{"start":0,"end":4,"color":"paint_1204:23117"}] TEXT="云端任务" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+      [INSTANCE] "divider" @(58,10.5) 202x?
+        [PATH] "line" @(0,0) 202x?
+    [FRAME] "容器 1185" @(0,34) 280x70
+      [PATH] "矩形 543" @(0,0) 280x70
+      [FRAME] "text/text" @(224,12) 44x20 fill=["#F5F8FF"] r="4px"
+        [TEXT] "进行中" @(4,0) 36x20 fill=["#3770F7"] tc=[{"start":0,"end":3,"color":"paint_1204:23101"}] TEXT="进行中" font={"family":"MiSans","size":12,"style":"{\"fontStyle\":\"Regular\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+      [INSTANCE] "text/text" @(32,38) 99x20
+        [TEXT] "中电金信" @(0,0) 99x20 fill=["#868686"] tc=[{"start":0,"end":13,"color":"paint_1204:23117"}] TEXT="我执行 · paa-web" font={"family":"MiSans","size":12,"style":"Regular","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+      [INSTANCE] "checkbox" @(12,12) 188x22
+        [INSTANCE] ".checkbox-input" @(0,4) 14x14
+          [FRAME] "wrapper" @(0,0) 14x14 fill=[]
+            [LAYER] "border" @(-5,-5) 24x24 r="50px"
+            [LAYER] "bg" @(0,0) 14x14 fill=["#3770F7"] r="2px"
+            [PATH] "Combined Shape" @(5.28,2.87) 3.7139530181884766x6.8544182777404785
+        [TEXT] "复选框" @(20,0) 168x22 fill=["#1F1F1F"] tc=[{"start":0,"end":12,"color":"paint_1204:24031"}] TEXT="登录失败提示异常分支补齐" font={"family":"MiSans","size":14,"style":"{\"fontStyle\":\"Medium\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+    [FRAME] "容器 1184" @(0,108) 280x70
+      [PATH] "矩形 543" @(0,0) 280x70
+      [FRAME] "text/text" @(224,12) 44x20 fill=["#F5F8FF"] r="4px"
+        [TEXT] "进行中" @(4,0) 36x20 fill=["#3770F7"] tc=[{"start":0,"end":3,"color":"paint_1204:23101"}] TEXT="进行中" font={"family":"MiSans","size":12,"style":"{\"fontStyle\":\"Regular\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+      [INSTANCE] "text/text" @(32,38) 99x20
+        [TEXT] "中电金信" @(0,0) 99x20 fill=["#868686"] tc=[{"start":0,"end":13,"color":"paint_1204:23117"}] TEXT="我协作 · paa-web" font={"family":"MiSans","size":12,"style":"Regular","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+      [INSTANCE] "checkbox" @(12,12) 160x22
+        [INSTANCE] ".checkbox-input" @(0,4) 14x14
+          [FRAME] "wrapper" @(0,0) 14x14 fill=[]
+            [LAYER] "border" @(-5,-5) 24x24 r="50px"
+            [LAYER] "bg" @(0,0) 14x14 fill=["#3770F7"] r="2px"
+            [PATH] "Combined Shape" @(5.28,2.87) 3.7139530181884766x6.8544182777404785
+        [TEXT] "复选框" @(20,0) 140x22 fill=["#1F1F1F"] tc=[{"start":0,"end":10,"color":"paint_1204:24031"}] TEXT="账号锁定提示交互走查" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+    [FRAME] "容器 1182" @(0,330) 280x70
+      [PATH] "矩形 543" @(0,0) 280x70
+      [FRAME] "text/text" @(224,12) 44x20 fill=["#FFFFFF"] r="4px"
+        [TEXT] "未开始" @(4,0) 36x20 fill=["#6B6B6B"] tc=[{"start":0,"end":3,"color":"paint_1204:26804"}] TEXT="未开始" font={"family":"MiSans","size":12,"style":"{\"fontStyle\":\"Regular\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+      [INSTANCE] "text/text" @(32,38) 99x20
+        [TEXT] "中电金信" @(0,0) 99x20 fill=["#868686"] tc=[{"start":0,"end":13,"color":"paint_1204:23117"}] TEXT="我执行 · paa-web" font={"family":"MiSans","size":12,"style":"Regular","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+      [INSTANCE] "checkbox" @(12,12) 188x22
+        [INSTANCE] ".checkbox-input" @(0,4) 14x14
+          [FRAME] "wrapper" @(0,0) 14x14 fill=[]
+            [LAYER] "border" @(-5,-5) 24x24 r="50px"
+            [LAYER] "bg" @(0,0) 14x14 fill=["#3770F7"] r="2px"
+            [PATH] "Combined Shape" @(5.28,2.87) 3.7139530181884766x6.8544182777404785
+        [TEXT] "复选框" @(20,0) 168x22 fill=["#1F1F1F"] tc=[{"start":0,"end":12,"color":"paint_1204:24031"}] TEXT="登记现有契约不一致的用例" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+    [FRAME] "容器 1188" @(0,256) 280x70
+      [PATH] "矩形 543" @(0,0) 280x70
+      [FRAME] "text/text" @(224,12) 44x20 fill=["#FFFFFF"] r="4px"
+        [TEXT] "未开始" @(4,0) 36x20 fill=["#6B6B6B"] tc=[{"start":0,"end":3,"color":"paint_1204:26804"}] TEXT="未开始" font={"family":"MiSans","size":12,"style":"{\"fontStyle\":\"Regular\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+      [INSTANCE] "text/text" @(32,38) 100x20
+        [TEXT] "中电金信" @(0,0) 100x20 fill=["#868686"] tc=[{"start":0,"end":14,"color":"paint_1204:23117"}] TEXT="我协作 · paa-auth" font={"family":"MiSans","size":12,"style":"Regular","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+      [INSTANCE] "checkbox" @(12,12) 199x22
+        [INSTANCE] ".checkbox-input" @(0,4) 14x14
+          [FRAME] "wrapper" @(0,0) 14x14 fill=[]
+            [LAYER] "border" @(-5,-5) 24x24 r="50px"
+            [LAYER] "bg" @(0,0) 14x14 fill=["#3770F7"] r="2px"
+            [PATH] "Combined Shape" @(5.28,2.87) 3.7139530181884766x6.8544182777404785
+        [TEXT] "复选框" @(20,0) 179x22 fill=["#1F1F1F"] tc=[{"start":0,"end":15,"color":"paint_1204:24031"}] TEXT="核对旧版调用方对登录错误..." font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+    [FRAME] "容器 1183" @(0,182) 280x70
+      [PATH] "矩形 543" @(0,0) 280x70
+      [INSTANCE] "text/text" @(32,38) 100x20
+        [TEXT] "中电金信" @(0,0) 100x20 fill=["#868686"] tc=[{"start":0,"end":14,"color":"paint_1204:23117"}] TEXT="我执行 · paa-auth" font={"family":"MiSans","size":12,"style":"Regular","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+      [INSTANCE] "checkbox" @(12,12) 160x22
+        [INSTANCE] ".checkbox-input" @(0,4) 14x14
+          [FRAME] "wrapper" @(0,0) 14x14 fill=[]
+            [LAYER] "border" @(-5,-5) 24x24 r="50px"
+            [LAYER] "bg" @(0,0) 14x14 fill=["#3770F7"] r="2px"
+            [PATH] "Combined Shape" @(5.28,2.87) 3.7139530181884766x6.8544182777404785
+        [TEXT] "复选框" @(20,0) 140x22 fill=["#1F1F1F"] tc=[{"start":0,"end":10,"color":"paint_1204:24031"}] TEXT="登录错误码兼容性回归" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+      [FRAME] "text/text" @(224,12) 44x20 fill=["#FFFFFF"] r="4px"
+        [TEXT] "未开始" @(4,0) 36x20 fill=["#6B6B6B"] tc=[{"start":0,"end":3,"color":"paint_1204:26804"}] TEXT="未开始" font={"family":"MiSans","size":12,"style":"{\"fontStyle\":\"Regular\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+  [FRAME] "容器 1187" @(540,116) 248x48
+    [INSTANCE] "text/text" @(0,28) 110x20
+      [TEXT] "中电金信" @(0,0) 110x20 fill=["#868686"] tc=[{"start":0,"end":16,"color":"paint_1204:23117"}] TEXT="TASK-20261102002" font={"family":"MiSans","size":12,"style":"Regular","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+    [FRAME] "容器 1186" @(0,0) 248x24
+      [INSTANCE] "text/title" @(0,0) 192x24
+        [TEXT] "中电金信" @(0,0) 192x24 fill=["#1F1F1F"] tc=[{"start":0,"end":12,"color":"paint_1204:24031"}] TEXT="登录失败提示异常分支补齐" font={"family":"MiSans","size":16,"style":"Medium","decoration":"none","case":"none","lineHeight":"24","letterSpacing":"auto","weight":"500"}
+      [FRAME] "text/text" @(204,2) 44x20 fill=["#F5F8FF"] r="4px"
+        [TEXT] "进行中" @(4,0) 36x20 fill=["#3770F7"] tc=[{"start":0,"end":3,"color":"paint_1204:23101"}] TEXT="进行中" font={"family":"MiSans","size":12,"style":"{\"fontStyle\":\"Regular\",\"opsz\":\"auto\"}","decoration":"none","case":"none","lineHeight":"20","letterSpacing":"auto","weight":"400"}
+  [FRAME] "容器 1190" @(540,176) 680x40
+    [LAYER] "矩形 544" @(0,0) 680x40 fill=["#FFFFFF"]
+    [INSTANCE] "_components/tabs-line" @(0,0) 184x40
+      [INSTANCE] "_components/tab" @(0,0) 28x40 r="2px"
+        [LAYER] "Hover" @(-8,8) 42.99999237060547x24 fill=["rgba(242, 243, 245, 0)"] r="2px"
+        [TEXT] "标签" @(0,9) 28x22 fill=["#1F1F1F"] tc=[{"start":0,"end":2,"color":"paint_1204:24031"}] TEXT="详情" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+      [INSTANCE] "_components/tab" @(52,0) 28x40
+        [TEXT] "标签" @(0,9) 28x22 fill=["#3770F7"] tc=[{"start":0,"end":2,"color":"paint_1204:23101"}] TEXT="日志" font={"family":"MiSans","size":14,"style":"Medium","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+      [INSTANCE] "_components/tab" @(129,0) 42x40 r="2px"
+        [LAYER] "Hover" @(-8,8) 42.99999237060547x24 fill=["rgba(242, 243, 245, 0)"] r="2px"
+        [TEXT] "标签" @(0,9) 28x22 fill=["#1F1F1F"] tc=[{"start":0,"end":2,"color":"paint_1204:24031"}] TEXT="资产" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+      [INSTANCE] "_components/tab" @(195,0) 42x40 r="2px"
+        [LAYER] "Hover" @(-8,8) 42.99999237060547x24 fill=["rgba(242, 243, 245, 0)"] r="2px"
+        [TEXT] "标签" @(0,9) 28x22 fill=["#1F1F1F"] tc=[{"start":0,"end":2,"color":"paint_1204:24031"}] TEXT="工序" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+  [FRAME] "容器 1205" @(540,248) 274x158
+    [PATH] "直线 43" @(?,?) 158x?
+    [FRAME] "容器 1204" @(0,0) 274x158
+      [FRAME] "容器 1201" @(0,0) 246x42
+        [FRAME] "容器 1200" @(22,0) 224x42
+          [INSTANCE] "text/text" @(0,0) 224x22
+            [TEXT] "中电金信" @(0,0) 224x22 fill=["#1F1F1F"] tc=[{"start":0,"end":16,"color":"paint_1204:24031"}] TEXT="详细设计已确认，任务进入代码开发" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+          [INSTANCE] "text/text" @(0,26) 28x16
+            [TEXT] "中电金信" @(0,0) 28x16 fill=["#1F1F1F"] tc=[{"start":0,"end":5,"color":"paint_1204:23117"}] TEXT="10:12" font={"family":"MiSans","size":12,"style":"Regular","decoration":"none","case":"none","lineHeight":"auto","letterSpacing":"auto","weight":"400"}
+        [SVG_ELLIPSE] "圆形 1" @(0,8) 6x6 fill=["#3770F7"]
+      [FRAME] "容器 1202" @(0,58) 246x42
+        [FRAME] "容器 1200" @(22,0) 224x42
+          [INSTANCE] "text/text" @(0,0) 252x22
+            [TEXT] "中电金信" @(0,0) 252x22 fill=["#1F1F1F"] tc=[{"start":0,"end":18,"color":"paint_1204:24031"}] TEXT="新增网络中断和服务不可用两条验收路径" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+          [INSTANCE] "text/text" @(0,26) 56x16
+            [TEXT] "中电金信" @(0,0) 56x16 fill=["#868686"] tc=[{"start":0,"end":8,"color":"paint_1204:23117"}] TEXT="昨天 10:16" font={"family":"MiSans","size":12,"style":"Regular","decoration":"none","case":"none","lineHeight":"auto","letterSpacing":"auto","weight":"400"}
+        [SVG_ELLIPSE] "圆形 1" @(0,8) 6x6 fill=["#A9A9A9"]
+      [FRAME] "容器 1203" @(0,116) 246x42
+        [FRAME] "容器 1200" @(22,0) 224x42
+          [INSTANCE] "text/text" @(0,0) 98x22
+            [TEXT] "中电金信" @(0,0) 98x22 fill=["#1F1F1F"] tc=[{"start":0,"end":7,"color":"paint_1204:24031"}] TEXT="任务已分配给我" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+          [INSTANCE] "text/text" @(0,26) 95x16
+            [TEXT] "中电金信" @(0,0) 95x16 fill=["#868686"] tc=[{"start":0,"end":16,"color":"paint_1204:23117"}] TEXT="2026/11/12 09:27" font={"family":"MiSans","size":12,"style":"Regular","decoration":"none","case":"none","lineHeight":"auto","letterSpacing":"auto","weight":"400"}
+        [SVG_ELLIPSE] "圆形 1" @(0,8) 6x6 fill=["#A9A9A9"]
+  [INSTANCE] "Message" @(606,56) 228x48 fill=["#FFFFFF"]
+    [INSTANCE] "icon-center-20px" @(16,14) 20x20
+      [INSTANCE] "tips/close-circle-fill" @(0,0) 20x20 fill=[]
+        [PATH] "Vector" @(1.6666666269302368,1.6666666269302368) 16.66670036315918x16.66670036315918
+    [TEXT] "这是一条报错的信息" @(44,13) 168x22 fill=["#F53F3F"] tc=[{"start":0,"end":12,"color":"paint_7:2422"}] TEXT="云端任务同步失败，请重试" font={"family":"MiSans","size":14,"style":"Medium","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}
+  [FRAME] "容器 1206" @(630,808) 180x32
+    [INSTANCE] "text/text" @(0,0) 76x32 fill=["#FFFFFF"] r="4px"
+      [TEXT] "中电金信" @(24,5) 28x22 fill=["#1F1F1F"] tc=[{"start":0,"end":2,"color":"paint_1204:24031"}] TEXT="取消" font={"family":"MiSans","size":14,"style":"Regular","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"400"}
+    [INSTANCE] "Button" @(88,0) 92x32 fill=["#B4C9FC"] r="4px"
+      [INSTANCE] "general/loading" @(16,9) 14x14
+        [PATH] "Vector" @(1.1666666269302368,1.1666666269302368) 11.666666030883789x11.666666030883789
+      [TEXT] "保存" @(34,5) 42x22 fill=["#FFFFFF"] tc=[{"start":0,"end":3,"color":"paint_6:245"}] TEXT="同步中" font={"family":"MiSans","size":14,"style":"Medium","decoration":"none","case":"none","lineHeight":"22","letterSpacing":"auto","weight":"500"}

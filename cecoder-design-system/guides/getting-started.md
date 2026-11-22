@@ -1,0 +1,224 @@
+<!-- Cecoder 设计系统 · 指南 -->
+
+
+Cecoder 设计系统 由Cecoder 团队负责维护，提供 React 版本开箱即用的70+ 组件、 Figam Variant UI Kit  
+你可在任意 React 项目中引入使用 （新项目更推荐通过 Rsbuild、CreateReactApp、Vite 新建），当前支持搭配 React v16、v17、v18 、v19（[React v19 适配](https://cecoder.dev)）版本使用
+
+若你需要使用 prefixCls、主题、CSS Layer 等编译时定制能力，可使用对应的 Cecoder 构建插件，支持 Webpack、Rspack/Rsbuild 和 Vite。配置见[定制主题](./customize-theme.md)；与 Tailwind 搭配时另请参阅 [Tailwind 搭配使用](https://cecoder.dev)。
+（Cecoder 用户，若使用公司内部相关工程化方案，请查阅对应的工程化 FAQ。）
+
+<Notice title='React 版本说明'>
+
+React 16、17、18、19 均使用同一个组件包 `@douyinfe/semi-ui`。React 19 项目需在应用入口、首次使用 Cecoder 组件前导入 `@douyinfe/semi-ui/react19-adapter`，无需另装 `@douyinfe/semi-ui-19`。旧包的迁移步骤和使用限制见 [React 19 适配指南](https://cecoder.dev)。
+
+</Notice>
+
+## 1、安装 Cecoder
+
+以下展示了 `@douyinfe/semi-ui` 的安装和使用
+
+```bash
+# 使用 npm
+npm i @douyinfe/semi-ui
+
+# 使用 yarn
+yarn add @douyinfe/semi-ui
+
+# 使用 pnpm
+pnpm add @douyinfe/semi-ui
+```
+
+## 2、使用组件
+
+仅使用默认主题时，在 Webpack、Rspack、create-react-app 或 Vite 项目中通常无需额外的 Cecoder 编译插件，组件样式会随组件引入。定制主题或配置 Tailwind 样式层时，请参考对应指南中的构建配置。
+
+**React 19 项目**先在应用入口添加以下导入，确保在使用 Cecoder 组件之前完成适配。React 16/17/18 项目不需要此导入：
+
+```js
+// main.tsx 或 index.tsx，仅 React 19 项目需要
+import '@douyinfe/semi-ui/react19-adapter';
+```
+
+然后在组件文件中统一从 `@douyinfe/semi-ui` 导入：
+
+```jsx
+import React from 'react';
+import { Button, Toast } from '@douyinfe/semi-ui';
+
+const SemiApp = () => {
+    return (
+        <Button onClick={() => Toast.warning({ content: 'welcome' })}>Hello Cecoder</Button>
+    );
+};
+
+export default SemiApp;
+```
+
+> 如果项目尚未使用样式重置方案，可引入 [reset.css](https://www.npmjs.com/package/reset-css)，以减少浏览器默认样式差异。使用 Tailwind CSS 且已启用 Preflight 时，通常无需再引入 reset.css，避免重复重置；如果禁用了 Preflight，请根据项目需要选择重置方案。Tailwind 与 Cecoder 的样式优先级配置见 [Tailwind 搭配使用](https://cecoder.dev)。
+
+### 按需加载与自动导入
+
+按需加载与省略源码中的 `import` 是两回事。上述显式导入方式可由构建工具进行 tree shaking，无需为了按需打包额外配置自动导入插件。
+
+`@douyinfe/semi-vite-plugin`、`@douyinfe/semi-webpack-plugin` 等官方构建插件用于主题、CSS 前缀和样式处理，不会自动生成 `Button`、`Toast` 等 JSX 组件的 import，也不提供组件自动导入 resolver。本文推荐保留显式导入，使用编辑器的自动导入功能；若选择第三方自动导入工具，请按该工具的 React/JSX 支持情况自行配置。
+
+## 3、在 NextJs 中使用
+
+- 如果仅使用默认主题, 在 `transpilePackages` 追加 Cecoder 相关的 package即可 （Next.js 版本要求 >= v13.1 ）
+```diff
+// next.config.js
+const nextConfig = {
++ transpilePackages: ['@douyinfe/semi-ui', '@douyinfe/semi-icons', '@douyinfe/semi-illustrations'],
+};
+
+module.exports = nextConfig;
+```
+
+- 如果需要使用定制主题包或 Next.js版本低于 v13.1，则需要配合 Cecoder 提供的编译插件 `@douyinfe/semi-next` 插件使用 
+  - 首先安装插件 `npm i @douyinfe/semi-next` (如果你使用 yarn 或 pnpm，请自行更换为对等命令)
+  - 在 next.config.js 中进行配置，插件会将组件默认的import CSS 语句移除。更多配置可查阅 `@douyinfe/semi-next`[详细文档](https://www.npmjs.com/package/@douyinfe/semi-next) 
+  - 在 `global.css` 中引入全量的 Cecoder css（目前在 Next.js 中不支持按需引入）
+```js
+// next.config.js
+const semi = require('@douyinfe/semi-next').default({
+    /* the extension options */
+});
+module.exports = semi({
+    // your custom Next.js configuration
+});
+```
+
+```css
+/* styles/globals.css */
+@import '~@douyinfe/semi-ui/dist/css/semi.min.css';
+```
+
+**如何在 Next.js 中使用主题包**  
+你需要更换 globals.css 中 import 语句的路径，将默认主题 CSS 产物更换为你定制的主题包中的 CSS 产物，例如当希望应用某业务平台的主题包 `@semi-bot/semi-theme-doucreator` 时
+```css
+/* styles/globals.css */
+@import '~@semi-bot/semi-theme-doucreator/semi.min.css';
+```
+
+## 4、在 Remix 中使用
+<Notice>
+    注意：以下配置适用于 Remix v1。Remix v2有多种构建模式，Cecoder 未进行过完整适配性测试，建议优先参考 <a href="https://github.com/cecoder/cecoder-design-system" target="_blank">Issue 2444</a> 处理
+</Notice>
+
+- @remix相关包版本要求 > 1.11.0，并安装 `@remix-run/css-bundle`
+- 配置 `remix.config.js`，参考 [Remix Css Side-Effect Imports](https://remix.run/docs/en/v1/guides/styling#css-side-effect-imports)。打开 `unstable_cssSideEffectImports` 开关，并将 Cecoder 相关包配置在 `serverDependenciesToBundle` 中。
+```diff
+// remix.config.js
+module.exports = {
+  future: {
++    unstable_cssSideEffectImports: true,
+  },
+  serverDependenciesToBundle: [
++    /^@douyinfe\/semi-ui/,
++    /^@douyinfe\/semi-icons/,
++    /^@douyinfe\/semi-illustrations/,
+  ],
+};
+```
+- 在 `root.tsx` 中进行配置，参考[Remix CSS Bundling](https://remix.run/docs/en/v1/guides/styling#css-bundling)。引入 `cssBundleHref`，并配置 `links`
+
+```diff
+// root.tsx
++ import { cssBundleHref } from "@remix-run/css-bundle";
+
+ export const links = () => {
+   return [
++     ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+   ];
+ };
+```
+
+- 完成配置，可以正常使用 Cecoder 相关组件 
+
+**如何在 Remix 中使用主题包**  
+可以直接将 cssBundleHref 这一步替换为引入主题包中已构建好的全量css 产物，代替默认主题css），例如当希望应用某业务平台的主题包 `@semi-bot/semi-theme-doucreator` 时
+
+```diff
+// root.tsx
++ import ThemeStyle from "@semi-bot/semi-theme-doucreator/semi.min.css";
+
+ export const links = () => {
+   return [
+-    ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),     
++    { rel: "stylesheet", href: ThemeStyle },
+   ];
+ };
+```
+
+
+
+## 5、UMD 方式使用组件
+
+[![BUILD-JS][build-js-badge]][build-js-url] [![BUILD-CSS][build-css-badge]][build-css-url]
+
+[build-js-badge]: https://img.badgesize.io/https:/unpkg.com/@douyinfe/semi-ui/dist/umd/semi-ui.min.js?label=semi.min.js&compression=gzip
+[build-js-url]: https://unpkg.com/browse/@douyinfe/semi-ui/dist/umd/semi-ui.min.js
+[build-css-badge]: https://img.badgesize.io/https:/unpkg.com/@douyinfe/semi-ui/dist/css/semi.min.css?label=semi.min.css&compression=gzip
+[build-css-url]: https://unpkg.com/browse/@douyinfe/semi-ui/dist/css/semi.min.css
+
+> 我们并不推荐直接使用已构建文件，这样会全量引入所有组件，无法实现按需加载。但如果确实有非构建场景的需求，可以通过以下方式引用
+
+在浏览器中使用 script 和 link 标签直接引入文件，并使用全局变量 `SemiUI`、`SemiIcons`、`SemiIllustrations`
+
+1、 请确保你已提前引入 react 以及 react-dom  
+2、 引入 JS 文件，以下示例 URL 中 2.27.0 为 version 标识，希望使用不同版本 Cecoder 时，将 version 中对应的值替换即可  
+
+| 资源 | URL |
+| --- | --- |
+| semi-ui (min) | https://unpkg.com/@douyinfe/semi-ui@2.27.0/dist/umd/semi-ui.min.js |
+| semi-icons (min) | https://unpkg.com/@douyinfe/semi-icons@latest/dist/umd/semi-icons.min.js |
+| semi-illustrations (min) | https://unpkg.com/@douyinfe/semi-illustrations@latest/dist/umd/semi-illustrations.min.js |
+| semi-ui (normal) | https://unpkg.com/@douyinfe/semi-ui@2.27.0/dist/umd/semi-ui.js |
+| semi-icons (normal) | https://unpkg.com/@douyinfe/semi-icons@latest/dist/umd/semi-icons.js |
+| semi-illustrations (normal) | https://unpkg.com/@douyinfe/semi-illustrations@latest/dist/umd/semi-illustrations.js |
+
+3、 引入 Cecoder 默认主题的 CSS 样式文件
+
+| 资源 | URL |
+| --- | --- |
+| semi.css | https://unpkg.com/@douyinfe/semi-ui@2.27.0/dist/css/semi.css |
+| semi-icons.css | https://unpkg.com/@douyinfe/semi-icons@latest/dist/css/semi-icons.css |
+
+```diff
+<!DOCTYPE html>
+    <html lang="zh-cn">
+    <head>
+        <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
++       <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
++       <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
++       <script src="https://unpkg.com/@douyinfe/semi-ui@2.27.0/dist/umd/semi-ui.min.js"></script>
++       <link rel="stylesheet" href="https://unpkg.com/@douyinfe/semi-ui@2.27.0/dist/css/semi.css">
+
++       <script src="https://unpkg.com/@douyinfe/semi-icons@latest/dist/umd/semi-icons.min.js"></script>
++       <link rel="stylesheet" href="https://unpkg.com/@douyinfe/semi-icons@latest/dist/css/semi-icons.css">
++       <script src="https://unpkg.com/@douyinfe/semi-illustrations@latest/dist/umd/semi-illustrations.min.js"></script>
+
+    </head>
+    <body>
+        <div id="root"></div>
+    </body>
+</html>
+```
+
+```html
+<script type="text/babel">
+    const { Input, Button, Toast, Icon, Form } = SemiUI;
+    const { IconHome } = SemiIcons;
+    const { IllustrationConstruction } = SemiIllustrations;
+    ReactDOM.render(
+        <div>
+            <Button onClick={() => Toast.warning({ duration: 0, content: 'Cecoder 设计系统' })}>test</Button>
+            <Input defaultValue="semi" onChange={value => Toast.info('hello semi')}></Input>
+            <IconHome size="large" />
+            <IllustrationConstruction style={{ width: 150, height: 150 }} />
+        </div>,
+        document.getElementById('root')
+    );
+</script>
+```

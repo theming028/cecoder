@@ -1,0 +1,189 @@
+/* Cecoder 设计系统 · 组件级全局覆盖（component-overrides.css）
+ * 这些是对底层组件库 DOM 类名的全局统一约定，所有转译/生成页面都应引用本文件，
+ * 避免每页重复发明。值一律走 --cds-* 语义 token。
+ * 依赖：cecoder-tokens.css（Layer1 --semi-* + Layer2 --cds-*）。
+ */
+
+/* 1) 下拉/选择器选项列表容器内边距统一 8px（--cds-space-3） */
+.semi-select-option-list-wrapper {
+  padding: var(--cds-space-3); /* 8px */
+}
+
+/* 3) AI 对话气泡圆角固定 8px（--cds-radius-card）
+ *    mode=bubble 时助手与用户都用 .semi-ai-chat-dialogue-content-bubble；
+ *    .semi-ai-chat-dialogue-content-userBubble 仅在 mode=userBubble 时出现，一并覆盖。 */
+.semi-ai-chat-dialogue-content-bubble,
+.semi-ai-chat-dialogue-content-userBubble {
+  border-radius: var(--cds-radius-card); /* 8px */
+}
+
+/* 4) 用户自己发送的气泡使用「浅蓝底 + 黑色文字」
+ *    运行时用户气泡的真实类名是 .semi-ai-chat-dialogue-content-user（与 -bubble 同时挂在同一元素上）。
+ *    浅蓝底用主色浅版 --cds-color-primary-bg；文字用 --semi-grey-9（明态黑字）。
+ *    暗色模式下 --cds-color-primary-bg 与 --semi-grey-9 随 底层组件库 调色板反转，自动转为可读的浅蓝底+浅色文字。 */
+.semi-ai-chat-dialogue-content-bubble.semi-ai-chat-dialogue-content-user,
+.semi-ai-chat-dialogue-content-userBubble {
+  background: var(--cds-color-primary-bg) !important; /* 浅蓝底 */
+  color: rgba(var(--semi-grey-9), 1) !important;       /* 黑色文字 */
+}
+.semi-ai-chat-dialogue-content-bubble.semi-ai-chat-dialogue-content-user .semi-markdown-body,
+.semi-ai-chat-dialogue-content-bubble.semi-ai-chat-dialogue-content-user *,
+.semi-ai-chat-dialogue-content-userBubble .semi-markdown-body,
+.semi-ai-chat-dialogue-content-userBubble * {
+  color: rgba(var(--semi-grey-9), 1) !important;       /* 内部文字同样黑字 */
+}
+
+/* 2) 图标：优先使用官方 SVG 图标库 @douyinfe/semi-icons（1048 个，命名 IconXxx / IconXxxStroked），
+ *    不要用 emoji 或自造 svg 代替语义图标。详见 components/Icon.md。
+ *    （图标是组件级 import，无需 CSS 覆盖；此处仅作规范说明。） */
+
+/* ---------- 5) 表格 ---------- */
+
+/* 5a) 表头字号统一 12px（--cds-table-header-font-size）。
+ *     选择器需 ≥ 底层组件库 自带的 .semi-table-thead>.semi-table-row>.semi-table-row-head 特异度，故补 !important。 */
+.semi-table .semi-table-row-head {
+  font-size: var(--cds-table-header-font-size) !important; /* 12px */
+}
+
+/* 5b) 默认行高 36px —— 指“含 padding 在内的总高度”。
+ *     底层组件库 body 单元格默认上下 padding 16px，会把行撑到 ~53px；
+ *     这里把垂直 padding 压到 8px，配合 border-box 的 height:36px，使总高恰为 36px。
+ *     选择器特异度需 ≥ 底层组件库 自带规则，故补 !important。 */
+.semi-table-tbody > .semi-table-row > .semi-table-row-cell,
+.semi-table-thead > .semi-table-row > .semi-table-row-head {
+  box-sizing: border-box !important;
+  height: var(--cds-table-row-height) !important; /* 36px 总高 */
+  padding-top: var(--cds-space-3) !important;     /* 8px */
+  padding-bottom: var(--cds-space-3) !important;  /* 8px */
+  line-height: 18px;
+}
+
+/* ---------- 6) AI 对话栏 ---------- */
+
+/* 6a) 消息操作栏 .semi-ai-chat-dialogue-action 默认不显示
+ *     （底层组件库 原生为 visibility:hidden + hover 经 -action-show 浮现；
+ *      规范改为彻底不占位、不显示，需要时由业务显式开启）。 */
+.semi-ai-chat-dialogue-action,
+.semi-ai-chat-dialogue-action-show {
+  display: none !important;
+}
+
+/* 6b) 建议条 .semi-ai-chat-dialogue-hints 使用“小一号”尺寸：
+ *     文本 14px→12px（--cds-font-xs），内边距/间距压缩一档。 */
+.semi-ai-chat-dialogue-hints .semi-ai-chat-dialogue-hint-item {
+  padding: 4px var(--cds-space-3); /* 8px 横向，纵向由 8px→4px */
+}
+.semi-ai-chat-dialogue-hints .semi-ai-chat-dialogue-hint-content {
+  font-size: var(--cds-font-xs); /* 12px（较默认 14px 小一号） */
+}
+.semi-ai-chat-dialogue-hints {
+  row-gap: 6px;
+  margin-top: var(--cds-space-2);
+  margin-bottom: var(--cds-space-3);
+}
+
+/* 6c) 对话栏标题 .semi-ai-chat-dialogue-title 字号 12px（--cds-font-xs）。
+ *     底层组件库 默认 16px，规范统一降为 12px，与栏内其他 12px 文本对齐。 */
+.semi-ai-chat-dialogue-title {
+  font-size: var(--cds-font-xs) !important; /* 12px */
+  line-height: 18px;
+}
+
+/* ---------- 7) 流程步骤节点（横向工序）----------
+ * 工序是步骤流程，节点之间必须有连接线表示先后顺序；连接线垂直居中于节点、用 --cds-border；
+ * 首尾不外延。节点内容（含 idle 待开始态）一律居中对齐。详见 showcase/workbench.css 的 .wb-node 实现。 */
+
+/* ---------- 8) <strong> 标签默认字重 500 ----------
+ * 规范：strong 默认字重统一为 var(--cds-font-weight-strong)（500），
+ * 覆盖浏览器 UA 默认(bolder≈700) 与 底层组件库 的 .semi-typography strong / markdown strong（默认 600）。
+ * 选择器与 底层组件库 特异度相等且本文件在其后加载，故可稳定覆盖；裸 strong 覆盖 UA 默认。 */
+strong {
+  font-weight: var(--cds-font-weight-strong); /* 500 */
+}
+.semi-typography strong,
+.semi-markdownRender-component-p strong {
+  font-weight: var(--cds-font-weight-strong); /* 500 */
+}
+
+/* ---------- 9) 卡片标题 / Tab / AI 对话栏默认呈现 ---------- */
+
+/* 9a) 卡片标题默认字号 14px（--cds-card-title-font-size）。
+ *     底层组件库 Card 的 title 渲染在 .semi-card-header-wrapper-title 内，统一压到 14px。 */
+.semi-card-header-wrapper-title {
+  font-size: var(--cds-card-title-font-size); /* 14px */
+}
+
+/* 9b) 所有类型 Tab 的非选中项文字颜色 = 一级正文色（--cds-text-primary）。
+ *     底层组件库 默认 .semi-tabs-tab 用 text-2（次要）；选中项仍走各类型自身的高亮色。 */
+.semi-tabs-tab:not(.semi-tabs-tab-active) {
+  color: var(--cds-text-primary);
+}
+
+/* 9c) AI 对话栏默认不显示双方头像（AI 与用户均不显示）。
+ *     覆盖三层：① 对话栏外层包裹类 .semi-ai-chat-dialogue-avatar/-hidden；
+ *     ② 半官方 Avatar 组件渲染时挂在同一 DOM 上的通用类 .semi-avatar——限定作用域
+ *        到 `.semi-ai-chat-dialogue-container`（含 `-right` 用户侧）内，
+ *        避免误伤顶栏 / Copilot 头部等页面其它位置的 .semi-avatar。
+ *     业务如需头像可显式开启（覆盖本条）。 */
+.semi-ai-chat-dialogue-avatar,
+.semi-ai-chat-dialogue-avatar-hidden,
+.semi-ai-chat-dialogue-container .semi-avatar,
+.semi-ai-chat-dialogue-container-right .semi-avatar {
+  display: none;
+}
+
+/* 9d) AI 对话栏用户自己发送的气泡不显示称呼（标题）。
+ *     用户消息容器带 .semi-ai-chat-dialogue-container-right；其内的 .semi-ai-chat-dialogue-title 隐藏。
+ *     助手侧称呼仍按 §6c 显示为 12px。 */
+.semi-ai-chat-dialogue-container-right .semi-ai-chat-dialogue-title {
+  display: none;
+}
+
+/* 9e) AI 输入区容器不加顶部分隔线（border-top）。
+ *     规范：Copilot 输入区与对话流之间用留白分隔，不用 border-top 线。
+ *     覆盖常见自定义容器类；业务页若用其它类名，同样遵循“无 border-top”。 */
+.cds-ai-input,
+.wb-cop-foot {
+  border-top: none;
+}
+
+/* ============================================================
+ * 10) 反 AI 感（硬性验收标准）—— 确定性兜底
+ *   目的：避免产品因视觉上的「AI 流水线感」降低用户信任与舒适度。
+ *   禁止清单（生成页面不得出现，评审时逐条核对）：
+ *     ① 蓝紫渐变（linear/radial-gradient 作背景，尤其 primary→ai-purple）
+ *     ② 玻璃拟态（backdrop-filter: blur 的卡片/面板）
+ *     ③ 霓虹发光（彩色 box-shadow / text-shadow 辉光）
+ *     ④ 过大圆角（内容/卡片表面 border-radius 超过 --cds-radius-max=12px）
+ *     ⑤ 弹跳动效（bounce/elastic cubic-bezier、scale 弹跳关键帧）
+ *     ⑥ 表单占位符替代标签（placeholder 当 label 用）
+ *     ⑦ 表单状态对比度不达无障碍标准（WCAG AA：正文≥4.5:1，大字/图标≥3:1）
+ *   ①②③④⑥⑦ 属生成期禁止项 + 评审验收项；⑤ 由下方统一缓动结构性兜底。
+ * ============================================================ */
+
+/* 10a) 统一非弹跳缓动：交互元素过渡一律 ease-out + 标准时长，
+ *      覆盖任何 bounce/elastic timing-function，结构性杜绝弹跳动效。 */
+.semi-button,
+.semi-input-wrapper,
+.semi-select-selection,
+.semi-switch,
+.semi-tabs-tab,
+.cds-task,
+.cds-node,
+.wb-node {
+  transition-timing-function: var(--cds-motion-ease) !important;
+  transition-duration: var(--cds-motion-duration);
+}
+
+/* 10b) 圆角上限兜底：内容/卡片类表面不得超过 --cds-radius-max（12px）。
+ *      仅作用于 Cecoder 自有表面类，避免误伤 avatar/switch 等合法全圆角组件。 */
+.cds-card,
+.cds-task,
+.cds-viewer,
+.wb-card,
+.wb-queue,
+.wb-code,
+.cds-code {
+  border-radius: min(var(--cds-radius-card), var(--cds-radius-max));
+}
+

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 软件工厂 · Cecoder 设计系统重绘（高保真）</title>
+<!--
+  转译说明：本页由「Cecoder 设计系统」标准流程重绘 ——
+  1) 角色/规则来自 ai-prompt.md；2) 真值来自 tokens/tokens.css（内嵌于下方 :root）；
+  3) 组件结构/类名遵循 components/*.md（.semi-* 约定）。
+  所有颜色/字号/字重/行高/间距/圆角/投影均引用 var(--cds-*)，无硬编码色值；
+  切换右上角「深色」或给 <body> 加 theme-mode="dark" 即整体换肤。
+-->
+<style>
+/* ============================================================
+   Cecoder Design Tokens（内嵌自 tokens.css · Layer1 原始 + Layer2 语义）
+   ============================================================ */
+:root{
+  /* Layer1 · 调色板三元组 */
+  --semi-white:255,255,255; --semi-black:0,0,0;
+  --semi-grey-0:249,249,249; --semi-grey-1:230,232,234; --semi-grey-2:198,202,205; --semi-grey-3:167,171,176; --semi-grey-4:136,141,146; --semi-grey-5:107,112,117; --semi-grey-6:85,91,97; --semi-grey-7:65,70,76; --semi-grey-8:46,50,56; --semi-grey-9:28,31,35;
+  --semi-blue-0:234,245,255; --semi-blue-1:203,231,254; --semi-blue-2:152,205,253; --semi-blue-5:0,100,250; --semi-blue-6:0,98,214; --semi-blue-7:0,79,179;
+  --semi-light-blue-5:0,149,238;
+  --semi-green-0:236,247,236; --semi-green-2:164,224,167; --semi-green-5:59,179,70; --semi-green-6:48,149,59; --semi-green-7:37,119,47;
+  --semi-red-0:254,242,237; --semi-red-2:253,183,165; --semi-red-5:249,57,32; --semi-red-6:213,37,21; --semi-red-7:178,20,12;
+  --semi-orange-0:255,248,234; --semi-orange-2:254,217,152; --semi-orange-5:252,136,0; --semi-orange-6:210,103,0; --semi-orange-7:168,74,0;
+  --semi-yellow-4:251,218,50;
+  --semi-ai-purple-5:166,71,255; --semi-ai-purple-6:134,54,219; --semi-ai-purple-7:105,40,184; --semi-ai-purple-0:248,237,255; --semi-ai-purple-2:227,181,255;
+
+  /* Layer1 · 语义色（浅色） */
+  --semi-color-white:rgba(var(--semi-white),1); --semi-color-black:rgba(var(--semi-black),1);
+  --semi-color-primary:rgba(var(--semi-blue-5),1); --semi-color-primary-hover:rgba(var(--semi-blue-6),1); --semi-color-primary-active:rgba(var(--semi-blue-7),1); --semi-color-primary-disabled:rgba(var(--semi-blue-2),1); --semi-color-primary-light-default:rgba(var(--semi-blue-0),1); --semi-color-primary-light-hover:rgba(var(--semi-blue-1),1);
+  --semi-color-secondary:rgba(var(--semi-light-blue-5),1);
+  --semi-color-tertiary:rgba(var(--semi-grey-5),1); --semi-color-tertiary-hover:rgba(var(--semi-grey-6),1); --semi-color-tertiary-light-default:rgba(var(--semi-grey-0),1);
+  --semi-color-info:rgba(var(--semi-blue-5),1); --semi-color-info-light-default:rgba(var(--semi-blue-0),1);
+  --semi-color-success:rgba(var(--semi-green-5),1); --semi-color-success-light-default:rgba(var(--semi-green-0),1);
+  --semi-color-danger:rgba(var(--semi-red-5),1); --semi-color-danger-light-default:rgba(var(--semi-red-0),1);
+  --semi-color-warning:rgba(var(--semi-orange-5),1); --semi-color-warning-light-default:rgba(var(--semi-orange-0),1);
+  --semi-color-focus-border:rgba(var(--semi-blue-5),1);
+  --semi-color-link:rgba(var(--semi-blue-5),1);
+  --semi-color-border:rgba(var(--semi-grey-9),.08);
+  --semi-color-overlay-bg:rgba(22,22,26,.6);
+  --semi-color-fill-0:rgba(var(--semi-grey-8),.05); --semi-color-fill-1:rgba(var(--semi-grey-8),.09); --semi-color-fill-2:rgba(var(--semi-grey-8),.13);
+  --semi-color-bg-0:rgba(var(--semi-white),1); --semi-color-bg-1:rgba(var(--semi-white),1); --semi-color-bg-2:rgba(var(--semi-white),1); --semi-color-bg-3:rgba(var(--semi-white),1);
+  --semi-color-text-0:rgba(var(--semi-grey-9),1); --semi-color-text-1:rgba(var(--semi-grey-9),.8); --semi-color-text-2:rgba(var(--semi-grey-9),.62); --semi-color-text-3:rgba(var(--semi-grey-9),.35);
+  --semi-color-disabled-text:rgba(var(--semi-grey-9),.35); --semi-color-disabled-bg:rgba(var(--semi-grey-1),1); --semi-color-disabled-border:rgba(var(--semi-grey-1),1);
+  --semi-color-highlight-bg:rgba(var(--semi-yellow-4),1);
+
+  /* Layer1 · 圆角 / 阴影 */
+  --semi-border-radius-extra-small:3px; --semi-border-radius-small:3px; --semi-border-radius-medium:6px; --semi-border-radius-large:12px; --semi-border-radius-circle:50%; --semi-border-radius-full:9999px;
+  --semi-shadow-elevated:0 0 1px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.1);
+  --semi-shadow-2:0px 2px 4px rgba(0,0,0,.14),0px 0px 1px rgba(0,0,0,.16); --semi-shadow-0:none; --semi-shadow-knob:0 4px 6px rgba(0,0,0,.1),0 0 1px rgba(0,0,0,.3);
+
+  /* Layer1 · 排版 / 间距 / 尺寸 / 层级 */
+  --semi-font-family-regular:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Segoe UI','Helvetica Neue',Helvetica,Arial,sans-serif;
+  --semi-font-size-small:12px; --semi-font-size-regular:14px; --semi-font-size-header-6:16px; --semi-font-size-header-5:18px; --semi-font-size-header-4:20px; --semi-font-size-header-3:24px; --semi-font-size-header-2:28px; --semi-font-size-header-1:32px;
+  --semi-font-size-small-line-height:16px; --semi-font-size-regular-line-height:20px; --semi-font-size-header-4-line-height:28px; --semi-font-size-header-3-line-height:32px; --semi-font-size-header-2-line-height:40px; --semi-font-size-header-1-line-height:44px;
+  --semi-font-weight-light:200; --semi-font-weight-regular:400; --semi-font-weight-bold:600;
+  --semi-spacing-none:0; --semi-spacing-super-tight:2px; --semi-spacing-extra-tight:4px; --semi-spacing-tight:8px; --semi-spacing-base-tight:12px; --semi-spacing-base:16px; --semi-spacing-base-loose:20px; --semi-spacing-loose:24px; --semi-spacing-extra-loose:32px; --semi-spacing-super-loose:40px;
+  --semi-height-control-small:24px; --semi-height-control-default:32px; --semi-height-control-large:40px;
+  --semi-z-affix:10; --semi-z-dropdown:1050; --semi-z-popover:1030; --semi-z-modal:1000; --semi-z-tooltip:1060;
+}
+body{
+  /* Layer2 · Cecoder 语义别名（生成 HTML 首选；定义在 body 上以便深色覆盖时重新解析） */
+  --cds-color-primary:var(--semi-color-primary); --cds-color-primary-hover:var(--semi-color-primary-hover); --cds-color-primary-active:var(--semi-color-primary-active); --cds-color-primary-disabled:var(--semi-color-primary-disabled); --cds-color-primary-bg:var(--semi-color-primary-light-default);
+  --cds-color-secondary:var(--semi-color-secondary); --cds-color-tertiary:var(--semi-color-tertiary); --cds-color-tertiary-bg:var(--semi-color-tertiary-light-default);
+  --cds-color-success:var(--semi-color-success); --cds-color-warning:var(--semi-color-warning); --cds-color-danger:var(--semi-color-danger); --cds-color-info:var(--semi-color-info);
+  --cds-color-success-bg:var(--semi-color-success-light-default); --cds-color-warning-bg:var(--semi-color-warning-light-default); --cds-color-danger-bg:var(--semi-color-danger-light-default); --cds-color-info-bg:var(--semi-color-info-light-default);
+  --cds-color-link:var(--semi-color-link);
+  --cds-text-primary:var(--semi-color-text-0); --cds-text-secondary:var(--semi-color-text-1); --cds-text-tertiary:var(--semi-color-text-2); --cds-text-disabled:var(--semi-color-text-3); --cds-text-inverse:var(--semi-color-white);
+  --cds-bg-page:var(--semi-color-bg-0); --cds-bg-container:var(--semi-color-bg-1); --cds-bg-elevated:var(--semi-color-bg-2); --cds-bg-overlay:var(--semi-color-bg-3);
+  --cds-border:var(--semi-color-border); --cds-focus-border:var(--semi-color-focus-border); --cds-fill:var(--semi-color-fill-0); --cds-fill-hover:var(--semi-color-fill-1); --cds-fill-active:var(--semi-color-fill-2);
+  --cds-disabled-bg:var(--semi-color-disabled-bg); --cds-disabled-border:var(--semi-color-disabled-border); --cds-overlay:var(--semi-color-overlay-bg);
+  --cds-radius-xs:var(--semi-border-radius-extra-small); --cds-radius-sm:var(--semi-border-radius-small); --cds-radius-md:var(--semi-border-radius-medium); --cds-radius-lg:var(--semi-border-radius-large); --cds-radius-full:var(--semi-border-radius-full); --cds-radius-circle:var(--semi-border-radius-circle);
+  --cds-space-1:var(--semi-spacing-super-tight); --cds-space-2:var(--semi-spacing-extra-tight); --cds-space-3:var(--semi-spacing-tight); --cds-space-4:var(--semi-spacing-base-tight); --cds-space-5:var(--semi-spacing-base); --cds-space-6:var(--semi-spacing-base-loose); --cds-space-7:var(--semi-spacing-loose); --cds-space-8:var(--semi-spacing-extra-loose); --cds-space-9:var(--semi-spacing-super-loose);
+  --cds-font-xs:var(--semi-font-size-small); --cds-font-sm:var(--semi-font-size-regular); --cds-font-h6:var(--semi-font-size-header-6); --cds-font-h5:var(--semi-font-size-header-5); --cds-font-h4:var(--semi-font-size-header-4); --cds-font-h3:var(--semi-font-size-header-3); --cds-line-xs:var(--semi-font-size-small-line-height); --cds-line-sm:var(--semi-font-size-regular-line-height); --cds-line-h4:var(--semi-font-size-header-4-line-height);
+  --cds-font-family:var(--semi-font-family-regular); --cds-font-weight-light:var(--semi-font-weight-light); --cds-font-weight-regular:var(--semi-font-weight-regular); --cds-font-weight-bold:var(--semi-font-weight-bold);
+  --cds-shadow-0:var(--semi-shadow-0); --cds-shadow-2:var(--semi-shadow-2); --cds-shadow-elevated:var(--semi-shadow-elevated); --cds-shadow-knob:var(--semi-shadow-knob);
+  --cds-height-control-sm:var(--semi-height-control-small); --cds-height-control:var(--semi-height-control-default); --cds-height-control-lg:var(--semi-height-control-large);
+  /* Layer2 扩展 · AI/自动驾驶语义色（指向 Layer1 ai-purple，体现双层可扩展） */
+  --cds-color-ai:rgba(var(--semi-ai-purple-5),1); --cds-color-ai-hover:rgba(var(--semi-ai-purple-6),1); --cds-color-ai-active:rgba(var(--semi-ai-purple-7),1); --cds-color-ai-bg:rgba(var(--semi-ai-purple-0),1);
+}
+body[theme-mode="dark"]{
+  --semi-color-bg-0:rgba(22,22,26,1); --semi-color-bg-1:rgba(35,36,41,1); --semi-color-bg-2:rgba(53,54,60,1); --semi-color-bg-3:rgba(67,68,74,1);
+  --semi-color-text-0:rgba(249,249,249,1); --semi-color-text-1:rgba(249,249,249,.8); --semi-color-text-2:rgba(249,249,249,.6); --semi-color-text-3:rgba(249,249,249,.35);
+  --semi-color-border:rgba(255,255,255,.08); --semi-color-fill-0:rgba(255,255,255,.12); --semi-color-fill-1:rgba(255,255,255,.16); --semi-color-fill-2:rgba(255,255,255,.2);
+  --semi-color-white:rgba(228,231,245,1);
+  --semi-color-primary-light-default:rgba(var(--semi-blue-5),.2); --semi-color-tertiary:rgba(var(--semi-grey-5),1); --semi-color-tertiary-light-default:rgba(var(--semi-grey-5),.2);
+  --semi-color-success-light-default:rgba(var(--semi-green-5),.2); --semi-color-danger-light-default:rgba(var(--semi-red-5),.2); --semi-color-warning-light-default:rgba(var(--semi-orange-5),.2); --semi-color-info-light-default:rgba(var(--semi-blue-5),.2);
+  --semi-color-disabled-bg:rgba(var(--semi-grey-1),1);
+  --semi-shadow-elevated:inset 0 0 0 1px rgba(255,255,255,.1),0 4px 14px rgba(0,0,0,.25);
+}
+
+/* ============================================================
+   页面样式 · 全部引用 --cds-* 变量；类名遵循 .semi-* / .cds-*
+   ============================================================ */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--cds-bg-page);color:var(--cds-text-primary);font-family:var(--cds-font-family);font-size:var(--cds-font-sm);line-height:var(--cds-line-sm);-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+:focus-visible{outline:2px solid var(--cds-focus-border);outline-offset:1px}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--cds-fill-active);border-radius:var(--cds-radius-full);border:2px solid transparent;background-clip:content-box}
+
+.cds-app{display:flex;flex-direction:column;height:100vh}
+
+/* Topbar */
+.semi-layout-header.cds-topbar{height:52px;flex:0 0 52px;display:flex;align-items:center;gap:var(--cds-space-3);padding:0 var(--cds-space-4);background:var(--cds-bg-container);border-bottom:1px solid var(--cds-border);z-index:var(--semi-z-affix)}
+.cds-brand{display:flex;align-items:center;gap:var(--cds-space-3);font-weight:var(--cds-font-weight-bold);white-space:nowrap;color:var(--cds-text-primary);font-size:var(--cds-font-h6)}
+.cds-brand .logo{width:26px;height:26px;border-radius:var(--cds-radius-md);background:linear-gradient(135deg,var(--cds-color-primary),var(--cds-color-ai));display:grid;place-items:center;font-size:var(--cds-font-h6);color:var(--cds-text-inverse)}
+.cds-brand small{color:var(--cds-text-tertiary);font-weight:var(--cds-font-weight-regular);font-size:var(--cds-font-xs)}
+.cds-divider{width:1px;height:24px;background:var(--cds-border)}
+.semi-tag.cds-workdir{display:flex;align-items:center;gap:var(--cds-space-3);height:var(--cds-height-control);padding:0 var(--cds-space-3);border:1px solid var(--cds-border);border-radius:var(--cds-radius-md);background:var(--cds-bg-container);font-size:var(--cds-font-xs);color:var(--cds-text-secondary);max-width:260px}
+.semi-tag.cds-workdir:hover{border-color:var(--cds-color-primary)}
+.semi-tag.cds-workdir b{color:var(--cds-text-primary);font-weight:var(--cds-font-weight-bold)}
+.cds-spacer{flex:1}
+.semi-select.cds-viewrole{display:flex;align-items:center;gap:var(--cds-space-3);height:var(--cds-height-control);border:1px solid var(--cds-border);border-radius:var(--cds-radius-md);background:var(--cds-bg-container);padding:0 var(--cds-space-3);font-size:var(--cds-font-xs);color:var(--cds-text-secondary)}
+.semi-select.cds-viewrole select{border:none;background:none;font:inherit;color:var(--cds-text-primary);outline:none;cursor:pointer}
+.cds-chip{display:inline-flex;align-items:center;gap:var(--cds-space-2);font-size:var(--cds-font-xs);color:var(--cds-text-secondary);border:1px solid var(--cds-border);background:var(--cds-bg-container);border-radius:var(--cds-radius-full);padding:var(--cds-space-1) var(--cds-space-3)}
+.cds-chip .md{width:7px;height:7px;border-radius:var(--cds-radius-circle);background:var(--cds-color-success)}
+.cds-chip.demo{color:var(--cds-color-ai);border-color:var(--cds-color-ai);background:var(--cds-color-ai-bg)}
+.semi-button{display:inline-flex;align-items:center;justify-content:center;gap:var(--cds-space-2);height:var(--cds-height-control);padding:0 var(--cds-space-4);border-radius:var(--cds-radius-sm);font-size:var(--cds-font-sm);font-weight:var(--cds-font-weight-bold);transition:background .15s,border-color .15s,color .15s}
+.semi-button-primary{background:var(--cds-color-primary);color:var(--cds-text-inverse)}
+.semi-button-primary:hover{background:var(--cds-color-primary-hover)}
+.semi-button-primary:active{background:var(--cds-color-primary-active)}
+.semi-button-ai{background:var(--cds-color-ai);color:var(--cds-text-inverse)}
+.semi-button-ai:hover{background:var(--cds-color-ai-hover)}
+.semi-button-tertiary{background:var(--cds-tertiary-bg);color:var(--cds-text-secondary);border:1px solid var(--cds-border)}
+.semi-button-tertiary{background:var(--cds-color-tertiary-bg)}
+.semi-button-tertiary:hover{border-color:var(--cds-color-primary);color:var(--cds-text-primary)}
+.semi-button-borderless.semi-icon-btn{width:var(--cds-height-control-lg);height:var(--cds-height-control-lg);padding:0;border-radius:var(--cds-radius-md);color:var(--cds-text-secondary);position:relative}
+.semi-button-borderless.semi-icon-btn:hover{background:var(--cds-fill);color:var(--cds-text-primary)}
+.semi-badge.cds-badge{position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;padding:0 var(--cds-space-2);border-radius:var(--cds-radius-full);background:var(--cds-color-danger);color:var(--cds-text-inverse);font-size:10px;display:none;place-items:center;font-weight:var(--cds-font-weight-bold)}
+.cds-theme-toggle{font-size:var(--cds-font-xs);color:var(--cds-text-secondary);border:1px solid var(--cds-border);border-radius:var(--cds-radius-full);padding:var(--cds-space-1) var(--cds-space-3);background:var(--cds-bg-container)}
+.cds-theme-toggle:hover{border-color:var(--cds-color-primary);color:var(--cds-text-primary)}
+
+/* Main 3-col */
+.cds-main{flex:1;display:flex;min-height:0}
+.cds-col{display:flex;flex-direction:column;min-height:0;background:var(--cds-bg-container)}
+#col-left{width:300px;flex:0 0 auto;border-right:1px solid var(--cds-border)}
+#col-mid{flex:1 1 auto;min-width:340px;background:var(--cds-bg-page)}
+#col-right{width:380px;flex:0 0 auto;border-left:1px solid var(--cds-border)}
+.cds-col-head{height:46px;flex:0 0 46px;display:flex;align-items:center;gap:var(--cds-space-3);padding:0 var(--cds-space-4);border-bottom:1px solid var(--cds-border)}
+.cds-tabs{display:flex;gap:var(--cds-space-1);background:var(--cds-fill);border-radius:var(--cds-radius-md);padding:3px}
+.cds-tabs button{padding:var(--cds-space-1) var(--cds-space-3);border-radius:var(--cds-radius-sm);font-size:var(--cds-font-xs);color:var(--cds-text-secondary)}
+.cds-tabs button.on{background:var(--cds-bg-container);color:var(--cds-text-primary);font-weight:var(--cds-font-weight-bold);box-shadow:var(--cds-shadow-2)}
+.cds-fold{margin-left:auto;width:28px;height:28px;border-radius:var(--cds-radius-sm);color:var(--cds-text-tertiary)}
+.cds-fold:hover{background:var(--cds-fill);color:var(--cds-text-primary)}
+.cds-list-actions{padding:var(--cds-space-3) var(--cds-space-4)}
+.semi-button-primary.cds-new{width:100%;height:var(--cds-height-control-lg)}
+.cds-task-list{flex:1;overflow-y:auto;padding:var(--cds-space-1) var(--cds-space-4) var(--cds-space-4)}
+
+/* Task cards */
+.semi-card.cds-task{background:var(--cds-bg-container);border:1px solid var(--cds-border);border-radius:var(--cds-radius-lg);padding:var(--cds-space-4);margin-bottom:var(--cds-space-3);cursor:pointer;transition:border-color .15s,transform .15s,box-shadow .15s}
+.semi-card.cds-task:hover{border-color:var(--cds-color-primary);transform:translateY(-1px);box-shadow:var(--cds-shadow-2)}
+.semi-card.cds-task.sel{border-color:var(--cds-color-primary);background:var(--cds-color-primary-bg)}
+.semi-card.cds-task.is-error{border-left:3px solid var(--cds-color-danger)}
+.cds-task-top{display:flex;align-items:center;gap:var(--cds-space-2);margin-bottom:var(--cds-space-2);flex-wrap:wrap}
+.cds-task-title{font-weight:var(--cds-font-weight-bold);font-size:var(--cds-font-h6);line-height:1.35;flex:1;min-width:0}
+.semi-tag.cds-tag{font-size:10.5px;padding:1px var(--cds-space-3);border-radius:var(--cds-radius-full);border:1px solid var(--cds-border);color:var(--cds-text-secondary);white-space:nowrap;background:var(--cds-fill)}
+.semi-tag.cds-tag.prio-high{color:var(--cds-color-danger);border-color:var(--cds-color-danger);background:var(--cds-color-danger-bg)}
+.semi-tag.cds-tag.prio-mid{color:var(--cds-color-warning);border-color:var(--cds-color-warning);background:var(--cds-color-warning-bg)}
+.semi-tag.cds-tag.ai{color:var(--cds-color-ai);border-color:var(--cds-color-ai);background:var(--cds-color-ai-bg)}
+.cds-task-meta{display:flex;align-items:center;gap:var(--cds-space-3);font-size:var(--cds-font-xs);color:var(--cds-text-tertiary);margin-bottom:var(--cds-space-3)}
+.cds-stages{display:flex;gap:var(--cds-space-1)}
+.cds-stages .s{height:5px;flex:1;border-radius:var(--cds-radius-full);background:var(--cds-fill-active)}
+.cds-stages .s.done{background:var(--cds-color-success)} .cds-stages .s.now{background:var(--cds-color-primary)} .cds-stages .s.att{background:var(--cds-color-warning)} .cds-stages .s.err{background:var(--cds-color-danger)}
+
+/* Mid head */
+.semi-layout-header.cds-mid-head{min-height:56px;flex:0 0 auto;display:flex;align-items:center;gap:var(--cds-space-4);padding:var(--cds-space-3) var(--cds-space-5);border-bottom:1px solid var(--cds-border);flex-wrap:wrap;background:var(--cds-bg-container)}
+.cds-mid-title{font-weight:var(--cds-font-weight-bold);font-size:var(--cds-font-h5)}
+.cds-mid-sub{font-size:var(--cds-font-xs);color:var(--cds-text-tertiary)}
+.cds-mid-body{flex:1;overflow-y:auto;padding:var(--cds-space-4) var(--cds-space-5)}
+
+/* Attention inbox */
+.cds-inbox{display:flex;gap:var(--cds-space-3);overflow-x:auto;padding:var(--cds-space-1) 0 var(--cds-space-3)}
+.semi-card.cds-att{flex:0 0 auto;width:300px;background:var(--cds-bg-container);border:1px solid var(--cds-border);border-radius:var(--cds-radius-lg);padding:var(--cds-space-4);cursor:pointer;transition:transform .12s,box-shadow .12s}
+.semi-card.cds-att:hover{transform:translateY(-1px);box-shadow:var(--cds-shadow-2)}
+.cds-att.decision{border-top:3px solid var(--cds-color-ai)}
+.cds-att.hesitate{border-top:3px solid var(--cds-color-warning)}
+.cds-att.review{border-top:3px solid var(--cds-color-success)}
+.cds-att-k{font-size:var(--cds-font-xs);font-weight:var(--cds-font-weight-bold);letter-spacing:.4px;margin-bottom:var(--cds-space-2)}
+.cds-att.decision .cds-att-k{color:var(--cds-color-ai)} .cds-att.hesitate .cds-att-k{color:var(--cds-color-warning)} .cds-att.review .cds-att-k{color:var(--cds-color-success)}
+.cds-att-t{font-weight:var(--cds-font-weight-bold);font-size:var(--cds-font-sm);line-height:1.4;margin-bottom:var(--cds-space-2)}
+.cds-att-b{font-size:var(--cds-font-xs);color:var(--cds-text-secondary);line-height:1.5;margin-bottom:var(--cds-space-3)}
+.cds-att-row{display:flex;gap:var(--cds-space-2);flex-wrap:wrap}
+.semi-button.sm{height:26px;padding:0 var(--cds-space-3);font-size:var(--cds-font-xs);border-radius:var(--cds-radius-sm)}
+
+/* Pipeline */
+.cds-sec-h{font-size:var(--cds-font-xs);font-weight:var(--cds-font-weight-bold);letter-spacing:.4px;color:var(--cds-text-tertiary);text-transform:uppercase;margin:var(--cds-space-4) 0 var(--cds-space-3)}
+.cds-pipe{display:flex;align-items:center;gap:0;flex-wrap:wrap;row-gap:var(--cds-space-3)}
+.semi-card.cds-node{flex:0 0 auto;min-width:104px;background:var(--cds-bg-container);border:1px solid var(--cds-border);border-radius:var(--cds-radius-lg);padding:var(--cds-space-3);position:relative;transition:.2s;cursor:pointer}
+.semi-card.cds-node:hover{border-color:var(--cds-color-primary)}
+.cds-node.running{border-color:var(--cds-color-ai);box-shadow:0 0 0 1px var(--cds-color-ai)}
+.cds-node.done{border-color:var(--cds-color-success)}
+.cds-node.attention{border-color:var(--cds-color-warning);box-shadow:0 0 0 1px var(--cds-color-warning)}
+.cds-node.is-error{border-color:var(--cds-color-danger)}
+.cds-node.pending{opacity:.62}
+.cds-node-name{font-weight:var(--cds-font-weight-bold);font-size:var(--cds-font-sm);display:flex;align-items:center;gap:var(--cds-space-2)}
+.cds-node-status{display:inline-flex;align-items:center;gap:var(--cds-space-2);font-size:10.5px;padding:1px var(--cds-space-3);border-radius:var(--cds-radius-full);margin-top:var(--cds-space-2)}
+.cds-node-status .d{width:7px;height:7px;border-radius:var(--cds-radius-circle)}
+.st-idle{color:var(--cds-text-tertiary);background:var(--cds-fill)} .st-idle .d{background:var(--cds-text-tertiary)}
+.st-run{color:var(--cds-color-ai);background:var(--cds-color-ai-bg)} .st-run .d{background:var(--cds-color-ai);animation:cds-pulse 1.1s infinite}
+.st-done{color:var(--cds-color-success);background:var(--cds-color-success-bg)} .st-done .d{background:var(--cds-color-success)}
+.st-att{color:var(--cds-color-warning);background:var(--cds-color-warning-bg)} .st-att .d{background:var(--cds-color-warning);animation:cds-pulse 1.1s infinite}
+.st-err{color:var(--cds-color-danger);background:var(--cds-color-danger-bg)} .st-err .d{background:var(--cds-color-danger)}
+.cds-parr{flex:0 0 20px;display:grid;place-items:center;color:var(--cds-text-disabled)}
+@keyframes cds-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Unified viewer (artifact) */
+.semi-card.cds-viewer{border:1px solid var(--cds-border);border-radius:var(--cds-radius-lg);overflow:hidden;background:var(--cds-bg-container);display:flex;height:360px;margin-top:var(--cds-space-5)}
+.cds-vtree{flex:0 0 210px;border-right:1px solid var(--cds-border);background:var(--cds-bg-page);overflow:auto;padding:var(--cds-space-3)}
+.cds-vgrp{font-size:var(--cds-font-xs);color:var(--cds-text-tertiary);font-weight:var(--cds-font-weight-bold);padding:var(--cds-space-2) var(--cds-space-2)}
+.cds-vitem{display:flex;align-items:center;gap:var(--cds-space-2);padding:var(--cds-space-2) var(--cds-space-3);border-radius:var(--cds-radius-sm);cursor:pointer;font-size:var(--cds-font-sm);color:var(--cds-text-secondary)}
+.cds-vitem:hover{background:var(--cds-fill)}
+.cds-vitem.on{background:var(--cds-color-primary-bg);color:var(--cds-text-primary);font-weight:var(--cds-font-weight-bold)}
+.cds-vitem .ok{color:var(--cds-color-success)}
+.cds-vdetail{flex:1;min-width:0;display:flex;flex-direction:column}
+.cds-vd-hd{display:flex;align-items:center;gap:var(--cds-space-3);padding:var(--cds-space-3) var(--cds-space-5);border-bottom:1px solid var(--cds-border);font-weight:var(--cds-font-weight-bold)}
+.cds-vd-body{flex:1;overflow:auto;padding:var(--cds-space-4) var(--cds-space-5)}
+.cds-doc p{margin:0 0 var(--cds-space-3);line-height:var(--cds-line-h4);color:var(--cds-text-secondary);font-size:var(--cds-font-sm)}
+.cds-doc b{color:var(--cds-text-primary)}
+.cds-doc h5{margin:var(--cds-space-4) 0 var(--cds-space-2);font-size:var(--cds-font-h6);color:var(--cds-text-primary)}
+.cds-doc ul{margin:0 0 var(--cds-space-3);padding-left:var(--cds-space-7);color:var(--cds-text-secondary);line-height:var(--cds-line-h4)}
+.cds-code{font-family:"SFMono-Regular",Consolas,monospace;font-size:var(--cds-font-sm);line-height:1.7;color:var(--cds-text-primary);background:var(--cds-bg-page);border:1px solid var(--cds-border);border-radius:var(--cds-radius-md);padding:var(--cds-space-3);overflow-x:auto;white-space:pre}
+.cds-code .add{background:var(--cds-color-success-bg);display:block} .cds-code .del{background:var(--cds-color-danger-bg);display:block;text-decoration:line-through;opacity:.8} .cds-code .ctx{display:block}
+.cds-code .ln{color:var(--cds-text-disabled);display:inline-block;width:24px;user-select:none}
+
+/* Mid foot */
+.cds-mid-foot{min-height:52px;flex:0 0 auto;display:flex;align-items:center;gap:var(--cds-space-3);padding:var(--cds-space-3) var(--cds-space-5);border-top:1px solid var(--cds-border);background:var(--cds-bg-container)}
+.cds-hint{font-size:var(--cds-font-xs);color:var(--cds-text-tertiary)}
+
+/* Right AI */
+.semi-layout-header.cds-ai-head{height:46px;flex:0 0 46px;display:flex;align-items:center;gap:var(--cds-space-3);padding:0 var(--cds-space-4);border-bottom:1px solid var(--cds-border)}
+.cds-ai-head .av{width:26px;height:26px;border-radius:var(--cds-radius-md);background:linear-gradient(135deg,var(--cds-color-primary),var(--cds-color-ai));display:grid;place-items:center;font-size:var(--cds-font-h6);color:var(--cds-text-inverse)}
+.cds-ai-head .nm{font-weight:var(--cds-font-weight-bold);font-size:var(--cds-font-sm)}
+.cds-ai-head .st{font-size:10.5px;color:var(--cds-text-tertiary)}
+.cds-ai-scope{margin-left:auto;font-size:10.5px;color:var(--cds-color-primary);border:1px solid var(--cds-color-primary);padding:1px var(--cds-space-3);border-radius:var(--cds-radius-full);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--cds-color-primary-bg)}
+.cds-ai-msgs{flex:1;overflow-y:auto;padding:var(--cds-space-4)}
+.semi-chat-list-msg.cds-msg{margin-bottom:var(--cds-space-4);display:flex;gap:var(--cds-space-3)}
+.cds-msg .ma{width:26px;height:26px;border-radius:var(--cds-radius-md);flex:0 0 26px;display:grid;place-items:center;font-size:var(--cds-font-xs);color:var(--cds-text-inverse)}
+.cds-msg.ai .ma{background:linear-gradient(135deg,var(--cds-color-primary),var(--cds-color-ai))}
+.cds-msg.me{flex-direction:row-reverse}.cds-msg.me .ma{background:var(--cds-fill-active);color:var(--cds-text-secondary)}
+.semi-card.cds-bubble{background:var(--cds-bg-container);border:1px solid var(--cds-border);border-radius:var(--cds-radius-lg);padding:var(--cds-space-3) var(--cds-space-4);font-size:var(--cds-font-sm);line-height:1.65;max-width:86%}
+.cds-msg.me .cds-bubble{background:var(--cds-color-primary-bg);border-color:var(--cds-color-primary)}
+.semi-tag.cds-ctxref{display:inline-flex;align-items:center;gap:var(--cds-space-2);font-size:10.5px;color:var(--cds-color-primary);border:1px solid var(--cds-color-primary);background:var(--cds-color-primary-bg);border-radius:var(--cds-radius-sm);padding:1px var(--cds-space-3);margin-bottom:var(--cds-space-2)}
+.semi-tag.cds-route{display:inline-flex;align-items:center;gap:var(--cds-space-2);font-size:10.5px;color:var(--cds-color-ai);border:1px solid var(--cds-color-ai);background:var(--cds-color-ai-bg);border-radius:var(--cds-radius-sm);padding:1px var(--cds-space-3);margin-bottom:var(--cds-space-2)}
+.cds-qactions{display:flex;gap:var(--cds-space-2);margin-top:var(--cds-space-3);flex-wrap:wrap}
+.cds-qactions button{font-size:var(--cds-font-xs);padding:var(--cds-space-1) var(--cds-space-3);border-radius:var(--cds-radius-sm);border:1px solid var(--cds-border);color:var(--cds-text-secondary);background:var(--cds-fill)}
+.cds-qactions button:hover{border-color:var(--cds-color-primary);color:var(--cds-text-primary)}
+.cds-ai-input{border-top:1px solid var(--cds-border);padding:var(--cds-space-3) var(--cds-space-3) var(--cds-space-4);background:var(--cds-bg-container)}
+.cds-inbox-bar{display:flex;align-items:flex-end;gap:var(--cds-space-3);background:var(--cds-bg-page);border:1px solid var(--cds-border);border-radius:var(--cds-radius-lg);padding:var(--cds-space-2) var(--cds-space-2) var(--cds-space-2) var(--cds-space-4);transition:border-color .15s}
+.cds-inbox-bar:focus-within{border-color:var(--cds-color-primary)}
+.cds-inbox-bar textarea{flex:1;background:none;border:none;color:var(--cds-text-primary);resize:none;font-family:inherit;font-size:var(--cds-font-sm);line-height:1.5;max-height:96px;padding:var(--cds-space-2) 0;outline:none}
+.cds-voice{width:var(--cds-height-control-lg);height:var(--cds-height-control-lg);border-radius:var(--cds-radius-md);background:var(--cds-fill);color:var(--cds-text-secondary);display:grid;place-items:center;font-size:var(--cds-font-h6);flex:0 0 var(--cds-height-control-lg)}
+.cds-voice:hover{background:var(--cds-fill-hover)}
+.cds-send{width:var(--cds-height-control-lg);height:var(--cds-height-control-lg);border-radius:var(--cds-radius-md);background:var(--cds-color-primary);color:var(--cds-text-inverse);display:grid;place-items:center;font-size:var(--cds-font-h6);flex:0 0 var(--cds-height-control-lg)}
+.cds-send:hover{background:var(--cds-color-primary-hover)}
+.cds-sugg{display:flex;gap:var(--cds-space-2);margin-top:var(--cds-space-3);flex-wrap:wrap}
+.semi-tag.cds-sug{font-size:var(--cds-font-xs);color:var(--cds-text-secondary);border:1px solid var(--cds-border);border-radius:var(--cds-radius-full);padding:var(--cds-space-1) var(--cds-space-4);background:var(--cds-bg-container);cursor:pointer}
+.semi-tag.cds-sug:hover{border-color:var(--cds-color-primary);color:var(--cds-text-primary)}
+
+@media (max-width:1180px){#col-right{display:none}}
+@media (max-width:900px){#col-left{display:none}}
+</style>
+</head>
+<body>
+<div class="cds-app">
+
+  <!-- Topbar -->
+  <header class="semi-layout-header cds-topbar">
+    <div class="cds-brand"><span class="logo">⚙</span> AI 软件工厂 <small>v2 · AI-Native</small></div>
+    <div class="cds-divider"></div>
+    <button class="semi-tag cds-workdir"><span>📁</span><b>~/dev/ai-factory</b><span style="color:var(--cds-color-success)">已连接</span></button>
+    <span class="semi-select cds-viewrole">🧑‍💼<select><option>项目经理 · 全局</option><option>产品经理</option><option>UI设计师</option><option>后端工程师</option><option>前端工程师</option><option>测试工程师</option></select></span>
+    <div class="cds-spacer"></div>
+    <span class="cds-chip demo">● 串讲中</span>
+    <span class="cds-chip"><span class="md"></span>接入模型</span>
+    <button class="cds-theme-toggle" id="themeBtn">🌙 深色</button>
+    <button class="semi-button semi-button-ai" title="自动串讲">▶ 演示串讲</button>
+    <button class="semi-button semi-button-borderless semi-icon-btn" title="组织全景看板">🗂<span class="semi-badge cds-badge" style="display:grid">3</span></button>
+    <button class="semi-button semi-button-borderless semi-icon-btn" title="命令面板">⌘K</button>
+    <button class="semi-button semi-button-borderless semi-icon-btn" title="产品理念">❓</button>
+    <button class="semi-button semi-button-ai" title="数字分身">🧠 数字分身</button>
+  </header>
+
+  <div class="cds-main">
+    <!-- Left: tasks -->
+    <aside class="cds-col" id="col-left">
+      <div class="cds-col-head">
+        <div class="cds-tabs">
+          <button class="on">我的需求</button>
+          <button>待我处理</button>
+        </div>
+        <button class="cds-fold" title="折叠">⟨⟨</button>
+      </div>
+      <div class="cds-list-actions">
+        <button class="semi-button semi-button-primary cds-new">＋ 说出你想做的（AI 帮你跑）</button>
+      </div>
+      <div class="cds-task-list">
+        <div class="semi-card cds-task sel">
+          <div class="cds-task-top">
+            <div class="cds-task-title">会员订阅体系</div>
+            <span class="semi-tag cds-tag prio-high">高</span>
+            <span class="semi-tag cds-tag ai">自动驾驶</span>
+          </div>
+          <div class="cds-task-meta"><span>📝 产品经理 · Eddy</span><span>·</span><span>UI设计进行中</span></div>
+          <div class="cds-stages"><span class="s done"></span><span class="s done"></span><span class="s done"></span><span class="s now"></span><span class="s"></span><span class="s"></span><span class="s"></span><span class="s"></span></div>
+        </div>
+        <div class="semi-card cds-task">
+          <div class="cds-task-top"><div class="cds-task-title">个人中心改版</div><span class="semi-tag cds-tag prio-mid">中</span></div>
+          <div class="cds-task-meta"><span>💻 前端 · Leo</span><span>·</span><span>测试中</span></div>
+          <div class="cds-stages"><span class="s done"></span><span class="s done"></span><span class="s done"></span><span class="s done"></span><span class="s done"></span><span class="s att"></span><span class="s now"></span><span class="s"></span></div>
+        </div>
+        <div class="semi-card cds-task">
+          <div class="cds-task-top"><div class="cds-task-title">双十一营销活动 H5</div><span class="semi-tag cds-tag">低</span></div>
+          <div class="cds-task-meta"><span>📝 产品 · Mia</span><span>·</span><span>概要设计</span></div>
+          <div class="cds-stages"><span class="s now"></span><span class="s"></span><span class="s"></span><span class="s"></span><span class="s"></span><span class="s"></span><span class="s"></span><span class="s"></span></div>
+        </div>
+        <div class="semi-card cds-task is-error">
+          <div class="cds-task-top"><div class="cds-task-title">退款流程自动化</div><span class="semi-tag cds-tag prio-high">高</span></div>
+          <div class="cds-task-meta"><span>🛠 后端 · Ken</span><span>·</span><span style="color:var(--cds-color-danger)">开发实现失败</span></div>
+          <div class="cds-stages"><span class="s done"></span><span class="s done"></span><span class="s done"></span><span class="s done"></span><span class="s"></span><span class="s err"></span><span class="s"></span><span class="s"></span></div>
+        </div>
+        <div class="semi-card cds-task">
+          <div class="cds-task-top"><div class="cds-task-title">运营数据看板</div><span class="semi-tag cds-tag ai">自动驾驶</span></div>
+          <div class="cds-task-meta"><span>📊 PM · Eddy</span><span>·</span><span>待交付确认</span></div>
+          <div class="cds-stages"><span class="s done"></span><span class="s done"></span><span class="s done"></span><span class="s done"></span><span class="s done"></span><span class="s done"></span><span class="s done"></span><span class="s att"></span></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mid: workspace -->
+    <main class="cds-col" id="col-mid">
+      <header class="semi-layout-header cds-mid-head">
+        <div class="cds-mid-title">会员订阅体系</div>
+        <div class="cds-mid-sub">8 道工序 · AI 自动排程</div>
+        <div class="cds-spacer"></div>
+        <div class="cds-tabs"><button>流水线</button><button class="on">工序产物</button><button>代码 diff</button><button>审计</button></div>
+      </header>
+      <div class="cds-mid-body">
+
+        <div class="cds-sec-h">需要你处理的</div>
+        <div class="cds-inbox">
+          <div class="semi-card cds-att decision">
+            <div class="cds-att-k">🤔 需要你拍板 · UI设计</div>
+            <div class="cds-att-t">AI 产出 3 套订阅页视觉方案，选一套继续</div>
+            <div class="cds-att-b">Aurora 商务 / Sunset 电商 / Graphite 极简，差异在套餐卡片排布与主色调。</div>
+            <div class="cds-att-row">
+              <button class="semi-button semi-button-primary sm">选 Aurora</button>
+              <button class="semi-button semi-button-tertiary sm">查看全部</button>
+            </div>
+          </div>
+          <div class="semi-card cds-att hesitate">
+            <div class="cds-att-k">⚠️ AI 没把握 · 详细设计</div>
+            <div class="cds-att-t">「年付是否自动续订」规则缺失</div>
+            <div class="cds-att-b">上游未定义续费策略，影响接口与状态机，需你确认后 AI 再继续。</div>
+            <div class="cds-att-row"><button class="semi-button semi-button-tertiary sm">去补充</button></div>
+          </div>
+          <div class="semi-card cds-att review">
+            <div class="cds-att-k">✅ 交付确认 · 测试</div>
+            <div class="cds-att-t">测试报告：42 通过 / 0 失败</div>
+            <div class="cds-att-b">P0/P1 全过，无阻断缺陷，建议 10%→100% 灰度上线。</div>
+            <div class="cds-att-row"><button class="semi-button semi-button-primary sm">查看报告</button><button class="semi-button semi-button-tertiary sm">通过</button></div>
+          </div>
+        </div>
+
+        <div class="cds-sec-h">流水线</div>
+        <div class="cds-pipe">
+          <div class="semi-card cds-node done"><div class="cds-node-name">📝 概要设计</div><span class="cds-node-status st-done"><span class="d"></span>已完成</span></div>
+          <span class="cds-parr">›</span>
+          <div class="semi-card cds-node done"><div class="cds-node-name">📐 详细设计</div><span class="cds-node-status st-done"><span class="d"></span>已完成</span></div>
+          <span class="cds-parr">›</span>
+          <div class="semi-card cds-node done"><div class="cds-node-name">🛠 程序设计</div><span class="cds-node-status st-done"><span class="d"></span>已完成</span></div>
+          <span class="cds-parr">›</span>
+          <div class="semi-card cds-node running attention"><div class="cds-node-name">🎨 UI设计</div><span class="cds-node-status st-run"><span class="d"></span>进行中·需拍板</span></div>
+          <span class="cds-parr">›</span>
+          <div class="semi-card cds-node pending"><div class="cds-node-name">🔍 代码变更分析</div><span class="cds-node-status st-idle"><span class="d"></span>待开始</span></div>
+          <span class="cds-parr">›</span>
+          <div class="semi-card cds-node pending"><div class="cds-node-name">💻 开发实现</div><span class="cds-node-status st-idle"><span class="d"></span>待开始</span></div>
+          <span class="cds-parr">›</span>
+          <div class="semi-card cds-node pending"><div class="cds-node-name">🧪 测试</div><span class="cds-node-status st-idle"><span class="d"></span>待开始</span></div>
+          <span class="cds-parr">›</span>
+          <div class="semi-card cds-node pending"><div class="cds-node-name">🚀 交付确认</div><span class="cds-node-status st-att"><span class="d"></span>排队</span></div>
+        </div>
+
+        <div class="cds-sec-h">当前工序产物 · 统一查看器</div>
+        <div class="semi-card cds-viewer">
+          <div class="cds-vtree">
+            <div class="cds-vgrp">🎨 UI设计 产物</div>
+            <div class="cds-vitem on"><span class="ok">✓</span> 界面设计画板</div>
+            <div class="cds-vitem"><span>🖼</span> 会员订阅页</div>
+            <div class="cds-vitem"><span>🖼</span> 支付确认</div>
+            <div class="cds-vitem"><span>🖼</span> 订阅成功</div>
+          </div>
+          <div class="cds-vdetail">
+            <div class="cds-vd-hd">会员订阅页 · Aurora 商务<span class="semi-tag cds-tag" style="margin-left:auto">v3</span></div>
+            <div class="cds-vd-body cds-doc">
+              <p>基于「概要设计」的目标人群与「详细设计」的字段状态，产出 <b>3 套视觉</b>供拍板；不重新发明，复用既有组件契约。</p>
+              <h5>设计要点</h5>
+              <ul><li>套餐卡片：年付立减角标 + 权益清单折叠</li><li>主 CTA 唯一，置于吸底栏，未勾协议置灰</li><li>价格数字用 <b>字重 bold / h5</b>，辅助说明用 text-2</li></ul>
+              <div class="cds-code"><span class="ctx"><span class="ln"> </span>/* 语义 token 还原 */</span><span class="add"><span class="ln">+</span>.semi-card.plan { background: var(--cds-bg-container); }</span><span class="add"><span class="ln">+</span>  border: 1px solid var(--cds-border); border-radius: var(--cds-radius-lg); }</span><span class="del"><span class="ln">-</span>  background: #ffffff;</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <footer class="cds-mid-foot">
+        <span class="cds-hint">💡 自动驾驶中，仅 3 处需要你拍板，其余 AI 自行推进</span>
+        <div class="cds-spacer"></div>
+        <button class="semi-button semi-button-tertiary sm">暂停 AI</button>
+        <button class="semi-button semi-button-primary sm">让 AI 继续</button>
+      </footer>
+    </main>
+
+    <!-- Right: Copilot -->
+    <aside class="cds-col" id="col-right">
+      <header class="semi-layout-header cds-ai-head">
+        <span class="av">🤖</span>
+        <div><div class="nm">工厂 Copilot</div><div class="st">在线 · 万能插话入口</div></div>
+        <div class="cds-ai-scope">范围：会员订阅体系</div>
+      </header>
+      <div class="cds-ai-msgs">
+        <div class="semi-chat-list-msg cds-msg ai">
+          <span class="ma">🤖</span>
+          <div class="semi-card cds-bubble">
+            <div class="semi-tag cds-route">↦ 路由 · 工序编排</div>
+            已根据你的描述排好 <b>8 道工序</b> 并分配岗位。UI设计阶段我产出了 3 套视觉，需要你拍板后再进入开发。
+          </div>
+        </div>
+        <div class="semi-chat-list-msg cds-msg me">
+          <span class="ma">Eddy</span>
+          <div class="semi-card cds-bubble">加一条：年付立减 20%，并自动续订。</div>
+        </div>
+        <div class="semi-chat-list-msg cds-msg ai">
+          <span class="ma">🤖</span>
+          <div class="semi-card cds-bubble">
+            <div class="semi-tag cds-ctxref">🔗 已关联 · 概要设计 / 字段与规则</div>
+            已写入「详细设计」字段规则并同步到 UI 方案 A。⚠️ 但「续费失败宽限期」上游未定义——这正是右侧 <b>AI 没把握</b> 的卡片，补充后我继续跑开发。
+            <div class="cds-qactions"><button>查看改动</button><button>切到详细设计</button><button>先忽略</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="cds-ai-input">
+        <div class="cds-inbox-bar">
+          <textarea rows="1" placeholder="随时说，AI 会路由到相应工序…（可指认 / 按住说话）"></textarea>
+          <button class="cds-voice" title="按住说话">🎙</button>
+          <button class="cds-send" title="发送">↑</button>
+        </div>
+        <div class="cds-sugg">
+          <span class="semi-tag cds-sug">查看概要设计</span>
+          <span class="semi-tag cds-sug">改派 UI 给设计师</span>
+          <span class="semi-tag cds-sug">直接跑开发</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+// 主题切换：仅切换 <body theme-mode="dark">，所有样式因走变量而自动换肤
+(function(){var b=document.getElementById('themeBtn');if(!b)return;b.onclick=function(){var on=document.body.getAttribute('theme-mode')==='dark';if(on){document.body.removeAttribute('theme-mode');b.textContent='🌙 深色';}else{document.body.setAttribute('theme-mode','dark');b.textContent='☀️ 浅色';}};})();
+// 标签 / 任务选中（仅演示态切换）
+document.querySelectorAll('.cds-tabs').forEach(function(t){t.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;t.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');});});
+document.querySelectorAll('.cds-task').forEach(function(c){c.addEventListener('click',function(){document.querySelectorAll('.cds-task').forEach(function(x){x.classList.remove('sel')});c.classList.add('sel');});});
+</script>
+</body>
+</html>
