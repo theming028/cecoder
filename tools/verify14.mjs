@@ -157,26 +157,22 @@ async function page(w, h, open) {
   await p.close();
 }
 
-/* ========== 5 涟漪加强 ========== */
+/* ========== 5 涟漪圆点已整块移除（第 42 轮） ========== */
 {
   const p = await page(1440, 900, false);
   const s = await p.evaluate(() => {
-    const d = document.getElementById('mbDot');
-    const a = getComputedStyle(d, '::after'), bf = getComputedStyle(d, '::before');
+    let css = '';
+    for (const sh of document.styleSheets) { let r; try { r = sh.cssRules; } catch (e) { continue; } for (const x of r) css += x.cssText; }
     return {
-      hasDot: document.querySelector('.menu-btn').classList.contains('has-dot'),
-      aName: a.animationName, aDur: a.animationDuration, aW: a.width, aBg: a.backgroundColor,
-      bName: bf.animationName, bDur: bf.animationDuration, bDelay: bf.animationDelay,
-      dotTransform: getComputedStyle(d).transform
+      dot: document.querySelectorAll('#mbDot, .mb-dot').length,
+      ripple: /mbRipple/.test(css),
+      dotRule: /\.mb-dot/.test(css),
+      floatTip: !!document.getElementById('fpTip')
     };
   });
-  ok('5 折叠态亮橙点', s.hasDot);
-  ok('5 两层波纹', s.aName === 'mbRipple' && s.bName === 'mbRipple', JSON.stringify(s));
-  ok('5 1.7s 一轮', s.aDur === '1.7s' && s.bDur === '1.7s', s.aDur);
-  ok('5 双层错开 0.85s', s.bDelay === '0.85s', s.bDelay);
-  ok('5 波纹直径 22px', s.aW === '22px', s.aW);
-  ok('5 波纹更浓', /0\.34/.test(s.aBg), s.aBg);
-  ok('5 实心点本体不缩放', s.dotTransform === 'matrix(1, 0, 0, 1, 0, 0)' || s.dotTransform === 'none', s.dotTransform);
+  ok('5 圆点 DOM 已移除', s.dot === 0);
+  ok('5 圆点 / 涟漪样式已移除', s.ripple === false && s.dotRule === false, JSON.stringify(s));
+  ok('5 折叠提示换成浮标', s.floatTip === true);
   await p.close();
 }
 

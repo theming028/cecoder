@@ -52,26 +52,28 @@ async function page(w, h, dw, open) {
   await p.close();
 }
 
-/* ========== 2 涟漪橙点与图标水平居中 ========== */
+/* ========== 2 折叠提示改为浮标（第 42 轮替掉涟漪橙点） ========== */
 {
   const p = await page(1440, 900, 320, false);
+  /* 第 41 轮起首页不认 open:false，要折叠得点一次收起 */
+  if (await p.evaluate(() => document.getElementById('wsDrawer').classList.contains('is-open'))) await p.click('.wd-collapse');
+  await wait(1400);
   const d = await p.evaluate(() => {
-    const btn = document.querySelector('.menu-btn');
-    const dot = document.getElementById('mbDot');
-    const br = btn.getBoundingClientRect(), dr = dot.getBoundingClientRect();
-    const btnMid = br.top + br.height / 2, dotMid = dr.top + dr.height / 2;
-    const cs = getComputedStyle(dot);
-    return { off: Math.abs(btnMid - dotMid), top: cs.top, right: cs.right };
+    const t = document.getElementById('fpTip');
+    const r = t.getBoundingClientRect();
+    const ar = t.querySelector('.fp-arrow').getBoundingClientRect();
+    const btn = document.querySelector('.menu-btn').getBoundingClientRect();
+    return {
+      dot: document.querySelectorAll('#mbDot, .mb-dot').length,
+      on: t.classList.contains('is-on'),
+      left: Math.round(r.left), btnRight: Math.round(btn.right),
+      arrowCy: +(ar.y + ar.height / 2).toFixed(1),
+      btnCy: +(btn.y + btn.height / 2).toFixed(1)
+    };
   });
-  ok('2 橙点垂直中心与按钮中心重合', d.off < 1, String(d.off));
-  ok('2 橙点仍贴按钮右缘', parseFloat(d.right) < 3, d.right);
-  // 触发涟漪：折叠态 + 待确认
-  await p.evaluate(() => {
-    const drawer = document.getElementById('wsDrawer');
-    drawer.dataset.forcedot = '1';
-  });
-  const hasFn = await p.evaluate(() => typeof window !== 'undefined');
-  ok('2 页面可执行', hasFn, '');
+  ok('2 橙点已移除', d.dot === 0);
+  ok('2 折叠态浮标出现且不压按钮', d.on === true && d.left > d.btnRight, JSON.stringify(d));
+  ok('2 尖角与按钮中线齐平（≤0.5px）', Math.abs(d.arrowCy - d.btnCy) <= 0.5, d.arrowCy + ' vs ' + d.btnCy);
   await p.close();
 }
 

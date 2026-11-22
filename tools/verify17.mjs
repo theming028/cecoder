@@ -222,21 +222,28 @@ async function page(w = 1440, h = 900, dw = 320, open = true) {
   await p.close();
 }
 
-/* ========== 9 涟漪原点与图标间距 8px ========== */
+/* ========== 9 折叠态提示：圆点已移除 → 浮标挂在按钮右侧（第 42 轮） ========== */
 {
   const p = await page(1440, 900, 320, false);
+  await wait(1400);
   const d = await p.evaluate(() => {
-    const btn = document.querySelector('.menu-btn');
-    btn.classList.add('has-dot');
-    const ico = btn.querySelector('.ico').getBoundingClientRect();
-    const dot = document.getElementById('mbDot').getBoundingClientRect();
-    const br = btn.getBoundingClientRect();
-    return { gap: Math.round(dot.left - ico.right), vOff: Math.abs((dot.top + dot.height / 2) - (ico.top + ico.height / 2)),
-      dotRight: Math.round(dot.right - br.right) };
+    const t = document.getElementById('fpTip');
+    const r = t.getBoundingClientRect();
+    const ar = t.querySelector('.fp-arrow').getBoundingClientRect();
+    const btn = document.querySelector('.menu-btn').getBoundingClientRect();
+    return {
+      dot: document.querySelectorAll('#mbDot, .mb-dot').length,
+      on: t.classList.contains('is-on'),
+      x: Math.round(r.left), btnRight: Math.round(btn.right),
+      arrowCy: +(ar.y + ar.height / 2).toFixed(1), btnCy: +(btn.y + btn.height / 2).toFixed(1),
+      txt: t.querySelector('.fp-text').textContent.replace(/\s+/g, ' ').trim()
+    };
   });
-  ok('9 原点左缘距图标右缘 8px', d.gap === 8, String(d.gap));
-  ok('9 与图标垂直居中', d.vOff < 1, String(d.vOff));
-  await p.screenshot({ path: 'R17-dot.png', clip: { x: 0, y: 40, width: 120, height: 60 } });
+  ok('9 圆点已移除', d.dot === 0);
+  ok('9 折叠态浮标在按钮右侧且不压按钮', d.on === true && d.x > d.btnRight, JSON.stringify(d));
+  ok('9 尖角中线对齐按钮中线（≤0.5px）', Math.abs(d.arrowCy - d.btnCy) <= 0.5, d.arrowCy + ' vs ' + d.btnCy);
+  ok('9 文案带待确认数量', /^有 \d+ 个待确认的事项需处理$/.test(d.txt), d.txt);
+  await p.screenshot({ path: 'R17-dot.png', clip: { x: 0, y: 40, width: 300, height: 110 } });
   await p.close();
 }
 

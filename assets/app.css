@@ -221,35 +221,64 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 /* 抽屉展开时由抽屉头部的「收起」接管，这里淡出避让（否则会被 320 宽抽屉压住） */
 .menu-btn[aria-expanded="true"] { opacity: 0; transform: translateX(8px); pointer-events: none; }
 
-/* 第 13 轮：抽屉折叠 + 列表里有「待确认」时，按钮右上角亮橙点（稿 2960:48800 ·
-   16×16 外圈 rgba(247,114,52,.16) + 6×6 实心 #F77234）。
-   涟漪只让「外圈伪元素」scale，图标本体全程静止 —— 上一轮分身发虚的教训：持续缩放会重采样。 */
-.mb-dot {
-  /* 第 16 轮：橙点移到与图标同一水平线；第 17 轮：原点与左侧 14px 图标留 8px 间距
-     （按钮 28 里图标居中占 7~21，点左缘 29 → right:-7），涟漪圈也整体右移跟随 */
-  position: absolute; top: 50%; margin-top: -3px; right: -7px; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--cds-orangered-6); pointer-events: none;
-  opacity: 0; transform: scale(.4);
-  transition: opacity .18s var(--cds-motion-ease), transform .18s var(--cds-motion-ease);
+/* ============================================================
+   第 42 轮：折叠态「待确认」浮标（整块替掉第 13/14/17 轮那颗涟漪圆点）
+   · 出现条件：左栏已收起 + 列表里还有待确认卡片（JS 的 syncFpTip 控制）
+   · 白卡 + 左侧尖角，尖角圆心 y=21 —— 正好是折叠按钮 (top 7 + 28/2) 的水平中线，
+     所以浮标永远挂在按钮右侧 7px 处指向它
+   · 主色沿用 orangered-6 #F77234；不做循环缩放动画（小尺寸反复重采样会发虚）
+   ============================================================ */
+.fp-tip {
+  position: absolute; left: 46px; top: 4px; z-index: 40;
+  width: max-content; max-width: 268px;
+  padding: 11px 12px 10px 13px;
+  background: var(--cds-bg-container);
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px rgba(247, 114, 52, .22),
+              0 10px 26px rgba(31, 68, 118, .16),
+              0 2px 6px rgba(31, 68, 118, .07);
+  opacity: 0; transform: translateX(-6px) scale(.97);
+  transform-origin: 0 21px;
+  pointer-events: none;
+  /* 收起时一并 visibility:hidden —— 否则透明度变 0 后两个按钮还留在 Tab 序列里，
+     键盘能聚焦到一张看不见的卡上；延迟 .26s 等淡出动画走完再切 */
+  visibility: hidden;
+  transition: opacity .2s var(--cds-motion-ease),
+              transform .26s cubic-bezier(.2, .9, .25, 1),
+              visibility 0s linear .26s;
 }
-.menu-btn.has-dot .mb-dot { opacity: 1; transform: none; }
-/* 第 14 轮：涟漪加强 —— 22px 直径、两层交错波纹、1.7s 一轮；
-   光环只走伪元素，实心点本体依然全程静止（持续缩放会让小图标重采样发虚） */
-.mb-dot::before, .mb-dot::after {
-  content: ''; position: absolute; left: 50%; top: 50%;
-  width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%;
-  background: rgba(247, 114, 52, .34); opacity: 0; pointer-events: none;
+.fp-tip.is-on {
+  opacity: 1; transform: none; pointer-events: auto; visibility: visible;
+  transition: opacity .2s var(--cds-motion-ease), transform .26s cubic-bezier(.2, .9, .25, 1);
 }
-.menu-btn.has-dot .mb-dot::after { animation: mbRipple 1.7s cubic-bezier(.16, .7, .3, 1) infinite; }
-.menu-btn.has-dot .mb-dot::before { animation: mbRipple 1.7s cubic-bezier(.16, .7, .3, 1) .85s infinite; }
-@keyframes mbRipple {
-  0%   { transform: scale(.24); opacity: 0; }
-  14%  { opacity: 1; }
-  70%  { opacity: .55; }
-  100% { transform: scale(1.3); opacity: 0; }
+/* 尖角：8×12 的实心三角，底边贴住卡片左缘，尖端离折叠按钮 3px；
+   圆心 y=17（+浮标 top 4 = 按钮中线 21）。用 clip-path + 1px 投影描出橙色轮廓，
+   比「转 45° 的方块」干净：不会在卡片角上留下被压掉一半的描边 */
+.fp-arrow {
+  position: absolute; left: -8px; top: 10.5px; width: 8px; height: 13px;
+  background: var(--cds-bg-container);
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+  filter: drop-shadow(-1px 0 0 rgba(247, 114, 52, .45));
 }
+.fp-main { display: flex; align-items: flex-start; gap: 8px; }
+.fp-bell { flex: 0 0 auto; width: 16px; height: 16px; margin-top: 1px; display: block; }
+.fp-text { margin: 0; font-size: 13px; line-height: 20px; color: var(--cds-text-primary); white-space: nowrap; }
+.fp-num { color: var(--cds-orangered-6); font-weight: 600; font-variant-numeric: tabular-nums; }
+.fp-acts { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; }
+.fp-btn {
+  height: 26px; padding: 0 10px; border-radius: 6px;
+  font-size: 13px; font-weight: 500; line-height: 24px;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease),
+              color var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.fp-btn-go { background: var(--cds-orangered-6); color: #fff; }
+.fp-btn-go:hover { background: #E45F1F; }
+.fp-btn-go:active { background: #D25518; }
+.fp-btn-later { background: transparent; color: var(--cds-text-secondary); }
+.fp-btn-later:hover { background: var(--cds-fill); color: var(--cds-text-primary); }
+.fp-btn:focus-visible { outline: 2px solid var(--cds-color-primary); outline-offset: 1px; }
 @media (prefers-reduced-motion: reduce) {
-  .menu-btn.has-dot .mb-dot::before, .menu-btn.has-dot .mb-dot::after { animation: none; }
+  .fp-tip { transition: opacity .01ms; transform: none; }
 }
 
 /* ===== 内容列：宽 960 居中，上下按 22vh / 底部锚定 =====
@@ -1566,6 +1595,14 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .wd-card.is-todo.is-sel,
 .wd-card.is-todo.is-sel:hover { background: rgba(55, 112, 247, .11); }
 .wd-card.is-todo.is-sel:hover { background: rgba(55, 112, 247, .16); }
+/* 第 42 轮：浮标「去处理」定位到卡片时的一圈橙色呼吸（1.5s 后由 JS 摘掉类） */
+.wd-card.is-fp-focus { animation: fpFocus 1.5s var(--cds-motion-ease); }
+@keyframes fpFocus {
+  0%   { box-shadow: 0 0 0 0 rgba(247, 114, 52, 0); }
+  22%  { box-shadow: 0 0 0 2px rgba(247, 114, 52, .62); }
+  70%  { box-shadow: 0 0 0 2px rgba(247, 114, 52, .62); }
+  100% { box-shadow: 0 0 0 0 rgba(247, 114, 52, 0); }
+}
 .wd-card-top { display: flex; align-items: flex-start; gap: 8px; }
 /* 第 17 轮：未选中时标题用常规字重，选中才 500 */
 .wd-card-title {

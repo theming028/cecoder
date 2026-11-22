@@ -818,21 +818,110 @@
     syncThumb();
   });
 
-  /* 第 13 轮：折叠态提醒点 —— 列表里存在「待确认」且抽屉是收起的时候才亮。
-     判断走 DOM（is-todo 卡片），任务状态变了这里自动跟着变。 */
-  function syncMenuDot() {
-    var has = !!drawer.querySelector('.wd-card.is-todo, .wd-sess-card.is-todo');
-    var show = has && !drawer.classList.contains('is-open');
-    menuBtn.classList.toggle('has-dot', show);
-    menuBtn.setAttribute('aria-label', show ? '展开任务列表（有待确认任务）' : '展开任务列表');
+  /* ============================================================
+     第 42 轮：折叠态「待确认」浮标（整块替掉第 13 轮的涟漪圆点）
+     · 出现条件：左栏已收起 + 列表里还有待确认卡片；浮出前随机等 0.45~1.35s，
+       避免每次收栏都「啪」地同一瞬间弹出来
+     · 去处理：展开左栏 → 切到含待确认的页签 → 展开所属分组 → 滚到卡片并给 1.5s 橙色圈
+     · 稍后：先收起，20s 后仍在折叠态就再浮一次
+     ============================================================ */
+  var fpTip = document.getElementById('fpTip');
+  var fpNumEl = document.getElementById('fpNum');
+  var fpGoBtn = document.getElementById('fpGo');
+  var fpLaterBtn = document.getElementById('fpLater');
+  var fpShowT = 0, fpSnoozeT = 0;
+
+  function fpPending() {
+    /* 以「待确认」chip 为准（任务卡 + 会话卡），拿不到再退回 is-todo 类 */
+    var n = drawer.querySelectorAll('.wd-card .wd-chip-todo, .wd-sess-card .wd-chip-todo').length;
+    if (!n) n = drawer.querySelectorAll('.wd-card.is-todo, .wd-sess-card.is-todo').length;
+    return n;
   }
+  /* 会话形态（.panel-main.is-chat）里左上角被「对话 / 轨迹」页签占着，
+     浮标压上去会挡点击，所以这种形态下不浮出；只落在工作台画布上 */
+  function fpAllowed() {
+    var pm = document.getElementById('panelMain');
+    return !(pm && pm.classList.contains('is-chat'));
+  }
+  function fpHide() {
+    if (fpShowT) { clearTimeout(fpShowT); fpShowT = 0; }
+    if (!fpTip) return;
+    fpTip.classList.remove('is-on');
+    fpTip.setAttribute('aria-hidden', 'true');
+  }
+  function fpPop() {
+    if (!fpTip || !fpAllowed()) return;
+    var n = fpPending();
+    if (!n || drawer.classList.contains('is-open')) return;
+    fpNumEl.textContent = String(n);
+    fpTip.classList.add('is-on');
+    fpTip.setAttribute('aria-hidden', 'false');
+  }
+  function syncFpTip() {
+    var n = fpPending();
+    if (!n || !fpAllowed() || drawer.classList.contains('is-open')) { fpHide(); return; }
+    if (fpShowT || (fpTip && fpTip.classList.contains('is-on'))) return;
+    fpShowT = setTimeout(function () { fpShowT = 0; fpPop(); }, 450 + Math.random() * 900);
+  }
+
+  /* 找当前第一张待确认卡（优先任务页签，其次会话页签） */
+  function fpTarget() {
+    var pick = function (root) {
+      if (!root) return null;
+      var cards = root.querySelectorAll('.wd-card, .wd-sess-card');
+      for (var i = 0; i < cards.length; i++) {
+        if (cards[i].querySelector('.wd-chip-todo') || cards[i].classList.contains('is-todo')) return cards[i];
+      }
+      return null;
+    };
+    var viewTask = document.getElementById('wdViewTask');
+    var viewSess = document.getElementById('wdViewSession');
+    var t = pick(viewTask);
+    if (t) return { el: t, view: '任务' };
+    t = pick(viewSess);
+    return t ? { el: t, view: '会话' } : null;
+  }
+
+  function fpGoTo() {
+    var hit = fpTarget();
+    if (!hit) return;
+    var tab = drawer.querySelector('[data-wd-tab="' + hit.view + '"]');
+    if (tab && !tab.classList.contains('is-active')) tab.click();
+    /* 卡片在折叠分组里时先摊开，否则滚过去是一片标题 */
+    var grp = hit.el.closest ? hit.el.closest('.wd-grp') : null;
+    if (grp && !grp.classList.contains('is-open')) {
+      var head = grp.querySelector('.wd-grp-head');
+      if (head) head.click();
+    }
+    /* 等抽屉 260ms 宽度动画 + 分组摊开再定位，否则量到的是中间态 */
+    setTimeout(function () {
+      try { hit.el.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (err) { hit.el.scrollIntoView(); }
+      hit.el.classList.add('is-fp-focus');
+      setTimeout(function () { hit.el.classList.remove('is-fp-focus'); }, 1500);
+      try { hit.el.focus({ preventScroll: true }); } catch (err) {}
+    }, 380);
+  }
+
+  if (fpGoBtn) fpGoBtn.addEventListener('click', function () {
+    fpHide();
+    clearTimeout(fpSnoozeT);
+    if (!drawer.classList.contains('is-open')) openDrawer();
+    fpGoTo();
+  });
+  if (fpLaterBtn) fpLaterBtn.addEventListener('click', function () {
+    fpHide();
+    clearTimeout(fpSnoozeT);
+    fpSnoozeT = setTimeout(function () {
+      if (!drawer.classList.contains('is-open')) syncFpTip();
+    }, 20000);
+  });
 
   function openDrawer() {
     drawer.classList.add('is-open');
     drawer.setAttribute('aria-hidden', 'false');
     menuBtn.setAttribute('aria-expanded', 'true');
     wsSave({ open: true });
-    syncMenuDot();
+    syncFpTip();
     syncThumb();
     /* 侧栏滑出后进度条再长出来（等 120ms，避免和宽度动画抢视觉） */
     setTimeout(growBars, 120);
@@ -851,11 +940,11 @@
     wdSearchExit(true);
     closeCardMenu();
     wsSave({ open: false });
-    syncMenuDot();
+    syncFpTip();
     setTimeout(function () { syncStageScroll(); rsFollow(); }, 320);
     if (back) menuBtn.focus({ preventScroll: true });
   }
-  syncMenuDot();
+  syncFpTip();
 
   menuBtn.addEventListener('click', function (e) {
     e.stopPropagation();
@@ -1353,7 +1442,7 @@
       if (typeof wdSearchExit === 'function' && wdTools && wdTools.classList.contains('is-searching')) wdSearchExit(true);
       wdScroll.scrollTop = 0;
       syncThumb();
-      syncMenuDot();
+      syncFpTip();
       growBars();
     });
   });

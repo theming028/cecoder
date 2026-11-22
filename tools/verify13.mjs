@@ -24,69 +24,27 @@ async function page(w = 1440, h = 900, open = false) {
   return p;
 }
 
-/* ========== 1 折叠态「待确认」橙点 ========== */
+/* ========== 1 折叠态提示：涟漪圆点已整块移除（第 42 轮起改为 fpTip 浮标） ========== */
 {
   const p = await page(1440, 900, false);
-  const dot = await p.evaluate(() => {
-    const btn = document.querySelector('.menu-btn');
-    const d = document.getElementById('mbDot');
-    const cs = getComputedStyle(d);
-    const csAfter = getComputedStyle(d, '::after');
-    const br = btn.getBoundingClientRect(), dr = d.getBoundingClientRect();
+  const g = await p.evaluate(() => {
+    let css = '';
+    for (const sh of document.styleSheets) { let r; try { r = sh.cssRules; } catch (e) { continue; } for (const x of r) css += x.cssText; }
     return {
-      has: btn.classList.contains('has-dot'),
-      op: cs.opacity, w: +dr.width.toFixed(1), h: +dr.height.toFixed(1),
-      bg: cs.backgroundColor, radius: cs.borderRadius,
-      right: +(br.right - dr.right).toFixed(1), top: +(dr.top - br.top).toFixed(1),
-      anim: csAfter.animationName, animDur: csAfter.animationDuration,
-      waveBg: csAfter.backgroundColor, waveW: parseFloat(csAfter.width),
-      label: btn.getAttribute('aria-label'),
-      todo: document.querySelectorAll('.wd-card.is-todo').length
+      node: document.querySelectorAll('#mbDot, .mb-dot').length,
+      hasDot: document.querySelector('.menu-btn').classList.contains('has-dot'),
+      ripple: /mbRipple/.test(css),
+      dotRule: /\.mb-dot/.test(css),
+      tip: !!document.getElementById('fpTip'),
+      tipArrow: !!document.querySelector('#fpTip .fp-arrow')
     };
   });
-  ok('1 折叠态检测到待确认 → 显示圆点', dot.has && dot.op === '1', JSON.stringify(dot));
-  ok('1 圆点 6x6 橙色 #F77234', dot.w === 6 && dot.h === 6 && dot.bg === 'rgb(247, 114, 52)', `${dot.w}x${dot.h} ${dot.bg}`);
-  ok('1 圆点贴按钮右缘', dot.right <= 2, `right ${dot.right} top ${dot.top}`);
-  /* 第 16 轮：圆点从右上角移到与图标同一水平线（垂直居中），不再贴顶 */
-  ok('1 有水波纹扩散动画', dot.anim === 'mbRipple' && dot.animDur === '1.7s', `${dot.anim} ${dot.animDur}`);
-  ok('1 涟漪外圈 22px / rgba(247,114,52,.34)', dot.waveW === 22 && dot.waveBg === 'rgba(247, 114, 52, 0.34)', `${dot.waveW} ${dot.waveBg}`);
-  ok('1 无障碍标签带提示', /有待确认/.test(dot.label), dot.label);
-  const iconStill = await p.evaluate(() => {
-    const s = document.querySelector('.menu-btn svg');
-    return { t: getComputedStyle(s).transform, wc: getComputedStyle(s.parentElement).willChange, anim: getComputedStyle(s.parentElement).animationName };
-  });
-  ok('1 图标本体静止（只涟漪动，避免发虚）', iconStill.t === 'none' && iconStill.anim === 'none', JSON.stringify(iconStill));
-
-  /* 展开 → 点消失 */
-  await p.click('.menu-btn'); await wait(600);
-  const opened = await p.evaluate(() => ({
-    has: document.querySelector('.menu-btn').classList.contains('has-dot'),
-    op: getComputedStyle(document.getElementById('mbDot')).opacity
-  }));
-  ok('1 展开后橙点消失', !opened.has && opened.op === '0', JSON.stringify(opened));
-
-  /* 收起 → 回来 */
-  await p.click('.wd-collapse'); await wait(600);
-  ok('1 再收起橙点恢复', await p.evaluate(() => document.querySelector('.menu-btn').classList.contains('has-dot')));
-
-  /* 没有待确认卡片时不亮 */
-  const none = await p.evaluate(() => {
-    document.querySelectorAll('.wd-card.is-todo').forEach(c => c.classList.remove('is-todo'));
-    return true;
-  });
-  await p.evaluate(() => {
-    /* 直接触发一次开合，让 syncMenuDot 重新计算 */
-    const btn = document.querySelector('.menu-btn');
-    btn.click();
-  });
-  await wait(500);
-  /* 第 14 轮：会话视图也有待确认，验证「无待确认」时要一起清掉 */
-  await p.evaluate(() => document.querySelectorAll('.wd-sess-card.is-todo').forEach(x => x.classList.remove('is-todo')));
-  await p.evaluate(() => document.querySelector('.wd-collapse').click());
-  await wait(600);
-  ok('1 无待确认时橙点不亮', none && await p.evaluate(() => !document.querySelector('.menu-btn').classList.contains('has-dot')));
+  ok('1 涟漪圆点节点已删除', g.node === 0, String(g.node));
+  ok('1 折叠按钮不再挂 has-dot', g.hasDot === false);
+  ok('1 样式表里已无 mbRipple 关键帧', g.ripple === false);
+  ok('1 样式表里已无 .mb-dot 规则', g.dotRule === false);
+  ok('1 折叠态改由 fpTip 浮标提示（带尖角）', g.tip === true && g.tipArrow === true);
   ok('1 无报错', p.__errs.length === 0, p.__errs.join(' | '));
-  await p.screenshot({ path: 'R13-dot.png', captureBeyondViewport: false });
   await p.close();
 }
 
