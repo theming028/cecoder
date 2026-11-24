@@ -133,7 +133,7 @@ async function page(w = 1440, h = 900, openDrawer = true) {
 {
   const p = await page(1440, 900, true);
   const fs = await p.evaluate(() => getComputedStyle(document.querySelector('.wd-grp-name')).fontSize);
-  ok('4 目录名字号 13', fs === '13px', fs);
+  ok('4 目录名字号 12（第 44 轮稿面 12/22）', fs === '12px', fs);
   await p.close();
 }
 

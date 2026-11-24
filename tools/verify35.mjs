@@ -80,7 +80,7 @@ function arrowGeom(d) {
     const af = getComputedStyle(icon, '::after');
     const afterBox = { l: parseFloat(af.left) + parseFloat(af.marginLeft), t: parseFloat(af.top) + parseFloat(af.marginTop), w: parseFloat(af.width), h: parseFloat(af.height) };
     const pm = document.querySelector('.panel-main').getBoundingClientRect();
-    const segs = [...document.querySelectorAll('.tt-btn')];
+    const segs = [...document.querySelectorAll('.tt-links .tt-link')];
     return {
       overflowX: cs.overflowX, sbWidth: cs.scrollbarWidth,
       sw: sc.scrollWidth, cw: sc.clientWidth,
@@ -100,11 +100,12 @@ function arrowGeom(d) {
   /* 2 滚动条：不隐藏、按需 */
   /* 第 36 轮：改成「自绘滚动条」—— 原生收起来（scrollbar-width:none），滚动能力仍在（overflow-x auto）+ 自绘那条按需出现 */
   ok('B1 原生滚动条收起来、滚动仍是 auto（自绘 .ts-prog 接管）', d.overflowX === 'auto' && d.sbWidth === 'none', d.overflowX + ' / ' + d.sbWidth);
-  ok('B2 1440（第 39 轮去边框后 1104 面板）放得下 → 不出滚动条', d.sw <= d.cw + 1 && d.pmW === 1104, d.sw + '/' + d.cw);
-  /* 6 内边距 24 */
-  ok('B3 ts-scroll 内边距全部 24', d.trackPad === '0px 24px' && d.itemPadTop === '24px', d.trackPad + ' / ' + d.itemPadTop);
+  /* 第 46 轮：工序横排后整条 1450，1440 窗的 1104 面板放不下 → 滚动条按需出现 */
+  ok('B2 1440（1104 面板）放不下 → 出现滚动条', d.sw > d.cw + 1 && d.pmW === 1104, d.sw + '/' + d.cw);
+  /* 6 内边距（第 46 轮：轨道左右 20、工序距顶 20） */
+  ok('B3 轨道左右内距 20、工序距顶 20', d.trackPad === '0px 20px' && d.itemPadTop === '20px', d.trackPad + ' / ' + d.itemPadTop);
   /* 7 字号 */
-  ok('B4 ts-name 13px', d.nameFS === '13px' && d.nameLH === '20px', d.nameFS + '/' + d.nameLH);
+  ok('B4 ts-name 14/22（第 46 轮稿面）', d.nameFS === '14px' && d.nameLH === '22px', d.nameFS + '/' + d.nameLH);
   /* 3 环 */
   ok('B5 外环 32×32、点阵遮罩、持续旋转', d.ring.w === 32 && d.ring.h === 32 && d.ring.mask && d.ring.anim === 'tsOrbit' && d.ring.dur !== '0s', JSON.stringify(d.ring));
   ok('B6 外环与圆点同心（中心差 ≤0.5）', Math.abs(d.ringC.cx - d.iconC.cx) <= .5 && Math.abs(d.ringC.cy - d.iconC.cy) <= .5, JSON.stringify(d.ringC) + ' vs ' + JSON.stringify(d.iconC));
@@ -114,9 +115,13 @@ function arrowGeom(d) {
   /* 4 自动执行 */
   ok('B9 自动执行 28 高', d.runH === 28, String(d.runH));
   /* 8 两段按钮 */
-  const flow = d.segs.find(s => s.t === '任务信息'), assets = d.segs.find(s => s.t.indexOf('工序资产') === 0), steps = d.segs.find(s => s.t.indexOf('工序进度') === 0);
-  ok('B10 任务信息 / 工序资产 无图标、字号 13', flow.ico === 0 && assets.ico === 0 && flow.fs === '13px' && assets.fs === '13px' && steps.fs === '13px', JSON.stringify(d.segs));
-  ok('B11 工序进度仍保留下拉箭头', steps.ico === 1, String(steps.ico));
+  /* 第 46 轮：顶栏改成「任务信息 / 工序资产」两段 + 独立的「工序进度 | 收起」组 */
+  const flow = d.segs.find(s => s.t === '任务信息'), assets = d.segs.find(s => s.t.indexOf('工序资产') === 0);
+  ok('B10 任务信息 / 工序资产 无图标、字号 14', !!flow && !!assets && flow.ico === 0 && assets.ico === 0 && flow.fs === '14px' && assets.fs === '14px', JSON.stringify(d.segs));
+  ok('B11 工序进度独立成组、箭头在「收起」键里', await p.evaluate(() => {
+    const g = document.querySelector('.tt-now');
+    return !!g && /工序进度/.test(g.textContent) && !!document.querySelector('#tkStepsToggle .tt-caret');
+  }), 'missing');
   ok('B12 无 JS 报错', p.__e.length === 0, p.__e.join(' | '));
   await p.close();
 }
@@ -132,7 +137,7 @@ function arrowGeom(d) {
     return { sw: sc.scrollWidth, cw: sc.clientWidth, need: sc.scrollWidth > sc.clientWidth, gapL: Math.round(it[0].getBoundingClientRect().left - s.left), padL: getComputedStyle(tr).paddingLeft };
   });
   ok('C1 960（622 面板）放不下 → 需要滚动', d.need === true, d.sw + '/' + d.cw);
-  ok('C2 滚动时首项仍从左 24 起（内边距没被居中吃掉）', d.gapL === 24 && d.padL === '24px', d.gapL + '/' + d.padL);
+  ok('C2 滚动时首项仍从左 20 起（内边距没被居中吃掉）', d.gapL === 20 && d.padL === '20px', d.gapL + '/' + d.padL);
   await p.close();
 }
 

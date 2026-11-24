@@ -27,7 +27,7 @@ async function page(w, h, dw, open) {
 
 /* ========== 1 tab 与添加工作目录随抽屉拖宽自适应 ========== */
 {
-  for (const [dw, tabW, addW] of [[320, 142, 208], [480, 222, null], [300, 132, 188]]) {
+  for (const [dw, tabW, addW] of [[320, 144, 208], [480, 224, null], [300, 134, 188]]) {
     const p = await page(1440, 900, dw, true);
     const d = await p.evaluate(() => {
       const tabs = [...document.querySelectorAll('.wd-tab')].map(x => Math.round(x.getBoundingClientRect().width));
@@ -133,7 +133,7 @@ ok('2 切回任务：6 张任务卡不受影响', back.taskCards === 6, String(b
     cardW: Math.round(document.querySelector('#wdViewSession .wd-sess-card').getBoundingClientRect().width)
   }));
   ok('3 480 下添加工作目录拉宽到 368', Math.abs(s.addW - 368) < 3, String(s.addW));
-  ok('3 480 下 tab 各 222', Math.abs(s.tabs[0] - 222) < 2, JSON.stringify(s.tabs));
+  ok('3 480 下 tab 各 224（分段控件均分，第 44 轮）', Math.abs(s.tabs[0] - 224) < 2, JSON.stringify(s.tabs));
   ok('3 会话卡随宽抽屉拉满', Math.abs(s.cardW - 448) < 3, String(s.cardW));
   await p.close();
 }

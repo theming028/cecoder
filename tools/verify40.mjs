@@ -46,8 +46,8 @@ ok('A2 折叠行：文件夹可见、箭头透明', rows.filter(r => !r.open).ev
 ok('A3 展开行：文件夹透明、箭头可见', rows.filter(r => r.open).every(r => r.fOp === 0 && r.cOp === 1), JSON.stringify(rows.filter(r => r.open)));
 ok('A4 展开行箭头转 90°（指向下）', rows.filter(r => r.open).every(r => r.rot === 90), JSON.stringify(rows.map(r => r.rot)));
 ok('A5 折叠行箭头 0°（指向右）', rows.filter(r => !r.open).every(r => r.rot === 0), JSON.stringify(rows.map(r => r.rot)));
-ok('A6 图标盒 14×14，行高 36 不变', rows.every(r => r.box[0] === 14 && r.box[1] === 14 && r.headH === 36), JSON.stringify(rows[0]));
-ok('A7 文字左缘 54（14 图标 + 8 间距，第 41 轮）', rows.every(r => r.nameX === 54), JSON.stringify(rows.map(r => r.nameX)));
+ok('A6 图标盒 16×16（第 46 轮加大两号），行高 36 不变', rows.every(r => r.box[0] === 16 && r.box[1] === 16 && r.headH === 36), JSON.stringify(rows[0]));
+ok('A7 文字左缘 44（第 46 轮：8+12+16+8）', rows.every(r => r.nameX === 44), JSON.stringify(rows.map(r => r.nameX)));
 
 /* ============ B 彩色文件夹：随机取色、彼此不同、柔和（HSL 落在温和区间） ============ */
 const hues = rows.map(r => r.hue);
@@ -121,7 +121,7 @@ const added = await p.evaluate(() => {
 });
 ok('F1 新分组自动落到新目录名下', added.name === '验收目录', added.name);
 ok('F2 新分组取到色板里的颜色', /^#[0-9A-Fa-f]{6}$/.test(added.hue) && added.folderColor !== 'rgb(31, 31, 31)', JSON.stringify(added));
-ok('F3 新分组同样是「文件夹 + 箭头」双层、14×14', added.dual && added.box[0] === 14 && added.box[1] === 14, JSON.stringify(added));
+ok('F3 新分组同样是「文件夹 + 箭头」双层、16×16', added.dual && added.box[0] === 16 && added.box[1] === 16, JSON.stringify(added));
 ok('F4 无脚本报错', p.__e.length === 0, p.__e.join(' | '));
 await p.close();
 

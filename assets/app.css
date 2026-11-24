@@ -72,8 +72,16 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
   position: relative; width: 100%; height: 100vh; min-width: 960px; min-height: 700px;
   overflow: hidden; background: var(--cds-bg-page);
 }
-/* 第 39 轮：稿件背景 = 冷蓝→淡蓝→淡紫的纵向渐变（1440x900 上量得 0/58%/100% 三档） */
-.cds-frame[data-bg="design"] { background: var(--cds-page-grad); }
+/* 第 39 轮：稿件背景 = 冷蓝→淡蓝→淡紫的纵向渐变（1440x900 上量得 0/58%/100% 三档）
+   第 44 轮：渐变之上再叠一张 1952×364 的顶部背景图（assets/cecoder-bg.png，RGBA 下缘渐隐），
+   横向铺满、顶部对齐、高度按比例（background-size: 100% auto）。图在渐变之上，透明处露渐变。 */
+.cds-frame[data-bg="design"] {
+  background-color: transparent;
+  background-image: url("cecoder-bg.png"), var(--cds-page-grad);
+  background-repeat: no-repeat, no-repeat;
+  background-position: top center, 0 0;
+  background-size: 100% auto, 100% 100%;
+}
 
 /* ===== 白色窗口面板：左右下贴边，顶部 48；第 39 轮按稿件去掉 1px 描边 ===== */
 .panel {
@@ -1277,7 +1285,8 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .ws-drawer {
   position: relative; flex: 0 0 auto; width: 0; height: 100%; z-index: 2;
   --ws-w: 320px;
-  background: #FFFFFF; overflow: hidden; visibility: hidden;
+  /* 第 44 轮：稿面整栏是 #F7F7F7 的浅灰底（原来纯白），收起/展开靠右侧 1px 线分隔 */
+  background: #F7F7F7; overflow: hidden; visibility: hidden;
   transition: width .26s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .26s;
 }
 .ws-drawer.is-open {
@@ -1303,7 +1312,7 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .wd-head {
   flex: 0 0 44px; height: 44px; padding: 0 16px;
   display: flex; align-items: center; justify-content: space-between;
-  box-shadow: inset 0 -1px 0 0 #EBECED;
+  background: #F7F7F7; box-shadow: inset 0 -1px 0 0 #EBECED;
 }
 .wd-title { margin: 0; font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); }
 .wd-acts { display: flex; align-items: center; }
@@ -1317,41 +1326,54 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .wd-collapse {
   display: inline-flex; align-items: center; justify-content: center;
   width: 28px; height: 28px; margin-left: 16px; border-radius: 4px;
-  color: var(--cds-text-primary); background: #FFFFFF;
+  /* 第 45 轮：默认透明（栏底已经是 #F7F7F7，白底会突出一块）；hover 比栏底深一级 */
+  color: var(--cds-text-primary); background: transparent;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.wd-collapse:hover { background: var(--cds-surface-subtle); }
+.wd-collapse:hover { background: rgba(0, 0, 0, .05); }
 
-/* ---- 双 Tab 40（稿件：gutter 底 1px #E5E5E5 贯穿；非选中 tab 自己带底线，选中项白底压掉） ---- */
+/* ---- 会话 / 任务：分段控件（稿 3154:59351 radio-button-group 288×32@16,56）----
+   第 44 轮：从「页签」改成「分段控件」—— 轨道 rgba(229,229,229,.65) r4，选中段白底 +
+   1px #E5E5E5 r4，两段各 144 均分；块高 12 + 32 + 12 = 56，底边一条 288 的 1px #E5E5E5
+   分隔线（稿 y=100），工具行因此从 112 起。 ---- */
 .wd-tabs {
-  position: relative; flex: 0 0 40px; height: 40px; padding: 8px 16px 0;
-  display: flex; gap: 4px; background: #F7F7F7; box-shadow: inset 0 -1px 0 0 #E5E5E5;
+  position: relative; flex: 0 0 56px; height: 56px; padding: 12px 16px;
+  display: flex; gap: 0; background: transparent; box-shadow: none;
+}
+.wd-tabs::before {
+  content: ''; position: absolute; left: 16px; right: 16px; top: 12px; height: 32px;
+  border-radius: 4px; background: rgba(229, 229, 229, .65); pointer-events: none;
+}
+.wd-tabs::after {
+  content: ''; position: absolute; left: 16px; right: 16px; bottom: 0; height: 1px;
+  background: #E5E5E5; pointer-events: none;
 }
 .wd-tab {
-  position: relative; z-index: 1; flex: 1 1 142px; min-width: 0; height: 32px;
+  position: relative; z-index: 1; flex: 1 1 0; min-width: 0; height: 32px;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  border: 1px solid var(--cds-line-strong); border-bottom: 0; border-radius: 4px 4px 0 0;
-  background: var(--cds-surface-subtle); color: var(--cds-text-primary);
+  border: 1px solid transparent; border-radius: 4px;
+  background: transparent; color: var(--cds-text-primary);
   font-size: 14px; line-height: 22px; font-weight: 500;
-  /* 第 8 轮：非选中态补底线（tabs/card-gutter 的 0 0 1px #E5E5E5），否则两个 tab 之间像悬空 */
-  box-shadow: inset 0 -1px 0 0 #E5E5E5;
-  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease),
+              border-color var(--cds-motion-duration) var(--cds-motion-ease),
+              color var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.wd-tab:hover { background: var(--cds-fill); }
-.wd-tab.is-active { background: #FFFFFF; color: var(--cds-color-primary); box-shadow: none; }
+/* 第 45 轮：未选中段 hover 不改底色（原来会给一层 rgba(255,255,255,.55)，看着像被选中） */
+.wd-tab:not(.is-active):hover { background: transparent; }
+.wd-tab.is-active { background: #FFFFFF; border-color: #E5E5E5; }
 .wd-tab.is-active:hover { background: #FFFFFF; }
 .wd-tab-num { font-size: 12px; line-height: 22px; font-weight: 400; color: var(--cds-text-disabled); }
 
 /* ---- 工具行 32 ---- */
 .wd-tools {
   position: relative; z-index: 6;
-  flex: 0 0 32px; height: 32px; margin: 16px 16px 0;
+  flex: 0 0 32px; height: 32px; margin: 12px 16px 0;
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
 .wd-adddir {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   /* 第 15 轮：随抽屉拖宽自适应拉宽（稿件 320 下正好 208，min-width 兜底防压扁） */
-  flex: 1 1 208px; min-width: 120px; height: 32px; border: 1px dashed var(--cds-line-hover); border-radius: 4px;
+  flex: 1 1 208px; min-width: 120px; height: 32px; border: 1px solid #EEEEEE; border-radius: 4px;
   /* 第 21 轮：文字色由正文降一级到次级 */
   background: #FFFFFF; color: var(--cds-text-secondary); font-size: 14px; line-height: 22px;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease), border-color var(--cds-motion-duration) var(--cds-motion-ease), color var(--cds-motion-duration) var(--cds-motion-ease);
@@ -1366,7 +1388,8 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
   background: #FFFFFF; color: var(--cds-text-secondary);
   transition: background var(--cds-motion-duration) var(--cds-motion-ease), border-color var(--cds-motion-duration) var(--cds-motion-ease), color var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.wd-icon-btn:hover { background: var(--cds-surface-subtle); border-color: var(--cds-line-hover); color: var(--cds-text-primary); }
+/* 第 45 轮：hover 只换底色与图标色，描边保持 #C9C9C9 不动 */
+.wd-icon-btn:hover { background: var(--cds-surface-subtle); color: var(--cds-text-primary); }
 /* 排序生效时（按更新顺序）按钮保持主色，提示「当前不是默认顺序」 */
 .wd-icon-btn.is-on { color: var(--cds-color-primary); border-color: var(--cds-blue-3); background: var(--cds-blue-1); }
 
@@ -1447,7 +1470,7 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .wd-menu-div { display: block; height: 1px; margin: 4px 0; background: #EEEEEE; }
 
 /* ---- 列表滚动区 ---- */
-.wd-scroll-wrap { position: relative; flex: 1 1 auto; min-height: 0; margin-top: 16px; }
+.wd-scroll-wrap { position: relative; flex: 1 1 auto; min-height: 0; margin-top: 12px; }
 .wd-scroll { height: 100%; overflow-y: auto; overscroll-behavior: contain; padding: 0 16px 16px; scrollbar-width: none; }
 .wd-scroll::-webkit-scrollbar { width: 0; height: 0; }
 .wd-thumb {
@@ -1501,29 +1524,41 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .wd-grp:not(.is-open) + .wd-grp { margin-top: -1px; }
 /* 第 20 轮：展开的分组把卡片摊开后，与下一个分组之间要留 12 —— 否则最后一张卡
    直接贴住下一行的上边线（单卡分组最明显） */
-.wd-grp.is-open + .wd-grp { margin-top: 12px; }
+.wd-grp.is-open + .wd-grp { margin-top: 0; }
 .wd-grp.is-open + .wd-groups { margin-top: 12px; }
+/* 第 44 轮（稿 3292:53926）：分组行改「通栏」—— 稿里 320 宽、x=0，不再跟着内容缩进 16；
+   卡片仍是 288（左右各缩 16）。折叠行 = 灰底 #F7F7F7 + 上下两条 1px 线（相邻行叠 1px 合成一条）；
+   展开行 = 白底 + 只有上线，和下面白色的分组体连成一张卡。
+   第 45 轮：左右内距按稿统一成 12（稿里 Link 88x22@12,7、计数贴 300→308 收口）；
+   箭头 14 盒 + 2 间距共 16，文字仍落在 28，与卡片标题（16+12）左对齐。 */
 .wd-grp-head {
-  /* 第 26 轮：左右内边距 12 → 8 */
-  display: flex; align-items: center; width: 100%; height: 36px; padding: 0 8px;
-  background: #FFFFFF; box-shadow: inset 0 1px 0 0 #EBECED; text-align: left;
+  display: flex; align-items: center; width: auto; height: 36px;
+  margin: 0 -16px; padding: 0 12px;
+  background: #F7F7F7;
+  box-shadow: inset 0 1px 0 0 #EBECED, inset 0 -1px 0 0 #EBECED;
+  text-align: left;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-/* 底色 #F7F7F7 是「展开」后的表现，不是默认态：折叠时一律白底 */
 .wd-grp-head.is-edge { box-shadow: inset 0 1px 0 0 #EBECED, inset 0 -1px 0 0 #EBECED; }
 .wd-grp-head:hover { background: var(--cds-surface-subtle); }
-.wd-grp.is-open > .wd-grp-head { background: var(--cds-surface-subtle); }
+.wd-grp.is-open > .wd-grp-head {
+  background: #FFFFFF; box-shadow: inset 0 1px 0 0 #EBECED;
+}
 .wd-grp-name {
   max-width: 100%; min-width: 0; flex: 0 1 auto;
-  font-size: 13px; line-height: 22px; color: var(--cds-text-primary);
+  /* 第 44 轮：稿面分组名 12/22（展开 500、折叠 400） */
+  font-size: 12px; line-height: 22px; color: var(--cds-text-primary);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .wd-grp.is-open > .wd-grp-head .wd-grp-name { font-weight: 500; }
 /* 第 40 轮：分组标记改成「文件夹 → 箭头」双图标叠合
    折叠静止 = 彩色文件夹；hover / 键盘聚焦 / 展开 = 原来那枚箭头（折叠指向右、展开转 90° 指向下）。
-   第 41 轮：盒子 14×14 + 右 8（图标↔文字 8px）；箭头 12px 在盒内居中。 */
+   第 41 轮：盒子 14×14 + 右 8（图标↔文字 8px）；箭头 12px 在盒内居中。
+   第 45 轮：按稿收成 12×12 盒 + 右 4 —— 内距 12 + 12 + 4 = 28，文字仍与卡片标题左对齐。 */
 .wd-caret {
-  position: relative; top: 1px; display: block; width: 14px; height: 14px;
+  /* 第 46 轮：文件夹 12 → 16（加大两号），右间距 8
+     第 47 轮：盒从 14 长到 16 后又多压了 1px（墨迹看着比文字略低），top 2 → 1.5 */
+  position: relative; top: 1.5px; display: block; width: 16px; height: 16px;
   margin-right: 8px; flex: 0 0 auto; color: var(--cds-text-disabled);
   transition: color var(--cds-motion-duration) var(--cds-motion-ease);
 }
@@ -1536,8 +1571,9 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .wd-caret-ico > svg { display: block; width: 100%; height: 100%; }
 /* 文件夹配色：柔和版 Google 色板，由 JS 随机取色后写进 --wd-folder-color（会持久化，不再变） */
 .wd-caret-folder { color: var(--wd-folder-color, #87A9E3); }
-/* 箭头保持原 12px 大小（在 14 盒内居中 1px），观感与旧版完全一致；旋转基准＝自身圆心 */
-.wd-caret-chev { inset: 1px; opacity: 0; transform: rotate(var(--wd-chev-rot, 0deg)) scale(.7); transform-origin: 50% 50%; }
+/* 箭头保持原 12px 大小（盒已收到 12，故不再内缩）；旋转基准＝自身圆心 */
+/* 箭头仍是 12px（16 盒里居中 2px），不跟着文件夹一起放大 */
+.wd-caret-chev { inset: 2px; opacity: 0; transform: rotate(var(--wd-chev-rot, 0deg)) scale(.7); transform-origin: 50% 50%; }
 .wd-grp-head:hover .wd-caret-folder,
 .wd-grp-head:focus-visible .wd-caret-folder,
 .wd-grp.is-open .wd-caret-folder { opacity: 0; transform: scale(.68); }
@@ -1548,7 +1584,9 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .wd-grp-head:hover .wd-caret { color: var(--cds-text-secondary); }
 .wd-grp.is-open > .wd-grp-head .wd-caret { color: var(--cds-text-primary); }
 .wd-sub { display: none; }
-.wd-grp.is-open .wd-sub { display: block; }
+/* 第 44 轮：开着的分组体是白底通栏（-16 抵消滚动容器左右内距），卡片仍是 288 */
+/* 第 46 轮：分组体内距四边统一 16（「新建任务」上方那 8 也算在这条 padding 里） */
+.wd-grp.is-open > .wd-sub { display: block; background: #FFFFFF; margin: 0 -16px; padding: 16px; }
 /* 空态自身带上下 24 内边距（第 17 轮），这里不再额外加外边距 */
 .wd-num { margin-left: auto; padding-left: 8px; font-size: 12px; line-height: 18px; white-space: nowrap; color: var(--cds-text-tertiary); }
 /* 第 18 轮：分组里是空态（没有卡片）时，标题右侧的计数不显示 */
@@ -1569,7 +1607,7 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
    r4 · 1px dashed #C9C9C9 · 内容 [12 加号][4][12/22 文字 48] = 64 居中（x=128-16=112） ---- */
 .wd-newtask {
   display: flex; align-items: center; justify-content: center; gap: 4px;
-  width: 100%; height: 28px; margin-top: 8px;
+  width: 100%; height: 28px;
   border: 1px dashed var(--cds-line-dashed); border-radius: 4px;
   background: #FFFFFF; color: var(--cds-text-secondary); font-size: 12px; font-weight: 400; line-height: 22px;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease),
@@ -1925,7 +1963,7 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
    ============================================================ */
 /* 第 34 轮：任务执行页整体换稿（MasterGo 3113:44395，1140×206）
    —— 旧的 .task-head / .task-kv / .task-empty 全部退场，改由 src/taskview.html 渲染 */
-body[data-page="task"] .stage.is-chat { top: 206px; padding-bottom: 0; }
+body[data-page="task"] .stage.is-chat { top: 171px; padding-bottom: 0; }
 /* 第 33 轮：任务页先不放内容，输入卡与版本号一起收起（DOM 保留，脚本不用改） */
 body[data-page="task"] .composer,
 body[data-page="task"] .stage > .version { display: none; }
@@ -1955,7 +1993,8 @@ body[data-page="task"] .stage > .version { display: none; }
 .rs-drawer {
   position: relative; flex: 0 0 auto; width: 0; height: 100%; z-index: 2;
   --rs-w: 320px;
-  background: #FFFFFF; overflow: hidden; visibility: hidden;
+  /* 第 44 轮：稿面右栏同为 #F7F7F7 浅灰底 */
+  background: #F7F7F7; overflow: hidden; visibility: hidden;
   transition: width .26s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .26s;
 }
 .rs-drawer.is-open {
@@ -1979,7 +2018,8 @@ body[data-page="task"] .stage > .version { display: none; }
 
 /* 第 35 轮：一行 44 同时装「变更 / 文件」页签与收起键（原来标题栏 + 页签两行 84） */
 .rs-top {
-  position: relative; flex: 0 0 44px; height: 44px; padding: 0 8px 0 16px;
+  /* 第 44 轮：稿面标题起点 20（449×44 灰底 + 下分隔线） */
+  position: relative; flex: 0 0 44px; height: 44px; padding: 0 8px 0 20px;
   display: flex; align-items: stretch; gap: 8px;
   box-shadow: inset 0 -1px 0 0 #EBECED;
 }
@@ -2008,7 +2048,9 @@ body[data-page="task"] .stage > .version { display: none; }
   background: var(--cds-color-primary); border-radius: 2px 2px 0 0;
 }
 
-.rs-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 12px 8px 16px; scrollbar-width: thin; }
+/* 第 44 轮：稿面内容左右各 20（450 宽 → 410 内容） */
+/* 第 44 轮：稿面内容左右各 20（450 宽 → 410 内容） */
+.rs-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 12px 20px 16px; scrollbar-width: thin; }
 .rs-body::-webkit-scrollbar { width: 6px; }
 .rs-body::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, .16); border-radius: 6px; }
 .rs-pane[hidden] { display: none; }
@@ -2110,52 +2152,82 @@ body[data-page="task"] .stage > .version { display: none; }
    三段通栏贴 panel-main 左右边，纵向叠在 0 / 44 / 166
    ============================================================ */
 
-/* ---- ① 顶部工具条 ---- */
+/* ---- ① 顶部工具条（第 46 轮按稿 3140:45042 重排）
+   左：任务标题 14/500 @19
+   右：自动执行（文字按钮 92×28）| 竖线 16 | 分段 160×28（任务信息 / 工序资产，轨道 #FAFAFA）
+       | 工序进度 + 收起⌃（124×28）
+   ---- */
 .task-top {
   position: absolute; left: 0; right: 0; top: 0; height: 44px; z-index: 9;
-  display: flex; align-items: center; gap: 8px; padding: 0 8px 0 44px;
+  display: flex; align-items: center; gap: 8px; padding: 0 20px 0 44px;
   background: var(--cds-bg-container); overflow: hidden;
-  /* 第 37 轮：抽屉收起时左槽让给 .menu-btn（7~35），否则任务页没有入口再展开左栏；
-     展开时菜单键淡出，左内距回到 8（同 chat-head 的做法） */
+  /* 第 37 轮：抽屉收起时左槽让给 .menu-btn（7~35）；展开时菜单键淡出，左内距回到稿面的 19 */
   transition: padding-left .26s cubic-bezier(.2, .8, .2, 1), height .26s cubic-bezier(.2, .8, .2, 1);
   /* 第 35 轮：左缘补 1px 竖线 —— 抽屉右缘的分隔线是外投影（z-index 2），
      而工具条 z-index 9 的白底会把它压掉，这里用 inset 左线接上（同 chat-head） */
-  box-shadow: inset 1px 0 0 0 #EBECED, inset 0 -1px 0 0 var(--cds-line-soft);
+  box-shadow: inset 1px 0 0 0 #EBECED, inset 0 -1px 0 0 #EBECED;
 }
-.ws-drawer.is-open ~ .panel-main .task-top { padding-left: 8px; }
-.tt-seg { display: flex; align-items: center; gap: 8px; min-width: 0; }
-/* 三段按钮：稿里 76 / 119 / 112 × 28，5px 12px 内边距 + 4 gap，宽度由内容自然撑出 */
-.tt-btn {
-  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+.ws-drawer.is-open ~ .panel-main .task-top { padding-left: 19px; }
+.tt-title {
+  min-width: 0; flex: 0 1 auto;
+  font-size: 14px; line-height: 20px; font-weight: 500; color: var(--cds-text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tt-right { margin-left: auto; flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
+/* 自动执行：稿里是「12 播放图标 + 4 + 52 文字」的纯文字按钮，92×28，内距 12，无底无框 */
+.tt-run {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px;
   height: 28px; padding: 0 12px; border-radius: 4px;
-  font-size: 13px; line-height: 22px; color: var(--cds-text-primary);
-  background: var(--cds-surface-fill-1); box-shadow: inset 0 0 0 1px var(--cds-line-strong);
-  transition: background var(--cds-motion-duration) var(--cds-motion-ease),
-              box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
+  font-size: 13px; line-height: 20px; color: var(--cds-color-primary); background: transparent;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.tt-btn .ico { color: var(--cds-text-primary); }
-.tt-btn:hover { background: var(--cds-blue-1); box-shadow: inset 0 0 0 1px var(--cds-blue-3); }
-.tt-btn.is-on { background: var(--cds-blue-1); box-shadow: inset 0 0 0 1px var(--cds-blue-3); font-weight: 500; }
+.tt-run .ico { color: currentColor; }
+.tt-run:hover { background: var(--cds-blue-1); }
+.tt-run:active { background: #E3EDFE; }
+/* 竖线：稿里 16 高，前后各 8 */
+.tt-vsep { flex: 0 0 auto; width: 1px; height: 16px; background: var(--cds-line-strong); }
+/* 第 47 轮：稿里「任务信息 / 工序资产」是两条独立链接 —— 160×28 轨道 #FAFAFA r4，
+   各 80 宽（内距 12 + 56 文字），中间 1×12 竖线；hover 只把文字染成主色，不改底、不改框 */
+.tt-links {
+  flex: 0 0 auto; display: flex; align-items: center; height: 28px;
+  border-radius: 4px; background: #FAFAFA;
+}
+.tt-link {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  height: 28px; padding: 0 12px; border-radius: 4px;
+  font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  text-decoration: none;
+  transition: color var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tt-link:hover, .tt-link:focus-visible { color: var(--cds-color-primary); }
+.tt-links-sep { flex: 0 0 auto; width: 1px; height: 12px; background: var(--cds-line-strong); }
+/* 工序进度 | 收起⌃：稿里 124×28，左 8 起「工序进度」13/500，竖线，76 起「收起 13/400 + 蓝色小箭头」 */
+.tt-now {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 8px;
+}
+.tt-now-label { font-size: 13px; line-height: 20px; font-weight: 500; color: var(--cds-text-primary); white-space: nowrap; }
+/* 第 47 轮：工序条折起来之后，「工序进度」不再是当前态，回到常规字重 */
+.panel-main.is-steps-off .tt-now-label { font-weight: 400; }
+.tt-now-sep { flex: 0 0 auto; width: 1px; height: 12px; background: var(--cds-line-strong); }
+.tt-fold {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 2px;
+  height: 20px; padding: 0; border-radius: 2px;
+  font-size: 13px; line-height: 20px; color: var(--cds-text-primary); background: transparent;
+  transition: color var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tt-fold .tt-caret { color: var(--cds-color-primary); }
+.tt-fold:hover { color: var(--cds-color-primary); }
 .tt-num { font-variant-numeric: tabular-nums; }
 .tt-caret { transition: transform .2s var(--cds-motion-ease); }
-/* 第 36 轮：这个箭头现在是折叠开关 —— 展开时朝下（保持稿件原样），收起来才翻上来 */
-.tt-btn[aria-expanded="false"] .tt-caret { transform: rotate(180deg); }
-/* 右侧「自动执行」：第 35 轮与三段按钮同高 28（稿里 32 偏高），F5F8FF 底 + B4C9FC 描边 + 主色 14/22 */
-.tt-run {
-  flex: 0 0 auto; margin-left: auto; display: inline-flex; align-items: center; justify-content: center;
-  height: 28px; padding: 0 16px; border-radius: 4px;
-  font-size: 14px; line-height: 22px; color: var(--cds-color-primary);
-  background: var(--cds-blue-1); box-shadow: inset 0 0 0 1px var(--cds-blue-3);
-  transition: background var(--cds-motion-duration) var(--cds-motion-ease),
-              box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
-}
-.tt-run:hover { background: var(--cds-color-primary-bg); }
-.tt-run:active { background: #E3EDFE; }
+/* 第 46 轮：收起箭头在文字右侧，展开时朝上（= 可收起），折起来翻成朝下 */
+.tt-fold[aria-expanded="false"] .tt-caret { transform: rotate(180deg); }
 
 /* 当前工序外环的点阵：白色描边的圆 → 当作 mask 用，颜色跟着 background-color 走 */
 /* ---- ② 工序横条 ---- */
 .task-steps {
-  position: absolute; left: 0; right: 0; top: 44px; height: 122px; overflow: hidden;
+  /* 第 46 轮：稿 3124:47641 是 1133×87（上 20 + 工序行 42 + 下 20） */
+  position: absolute; left: 0; right: 0; top: 44px; height: 87px; overflow: hidden;
   container-type: inline-size;
   /* 当前工序外环的点阵：白色描边圆当 mask 用（颜色由 background-color 给） */
   --ts-ring: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='none' stroke='%23fff' stroke-width='2' stroke-dasharray='3 4' stroke-linecap='round'/%3E%3C/svg%3E");
@@ -2177,14 +2249,17 @@ body[data-page="task"] .stage > .version { display: none; }
    第 36 轮：整体居中 —— width:max-content + margin:0 auto，放得下时居中；
    放不下时剩余空间为负，auto 边距退化为 0（不会把左端裁进滚动区外） */
 .ts-track {
-  position: relative; display: flex; gap: 64px; padding: 0 24px;
+  position: relative; display: flex; gap: 72px; padding: 0 20px;
   width: max-content; margin: 0 auto; height: 100%;
 }
 .ts-item {
-  position: relative; flex: 0 0 auto; min-width: 56px; padding-top: 24px;
-  display: flex; flex-direction: column; align-items: center;
+  /* 第 46 轮：稿里是横向 —— 图标 24 + 8 + 文字块（名称 14/22 / 状态 12/20），块高 42，距顶 20 */
+  position: relative; flex: 0 0 auto; padding-top: 20px;
+  display: grid; grid-template-columns: 24px auto; grid-template-rows: 22px 20px;
+  column-gap: 8px; align-items: start;
 }
 .ts-icon {
+  grid-column: 1; grid-row: 1 / span 2; align-self: start;
   position: relative; z-index: 1; flex: 0 0 auto;
   width: 24px; height: 24px; border-radius: 50%;
   display: inline-flex; align-items: center; justify-content: center;
@@ -2192,8 +2267,8 @@ body[data-page="task"] .stage > .version { display: none; }
   color: var(--cds-text-secondary);
   background: var(--cds-surface-inset); box-shadow: inset 0 0 0 1px var(--cds-line-strong);
 }
-.ts-name { margin-top: 8px; font-size: 13px; line-height: 20px; color: var(--cds-text-primary); white-space: nowrap; }
-.ts-state { font-size: 12px; line-height: 20px; color: var(--cds-text-tertiary); white-space: nowrap; }
+.ts-name { grid-column: 2; grid-row: 1; font-size: 14px; line-height: 22px; color: var(--cds-text-primary); white-space: nowrap; }
+.ts-state { grid-column: 2; grid-row: 2; font-size: 12px; line-height: 20px; color: #868686; white-space: nowrap; }
 /* 已完成：F5F8FF 底 + DAE4FE 描边 + 主色对勾 */
 .ts-item.is-done .ts-icon { color: var(--cds-color-primary); background: var(--cds-blue-1); box-shadow: inset 0 0 0 1px var(--cds-blue-2); }
 /* 当前：主色实心 + 白字 + 32 点阵环（向外各 4，持续旋转） */
@@ -2212,18 +2287,19 @@ body[data-page="task"] .stage > .version { display: none; }
 }
 @keyframes tsOrbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .ts-item.is-now .ts-icon::after { animation: none; } }
-.ts-item.is-now .ts-name,
-.ts-item.is-now .ts-state { font-weight: 500; }
+.ts-item.is-now .ts-name { font-weight: 500; }
+/* 第 46 轮：状态色按稿 —— 当前主色、进行中橙、其余灰；未开始的工序名降一级到 #6B6B6B */
+.ts-item.is-now .ts-state { color: var(--cds-color-primary); }
+.ts-item.is-running .ts-state { color: #F77234; }
+.ts-item:not(.is-done):not(.is-now) .ts-name { color: var(--cds-text-secondary); }
 /* 连线：1.6 高、与圆点垂直居中（top 35），左端从上一圆点 +20、右端到本圆点 -20，位置由 JS 按圆心算 */
 .ts-link {
-  position: absolute; top: 35px; height: 1.6px; z-index: 0;
+  position: absolute; top: 31px; height: 1.6px; z-index: 0;
   background: var(--cds-line-strong);
 }
 .ts-link.is-on { background: var(--cds-color-primary); }
-/* 面板窄于稿件 1140 时把工序间距收一档，9 道工序仍能整排放下（不裁最后一个） */
-@container (max-width: 1139px) {
-  .ts-track { gap: 56px; }
-}
+/* 第 46 轮：工序项改成横排后单条宽度接近稿面（88~116），间距固定 72 才与稿一致；
+   放不下本来就走横向滚动条（.ts-prog），不再按窄窗收间距 */
 /* ---- 滚动条（稿 16,156 500×6 r6 rgba(0,0,0,.16)：左缩 16、离底 4、6 高、全圆角）
    第 36 轮：它不再是「4/9 进度条」，而是 ts-scroll 的真实滚动条。
    ① 长度 = 视口 / 内容（真比例，不是写死 4/9）；② 位移 = scrollLeft / 可滚距离；
@@ -2266,16 +2342,24 @@ body.is-focus[data-page="task"] .stage.is-chat { top: 40px; }
 body.is-focus .menu-btn { display: none; }
 /* 进出专注的图标：进 = 四角外扩，出 = 四角内收 */
 .tk-fm-out { display: none; }
+/* 第 46 轮：稿里「专注模式」是图标 + 文字（80×28：3 + 14 + 4 + 56 + 3），不再是纯图标 */
+button.tk-icon-btn.tk-focus {
+  /* 稿里 Link 80×28：3 + 14 图标 + 4 + 56 文字 + 3；文字 14/500 主色 */
+  width: auto; padding: 0 3px; gap: 4px; font-size: 14px; line-height: 22px;
+  font-weight: 500; color: var(--cds-color-primary);
+}
+.tk-focus-txt { white-space: nowrap; }
 .tk-focus[aria-pressed="true"] { color: var(--cds-color-primary); background: var(--cds-blue-1); }
 .tk-focus[aria-pressed="true"] .tk-fm-in { display: none; }
 .tk-focus[aria-pressed="true"] .tk-fm-out { display: inline-flex; }
 
 /* ---- ③ 工序资产页签 ---- */
 .task-tabs {
-  position: absolute; left: 0; right: 0; top: 166px; height: 40px; z-index: 9;
-  display: flex; align-items: center; gap: 4px; padding: 0 8px 0 6px;
-  background: var(--cds-bg-container);
-  box-shadow: inset 1px 0 0 0 #EBECED, inset 0 -1px 0 0 var(--cds-line-strong);
+  position: absolute; left: 0; right: 0; top: 131px; height: 40px; z-index: 9;
+  display: flex; align-items: center; gap: 4px; padding: 0 20px 0 19px;
+  /* 第 47 轮：稿 3124:54244 的页签条是浅灰轨道（选中页签是白块，才浮得出来） */
+  background: #FAFAFA;
+  box-shadow: inset 1px 0 0 0 #EBECED, inset 0 -1px 0 0 #E5E5E5;
 }
 .tk-tabs-l { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .tk-tab {
@@ -2289,7 +2373,7 @@ body.is-focus .menu-btn { display: none; }
 .tk-tab:hover { background: var(--cds-surface-subtle); color: var(--cds-text-primary); }
 .tk-tab.is-on {
   padding: 0 12px; font-weight: 500; color: var(--cds-text-primary);
-  background: var(--cds-surface-inset);
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #EEEEEE;
 }
 /* 页签上的关闭键 12×12（稿里常驻） */
 .tk-x {
@@ -2313,3 +2397,352 @@ body.is-focus .menu-btn { display: none; }
 .tk-tabs-l { overflow-x: auto; scrollbar-width: none; }
 .tk-tabs-l::-webkit-scrollbar { display: none; }
 /* 第 37 轮：右侧那颗键改成「专注模式」，原来的「收起工序资产栏」整套（.is-collapsed）退场 */
+
+/* ============================================================
+   第 48 轮：页签条下的大容器（稿 3292:53937 · 1094×842）
+   ① 头部 56：步骤卡 ×2 / 18 箭头 / 差异对比 96×56
+   ② 主体：白卡（描边 #EEEEEE）＝ 可折叠标题栏 36 + 自适应内容区
+   ③ 底部：与主体固定 40 间距 + 56 高（内线 #EBECED + 居中主键 212×36）
+   宽度：内容列 max-width 1024（--tp-col）且整体居中，窄屏按可用宽度收缩
+   ============================================================ */
+.tp-wrap {
+  --tp-col: 1024px;
+  position: absolute; left: 0; right: 0; top: 171px; bottom: 0; z-index: 8;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 20px 20px 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin;
+  transition: top .26s cubic-bezier(.2, .8, .2, 1);
+}
+.tp-wrap::-webkit-scrollbar { width: 8px; }
+.tp-wrap::-webkit-scrollbar-track { background: transparent; }
+.tp-wrap::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, .16); border-radius: 8px; }
+.tp-wrap::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, .28); }
+.panel-main.is-steps-off .tp-wrap { top: 84px; }
+body.is-focus[data-page="task"] .tp-wrap { top: 40px; }
+
+/* ---- ① 头部 ---- */
+.tp-head { flex: 0 0 56px; width: 100%; max-width: var(--tp-col); display: flex; align-items: center; }
+.tp-step {
+  flex: 1 1 0; min-width: 0; height: 56px; padding: 0 20px;
+  display: flex; align-items: center; gap: 8px; text-align: left;
+  border-radius: 4px; background: #F7F7F7; box-shadow: inset 0 0 0 1px #EEEEEE;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease),
+              box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-step:hover { background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5; }
+/* 当前步骤：浅蓝底 + 浅蓝描边（稿 #F5F8FF / #DAE4FE） */
+.tp-step.is-on { background: #F5F8FF; box-shadow: inset 0 0 0 1px #DAE4FE; }
+.tp-step.is-on:hover { background: #F5F8FF; box-shadow: inset 0 0 0 1px #DAE4FE; }
+/* 序号圈：白底 + 1px #E5E5E5 描边（稿 24×24 r=32）；当前步骤换成主色实心、无描边 */
+.tp-step-no {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 50%;
+  font-size: 12px; line-height: 22px; font-weight: 500;
+  color: #6B6B6B; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+}
+.tp-step.is-on .tp-step-no { color: #FFFFFF; background: var(--cds-color-primary); font-weight: 500; box-shadow: none; }
+.tp-step-txt { min-width: 0; display: flex; flex-direction: column; }
+.tp-step-txt b {
+  display: block; font-size: 14px; line-height: 22px; font-weight: 500;
+  color: var(--cds-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tp-step.is-on .tp-step-txt b { font-weight: 500; }
+.tp-step-txt i {
+  display: block; font-style: normal; font-size: 12px; line-height: 20px;
+  color: var(--cds-text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tp-step-arrow { flex: 0 0 18px; height: 18px; margin: 0 8px; color: var(--cds-text-disabled); }
+.tp-step-arrow svg { display: block; width: 100%; height: 100%; }
+/* 差异对比 / Diff：96×56 白底描边 r4，文字左距 20、Diff 再缩 17 */
+.tp-diff {
+  flex: 0 0 96px; height: 56px; margin-left: 16px; padding-left: 20px;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  border-radius: 4px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-diff:hover { background: #FAFAFA; }
+.tp-diff-t { font-size: 14px; line-height: 22px; color: var(--cds-text-primary); }
+.tp-diff-s { margin-left: 17px; font-size: 12px; line-height: 16px; color: var(--cds-text-tertiary); }
+
+/* ---- ② 主体：可折叠标题栏 + 自适应内容 ---- */
+.tp-body {
+  flex: 0 0 auto; width: 100%; max-width: var(--tp-col);
+  margin: 20px 0 40px; display: flex; flex-direction: column;
+  border: 1px solid #EEEEEE; border-radius: 4px; background: #FFFFFF; overflow: hidden;
+}
+.tp-body-head { flex: 0 0 36px; background: #F7F7F7; box-shadow: inset 0 -1px 0 0 #EEEEEE; }
+.tp-body-in { padding: 20px 30px 20px; }
+.tp-body.is-closed .tp-body-in { display: none; }
+
+.tp-goal-title {
+  margin: 0; font-size: 14px; line-height: 22px; font-weight: 500;
+  color: var(--cds-text-primary);
+}
+.tp-textarea {
+  display: block; width: 100%; height: 128px; margin-top: 8px; padding: 12px;
+  border: 1px solid #EEEEEE; border-radius: 4px; background: #FFFFFF;
+  font-family: inherit; font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  resize: none;
+}
+.tp-textarea::placeholder { color: var(--cds-text-disabled); }
+.tp-textarea:focus, .tp-textarea:focus-visible { outline: none; }
+
+/* 可折叠容器的标题栏（稿：36 高 #F7F7F7 + 下沿 #EEEEEE，箭头在 12、文字在 18） */
+.tp-sect {
+  display: flex; align-items: center; gap: 4px; width: 100%; height: 36px;
+  padding: 0 12px; text-align: left; background: transparent; border-radius: 0;
+  font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  transition: color var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-sect:hover { color: var(--cds-color-primary); }
+.tp-sect-caret {
+  flex: 0 0 auto; color: var(--cds-text-secondary);
+  transition: transform .2s cubic-bezier(.2, .8, .2, 1), color var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-sect:hover .tp-sect-caret { color: currentColor; }
+.tp-sect-caret.is-right,
+.tp-body.is-closed .tp-sect-caret,
+.tp-files.is-closed .tp-sect-caret,
+.tp-ref.is-closed .tp-sect-caret,
+.tp-repo.is-closed .tp-sect-caret { transform: rotate(-90deg); }
+
+/* 文件输入（可折叠）：头 36 通栏，内容左 28 / 右 20 / 下 20 */
+.tp-files {
+  margin-top: 12px; border: 1px solid #EEEEEE; border-radius: 4px;
+  background: #FFFFFF; overflow: hidden;
+}
+.tp-files-head { background: #F7F7F7; box-shadow: inset 0 -1px 0 0 #EEEEEE; }
+.tp-files-in { padding: 0 20px 20px 0; }
+.tp-files.is-closed .tp-files-in { display: none; }
+.tp-file-btns { display: flex; gap: 12px; margin: 20px 0 0 28px; }
+.tp-file-btn {
+  /* 稿里 126×32 / 140×32 是不含边框的整数宽 → 描边用 inset 阴影，不占盒宽 */
+  display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 12px;
+  border-radius: 4px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #EEEEEE;
+  font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease),
+              box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-file-btn .ico { color: var(--cds-text-secondary); }
+.tp-file-btn:hover { background: #FAFAFA; box-shadow: inset 0 0 0 1px #E5E5E5; }
+/* 第 49 轮：提示语是警告橙（稿 textColor paint_1204:56466 = 提示/@colorWarning-6 #FF7D00） */
+.tp-tip { margin: 20px 0 0 28px; font-size: 14px; line-height: 22px; color: #FF7D00; }
+.tp-tip.is-ready { margin-top: 16px; color: #F77234; }
+.tp-file-list { display: flex; flex-direction: column; gap: 4px; margin: 8px 0 0 28px; padding: 0; list-style: none; }
+.tp-file-row {
+  display: flex; align-items: center; height: 40px; padding: 0 6px 0 16px;
+  border: 1px solid #EEEEEE; border-radius: 4px; background: #F7F7F7;
+}
+/* AI 已就绪那一行是暖色（稿 #FFF7E8 / #FFE4BA） */
+.tp-file-row.is-ai { background: #FFF7E8; border-color: #FFE4BA; }
+.tp-file-name { min-width: 0; font-size: 14px; line-height: 22px; color: var(--cds-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tp-file-tag {
+  flex: 0 0 auto; margin-left: 8px; padding: 2px 4px; border-radius: 3px;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-size: 12px; line-height: 16px; color: var(--cds-color-primary);
+}
+.tp-file-act { flex: 0 0 auto; display: flex; gap: 8px; margin-left: auto; }
+/* 行内动作键：白底 + 1px #E5E5E5 描边（稿 100/72/44 × 28，内距 8） */
+.tp-mini {
+  height: 28px; padding: 0 8px; border-radius: 4px; background: #FFFFFF;
+  box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease),
+              box-shadow var(--cds-motion-duration) var(--cds-motion-ease),
+              color var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-mini:hover { background: #FAFAFA; box-shadow: inset 0 0 0 1px #D9D9D9; }
+.tp-mini:last-child:hover { color: #F53F3F; background: #FFF1F0; box-shadow: inset 0 0 0 1px #FFCCC7; }
+
+/* 参考代码源（可折叠）：头 36 通栏 + 展开体（稿 3292:53973） */
+.tp-ref {
+  margin-top: 12px; border: 1px solid #EEEEEE; border-radius: 4px;
+  background: #FFFFFF; overflow: hidden;
+}
+.tp-ref-head { background: #F7F7F7; box-shadow: inset 0 -1px 0 0 #EEEEEE; }
+.tp-ref.is-closed .tp-ref-head { box-shadow: none; }
+.tp-ref-sub {
+  margin-left: auto; padding-left: 12px;
+  font-size: 12px; line-height: 20px; color: var(--cds-text-tertiary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tp-ref.is-closed .tp-ref-sub { color: var(--cds-text-tertiary); }
+.tp-ref-in { padding: 20px 20px 20px 30px; }
+.tp-ref.is-closed .tp-ref-in { display: none; }
+.tp-ref-tip { margin: 0 0 12px; font-size: 14px; line-height: 22px; color: #868686; }
+
+/* 选择条：994×80（#F7F7F7 / #E5E5E5，内距 12） */
+.tp-pick {
+  padding: 12px; margin-bottom: 16px;
+  border: 1px solid #E5E5E5; border-radius: 4px; background: #F7F7F7;
+}
+.tp-pick-row { display: flex; align-items: center; gap: 12px; height: 32px; }
+.tp-sel {
+  display: flex; align-items: center; min-width: 0; height: 32px; padding: 0 12px;
+  border-radius: 4px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-size: 14px; line-height: 22px; text-align: left;
+  transition: box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-sel:hover { box-shadow: inset 0 0 0 1px #D9D9D9; }
+.tp-sel-a { flex: 0 0 200px; }
+.tp-sel-b { flex: 1 1 auto; }
+.tp-sel-k { flex: 0 0 auto; color: var(--cds-text-secondary); }
+.tp-sel-a .tp-sel-k { color: var(--cds-text-secondary); }
+.tp-sel-b .tp-sel-k { color: var(--cds-text-primary); }
+.tp-sel-v { min-width: 0; flex: 1 1 auto; margin-left: 4px; color: var(--cds-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tp-sel-v.is-ph { color: var(--cds-text-disabled); }
+.tp-sel-ic { flex: 0 0 auto; margin-left: 8px; color: var(--cds-text-secondary); }
+.tp-pick-add {
+  flex: 0 0 auto; height: 32px; padding: 0 16px; border-radius: 4px;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-pick-add:hover { background: #FAFAFA; }
+.tp-pick-sep { flex: 0 0 auto; width: 1px; height: 16px; margin: 0 4px; background: #E5E5E5; }
+.tp-pick-link {
+  flex: 0 0 auto; font-size: 14px; line-height: 22px; color: var(--cds-color-primary);
+  text-decoration: none; transition: color var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-pick-link:hover { color: #2E63DB; }
+.tp-pick-hint {
+  display: flex; gap: 12px; margin-top: 8px;
+  font-size: 12px; line-height: 16px; color: var(--cds-text-tertiary);
+}
+.tp-pick-hint span { padding-left: 12px; }
+.tp-pick-hint span:first-child { flex: 0 0 200px; }
+.tp-pick-hint span:last-child { flex: 1 1 auto; }
+
+/* 代码源卡片：994×260（头 36 + 内距 20/20/20/30） */
+.tp-repo {
+  margin-bottom: 12px; border: 1px solid #EEEEEE; border-radius: 4px;
+  background: #FFFFFF; overflow: hidden;
+}
+.tp-repo-head { display: flex; align-items: center; height: 36px; background: #F7F7F7; box-shadow: inset 0 -1px 0 0 #EEEEEE; }
+.tp-repo-head .tp-sect { flex: 1 1 auto; width: auto; height: 36px; padding-right: 0; }
+.tp-repo-in { display: flex; flex-direction: column; gap: 12px; padding: 20px 20px 20px 30px; }
+.tp-repo.is-closed .tp-repo-in { display: none; }
+
+.tp-row { display: flex; align-items: center; min-width: 0; }
+.tp-row--area { align-items: flex-start; }
+.tp-fld-k { flex: 0 0 114px; font-size: 14px; line-height: 22px; color: var(--cds-text-primary); }
+.tp-row--area .tp-fld-k { padding-top: 12px; }
+.tp-fld-k-b { flex: 0 0 56px; margin-right: 12px; }
+.tp-row > .tp-pick-link { margin-left: 12px; }
+.tp-btn28 {
+  display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 12px;
+  border-radius: 4px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease),
+              box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-btn28 .ico { color: var(--cds-text-secondary); }
+.tp-btn28:hover { background: #FAFAFA; box-shadow: inset 0 0 0 1px #D9D9D9; }
+.tp-inp {
+  min-width: 0; height: 28px; padding: 0 12px; border: 0; border-radius: 4px;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-family: inherit; font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  outline: none;
+  transition: box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-inp::placeholder { color: var(--cds-text-disabled); }
+.tp-inp:focus { box-shadow: inset 0 0 0 1px var(--cds-color-primary); }
+.tp-cell { display: flex; align-items: center; min-width: 0; }
+.tp-cell-a { flex: 0 0 514px; }
+.tp-cell-a .tp-inp { flex: 0 0 400px; }
+.tp-cell-b { flex: 1 1 auto; margin-left: 20px; }
+.tp-cell-b .tp-inp { flex: 1 1 auto; }
+.tp-area {
+  flex: 1 1 auto; min-width: 0; height: 64px; padding: 12px;
+  border: 0; border-radius: 4px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-family: inherit; font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  resize: none; outline: none;
+  transition: box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-area::placeholder { color: var(--cds-text-disabled); }
+.tp-area:focus { box-shadow: inset 0 0 0 1px var(--cds-color-primary); }
+
+/* 后端 / 前端代码源两行（994×36，行间 12） */
+.tp-src { display: flex; flex-direction: column; gap: 12px; }
+.tp-src-row {
+  display: flex; align-items: center; height: 36px;
+  border: 1px solid #EEEEEE; border-radius: 4px; background: #F7F7F7;
+}
+.tp-src-row.is-on { background: #F5F8FF; border-color: #DAE4FE; }
+.tp-src-t { flex: 1 1 auto; width: auto; height: 34px; padding-right: 0; }
+.tp-chip-grp { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; padding-right: 12px; }
+.tp-pill {
+  display: inline-flex; align-items: center; height: 22px; padding: 0 4px;
+  border-radius: 3px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-size: 12px; line-height: 20px; color: var(--cds-color-primary); white-space: nowrap;
+}
+.tp-chip-sep { flex: 0 0 auto; width: 1px; height: 14px; background: #E5E5E5; }
+.tp-del {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; color: var(--cds-text-secondary);
+  transition: color var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-del:hover { color: #F53F3F; }
+
+/* ---- ③ 底部：与主体固定 40 间距 ---- */
+.tp-foot {
+  position: sticky; bottom: 0; z-index: 1;
+  flex: 0 0 56px; width: 100%; margin-top: auto;
+  display: flex; align-items: center; justify-content: center;
+  background: #FFFFFF; box-shadow: inset 0 1px 0 0 #EBECED;
+}
+.tp-primary {
+  height: 36px; padding: 0 64px; border-radius: 4px;
+  background: var(--cds-color-primary); color: #FFFFFF;
+  font-size: 14px; line-height: 22px; font-weight: 500;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-primary:hover { background: #2E63DB; }
+.tp-primary:active { background: #2A58C4; }
+
+/* ============================================================
+   第 49 轮：文字说明弹窗（480 宽，多行文本框 + 保存关闭）
+   ============================================================ */
+.tp-dlg {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 480px; max-width: calc(100% - 48px);
+  display: flex; flex-direction: column; overflow: hidden;
+  background: #FFFFFF; border-radius: 8px; box-shadow: 0 12px 40px rgba(0, 0, 0, .18);
+  animation: tp-dlg-pop 200ms cubic-bezier(.2, .8, .2, 1);
+}
+@keyframes tp-dlg-pop {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(.97); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.tp-dlg-head {
+  flex: 0 0 48px; padding: 0 20px; display: flex; align-items: center;
+  box-shadow: inset 0 -1px 0 0 #EBECED;
+}
+.tp-dlg-title { margin: 0; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--cds-text-primary); }
+.tp-dlg-x {
+  margin-left: auto; flex: 0 0 auto; width: 28px; height: 28px; border-radius: 4px;
+  display: inline-flex; align-items: center; justify-content: center; color: var(--cds-text-primary);
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-dlg-x:hover { background: var(--cds-surface-subtle); }
+.tp-dlg-body { padding: 20px; }
+.tp-dlg-ta {
+  display: block; width: 100%; height: 160px; padding: 12px;
+  border: 1px solid #EEEEEE; border-radius: 4px; background: #FFFFFF; resize: none;
+  font-family: inherit; font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  transition: border-color var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-dlg-ta::placeholder { color: var(--cds-text-disabled); }
+.tp-dlg-ta:focus, .tp-dlg-ta:focus-visible { outline: none; border-color: var(--cds-color-primary); }
+.tp-dlg-foot { padding: 0 20px 20px; display: flex; justify-content: flex-end; gap: 12px; }
+.tp-dlg-btn {
+  height: 32px; padding: 0 20px; border-radius: 4px; background: #FFFFFF;
+  box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease),
+              box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-dlg-btn:hover { background: #FAFAFA; box-shadow: inset 0 0 0 1px #D9D9D9; }
+.tp-dlg-btn.is-primary {
+  background: var(--cds-color-primary); color: #FFFFFF; font-weight: 500; box-shadow: none;
+}
+.tp-dlg-btn.is-primary:hover { background: #2E63DB; box-shadow: none; }

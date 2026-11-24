@@ -97,12 +97,17 @@ async function rsCase(label, w, h, seed) {
     const ring = document.querySelector('.ts-item.is-now .ts-icon');
     return {
       top: g('.task-top'), steps: g('.task-steps'), tabs: g('.task-tabs'), stage: g('.stage'),
-      segs: [...document.querySelectorAll('.tt-seg .tt-btn')].map(rel),
+      segs: [...document.querySelectorAll('.tt-links .tt-link')].map(rel),
       run: g('.tt-run'),
       items: items.map(rel), links, icons,
       ring: ring ? (() => { const a = getComputedStyle(ring, '::after'); return { w: a.width, h: a.height, anim: a.animationName, mask: /^url/.test(a.maskImage || a.webkitMaskImage || ''), ml: a.marginLeft, mt: a.marginTop }; })() : null,
-      segIcons: document.querySelectorAll('.tt-seg .tt-btn .ico').length,
-      segFS: getComputedStyle(document.querySelector('.tt-btn')).fontSize,
+      segIcons: document.querySelectorAll('.tt-links .tt-link .ico').length,
+      segFS: getComputedStyle(document.querySelector('.tt-link')).fontSize,
+      fold: g('.tt-fold'), foldTxt: (document.querySelector('.tt-fold') || {}).textContent,
+      foldExp: document.querySelector('.tt-fold') ? document.querySelector('.tt-fold').getAttribute('aria-expanded') : null,
+      nowLabel: (document.querySelector('.tt-now-label') || {}).textContent,
+      runBg: getComputedStyle(document.querySelector('.tt-run')).backgroundColor,
+      runColor: getComputedStyle(document.querySelector('.tt-run')).color,
       done: document.querySelectorAll('.ts-item.is-done').length,
       now: document.querySelectorAll('.ts-item.is-now').length,
       prog: g('.ts-prog'),
@@ -116,24 +121,26 @@ async function rsCase(label, w, h, seed) {
       pad: getComputedStyle(document.getElementById('tkStepTrack')).padding,
     };
   });
-  ok('C1 三段 y = 0 / 44 / 166，高 44 / 122 / 40', d.top.y === 0 && d.top.h === 44 && d.steps.y === 44 && d.steps.h === 122 && d.tabs.y === 166 && d.tabs.h === 40, JSON.stringify([d.top, d.steps, d.tabs]));
-  ok('C2 内容区（stage）从 206 起', d.stage.y === 206, JSON.stringify(d.stage));
-  /* 第 35 轮：去图标、字号 13，宽度随文字自然收缩；第 37 轮「全链路」→「任务信息」（+13） */
-  ok('C3 顶部三段按钮 76 / 125 / 103±2，左起 8、间距 8', Math.abs(d.segs[0].w - 76) <= 2 && Math.abs(d.segs[1].w - 125) <= 2 && Math.abs(d.segs[2].w - 103) <= 2 && d.segs[0].x === 8 && d.segs[1].x === d.segs[0].x + d.segs[0].w + 8, JSON.stringify(d.segs));
-  ok('C3b 只剩「工序进度」一个下拉箭头图标、字号 13', d.segIcons === 1 && d.segFS === '13px', d.segIcons + ' / ' + d.segFS);
-  ok('C4 自动执行 88×28，距右 8、垂直居中(8)', d.run.w === 88 && d.run.h === 28 && d.run.x + d.run.w === d.top.w - 8 && d.run.y === 8, JSON.stringify(d.run));
+  ok('C1 三段 y = 0 / 44 / 131，高 44 / 87 / 40（第 46 轮稿面工序条 87）', d.top.y === 0 && d.top.h === 44 && d.steps.y === 44 && d.steps.h === 87 && d.tabs.y === 131 && d.tabs.h === 40, JSON.stringify([d.top, d.steps, d.tabs]));
+  ok('C2 内容区（stage）从 171 起', d.stage.y === 171, JSON.stringify(d.stage));
+  /* 第 46 轮：稿 3140:45042 —— 顶栏只剩两段（任务信息 / 工序资产），各 80 宽、中间 1px 竖分隔 */
+  ok('C3 分段两段各 80 宽、中间 1px 分隔（80+1+80）', d.segs.length === 2 && d.segs.every(x => x.w === 80) && d.segs[1].x === d.segs[0].x + 81, JSON.stringify(d.segs));
+  ok('C3b 分段内无图标、字号 14；右侧「工序进度 | 收起⌃」独立成组', d.segIcons === 0 && d.segFS === '14px' && d.nowLabel === '工序进度' && /收起/.test(d.foldTxt) && d.foldExp === 'true', d.segIcons + ' / ' + d.segFS + ' / ' + d.nowLabel + ' / ' + d.foldTxt);
+  ok('C4 自动执行 92×28（文字按钮：透明底 + 主色文字），垂直居中 8', d.run.w === 92 && d.run.h === 28 && d.run.y === 8 && d.runBg === 'rgba(0, 0, 0, 0)' && d.runColor === 'rgb(55, 112, 247)', JSON.stringify(d.run) + ' ' + d.runBg + ' ' + d.runColor);
   ok('C5 9 道工序、图标 24、圆心等距 64 间距排版', d.items.length === 9 && d.icons.every(i => i.iconW === 24), JSON.stringify(d.icons.map(i => i.cx)));
-  ok('C6 连线 8 条：与两侧圆心各留 20', d.links.length === 8 && d.links.every((l, i) => Math.abs(l.x - (d.icons[i].cx + 20)) <= 1 && Math.abs(l.w - (d.icons[i + 1].cx - 20 - (d.icons[i].cx + 20))) <= 1), JSON.stringify(d.links));
+  ok('C6 连线 8 条：56 长，前后各留 8（工序横排后的纯间隙）', d.links.length === 8 && d.links.every((l, i) => l.w === 56 && l.x - (d.items[i].x + d.items[i].w) === 8 && d.items[i + 1].x - (l.x + l.w) === 8), JSON.stringify(d.links));
   ok('C7 前两条连线主色、其后灰线', d.done === 2 && d.now === 1, d.done + '/' + d.now);
   /* 第 35 轮：外环改成 32×32 遮罩点阵、绕圆心旋转，靠 50% + 负 margin 保证同心 */
   ok('C8 当前项 32 点阵环（mask + 旋转，居中 -16）', d.ring && d.ring.w === '32px' && d.ring.h === '32px' && d.ring.mask && d.ring.anim === 'tsOrbit' && d.ring.ml === '-16px' && d.ring.mt === '-16px', JSON.stringify(d.ring));
   /* 第 36 轮：那条其实是滚动条 —— 几何照稿（左缩 16、离底 4、6 高），1440 放得下时整条不出现 */
-  ok('C9 底部滚动条：左右各缩 16、离底 4、6 高，放得下时隐藏', d.prog.x === 16 && d.prog.h === 6 && d.prog.y === 156 && d.prog.w === 1072 && d.progOp === '0', JSON.stringify(d.prog) + ' op=' + d.progOp);
+  /* 第 46 轮：工序横排后单条更宽，9 道在这个宽度下放不下 → 滚动条应当出现 */
+  ok('C9 底部滚动条：左右各缩 16、离底 4、6 高；放不下时出现', d.prog.x === 16 && d.prog.h === 6 && d.prog.y === 121 && d.prog.w === 1072 && d.progOp === '1' && d.scroll[0] > d.scroll[1], JSON.stringify(d.prog) + ' op=' + d.progOp + ' ' + d.scroll);
   ok('C10 页签：概要设计 80 宽、共 5 个、2 条竖分隔', d.tabsRow.length === 5 && d.tabsRow[0].w === 80 && d.vseps === 2, JSON.stringify(d.tabsRow) + ' sep=' + d.vseps);
   ok('C11 旧标题栏 / 占位内容已删除', !d.old, d.old);
   ok('C12 输入卡收起', d.comp === 'none', d.comp);
   /* 第 35 轮：内边距统一 24（原 41），9 道工序在 1102 面板里仍一屏放下 */
-  ok('C13 工序条不溢出 + 左右内边距 24', d.scroll[0] <= d.scroll[1] + 1 && d.pad === '0px 24px', d.scroll.join('/') + ' pad=' + d.pad);
+  /* 第 46 轮：横排后每条工序更宽，9 道在 1104 下必然溢出 → 交给横向滚动（这与稿一致） */
+  ok('C13 工序条左右内边距 20、可横向滚动', d.pad === '0px 20px' && d.scroll[0] > d.scroll[1], d.scroll.join('/') + ' pad=' + d.pad);
   ok('C14 无 JS 报错', p.__e.length === 0, p.__e.join(' | '));
   await p.close();
 }
@@ -141,10 +148,13 @@ async function rsCase(label, w, h, seed) {
 /* ========== D 任务页交互 ========== */
 {
   const p = await mk('cecoder-task.html?id=1');
-  /* 视图切换 */
-  await (await p.$('.tt-seg .tt-btn:first-child')).click(); await wait(200);
-  const seg = await p.evaluate(() => [...document.querySelectorAll('.tt-btn')].map(b => b.classList.contains('is-on') + '/' + b.getAttribute('aria-selected')));
-  ok('D1 切到「任务信息」：选中态跟着走', seg[0] === 'true/true' && seg[1] === 'false/false', JSON.stringify(seg));
+  /* 第 47 轮：任务信息 / 工序资产改成两条独立链接（不再有 tab 选中态） */
+  await (await p.$('.tt-links .tt-link:first-child')).click(); await wait(150);
+  const seg = await p.evaluate(() => [...document.querySelectorAll('.tt-links .tt-link')].map(a => a.tagName + '/' + a.getAttribute('role') + '/' + a.classList.contains('is-on')));
+  ok('D1 任务信息 / 工序资产是 <a> 链接、无 role=tab、点击不产生选中态', seg.length === 2 && seg.every(x => x === 'A/null/false'), JSON.stringify(seg));
+  await p.hover('.tt-links .tt-link'); await wait(200);
+  const segHov = await p.evaluate(() => getComputedStyle(document.querySelector('.tt-links .tt-link')).color);
+  ok('D1b 链接 hover 文字转主色（#3770F7）', segHov === 'rgb(55, 112, 247)', segHov);
   /* 页签切换 + 关闭 */
   await p.evaluate(() => document.querySelectorAll('.tk-tab')[2].click()); await wait(150);
   const t2 = await p.evaluate(() => [...document.querySelectorAll('.tk-tab')].map(t => t.classList.contains('is-on')));

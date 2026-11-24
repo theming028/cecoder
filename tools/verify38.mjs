@@ -74,7 +74,7 @@ await p.close();
 p = await mk('cecoder-home.html', 1440, 900, () => { localStorage.clear(); });
 const order = await tabOrder(p);
 ok('D1 会话在前、任务在后', order[0].startsWith('会话') && order[1].startsWith('任务'), order.join(' / '));
-ok('D2 会话 x=16 / 任务 x=162', /@16$/.test(order[0]) && /@162$/.test(order[1]), order.join(' / '));
+ok('D2 会话 x=16 / 任务 x=160（两段各 144 均分）', /@16$/.test(order[0]) && /@160$/.test(order[1]), order.join(' / '));
 ok('D3 默认选中改成「会话」', (await activeTab(p)) === '会话');
 ok('D4 「12」角标跟着会话', await p.evaluate(() => document.querySelector('.wd-tab .wd-tab-num').parentElement.dataset.wdTab) === '会话');
 ok('D5 默认落在会话视图（任务视图隐藏）', await p.evaluate(() => document.getElementById('wdViewSession').hidden === false && document.getElementById('wdViewTask').hidden === true));
@@ -86,10 +86,12 @@ ok('D7 点任务 → 选中任务', (await activeTab(p)) === '任务');
 ok('D8 任务视图显示、会话视图隐藏', await p.evaluate(() => document.getElementById('wdViewTask').hidden === false && document.getElementById('wdViewSession').hidden === true));
 ok('D9 任务页签工具行同样三件套', await p.evaluate(() => { const a = document.querySelector('.wd-adddir'); return getComputedStyle(a).display !== 'none' && a.getBoundingClientRect().width > 200; }));
 ok('D10 侧栏宽度不变', (await p.evaluate(() => Math.round(document.getElementById('wsDrawer').getBoundingClientRect().width))) === 320);
-/* 未选中页签的底色/底线仍成立（交换后两个 tab 的样式不串） */
-ok('D11 选中 tab 无底线 / 未选中带底线', await p.evaluate(() => {
+/* 第 44 轮：页签改成「分段控件」—— 选中白底 + 1px #E5E5E5 描边，未选中透明底无描边 */
+ok('D11 选中段白底带描边 / 未选中透明无描边', await p.evaluate(() => {
   const on = document.querySelector('.wd-tab.is-active'), off = document.querySelector('.wd-tab:not(.is-active)');
-  return getComputedStyle(on).boxShadow === 'none' && getComputedStyle(off).boxShadow.includes('inset');
+  const a = getComputedStyle(on), b = getComputedStyle(off);
+  return a.backgroundColor === 'rgb(255, 255, 255)' && a.borderTopColor === 'rgb(229, 229, 229)'
+    && b.backgroundColor === 'rgba(0, 0, 0, 0)' && b.borderTopColor === 'rgba(0, 0, 0, 0)';
 }));
 ok('D12 无脚本报错', p.__e.length === 0, p.__e.join(' | '));
 await p.close();

@@ -145,18 +145,18 @@ async function page(url, w = 1440, h = 900, open = true) {
       stage: g('.stage'),
       old: !!(document.querySelector('.task-head') || document.getElementById('tkTitle') || document.querySelector('.task-body')),
       comp: getComputedStyle(document.querySelector('.composer')).display,
-      segs: [...document.querySelectorAll('.tt-seg .tt-btn')].map(b => Math.round(b.getBoundingClientRect().width)),
+      segs: [...document.querySelectorAll('.tt-links .tt-link')].map(b => Math.round(b.getBoundingClientRect().width)),
       items: document.querySelectorAll('.ts-item').length,
       tabsN: document.querySelectorAll('.tk-tab').length,
     };
   });
   ok('6 三页仍为 data-page=task', d.page === 'task', d.page);
   ok('6 顶部工具条 44 @0', d.top.y === 0 && d.top.h === 44, JSON.stringify(d.top));
-  ok('6 工序条 122 @44', d.steps.y === 44 && d.steps.h === 122, JSON.stringify(d.steps));
-  ok('6 页签条 40 @166', d.tabs.y === 166 && d.tabs.h === 40, JSON.stringify(d.tabs));
-  ok('6 内容区从 206 起、旧标题栏已移除', d.stage.y === 206 && !d.old, JSON.stringify(d.stage) + ' old=' + d.old);
+  ok('6 工序条 87 @44', d.steps.y === 44 && d.steps.h === 87, JSON.stringify(d.steps));
+  ok('6 页签条 40 @131', d.tabs.y === 131 && d.tabs.h === 40, JSON.stringify(d.tabs));
+  ok('6 内容区从 171 起、旧标题栏已移除', d.stage.y === 171 && !d.old, JSON.stringify(d.stage) + ' old=' + d.old);
   /* 第 35 轮：去图标、字号 13 → 宽度自然收缩；第 37 轮首段改名「任务信息」76 宽 */
-  ok('6 三段按钮 ≈76/125/103', Math.abs(d.segs[0] - 76) <= 2 && Math.abs(d.segs[1] - 125) <= 2 && Math.abs(d.segs[2] - 103) <= 2, JSON.stringify(d.segs));
+  ok('6 分段两段各 80', d.segs.length === 2 && d.segs.every(w => Math.abs(w - 80) <= 2), JSON.stringify(d.segs));
   ok('6 9 道工序 + 5 个页签', d.items === 9 && d.tabsN === 5, d.items + '/' + d.tabsN);
   ok('6 输入卡仍收起', d.comp === 'none', d.comp);
   ok('6 无 JS 报错', p.__errs.length === 0, p.__errs.join(' | '));

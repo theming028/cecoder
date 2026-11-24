@@ -40,7 +40,8 @@ const M = p => p.evaluate(() => {
     sb: { on: sb.classList.contains('is-on'), op: cs.opacity, pe: cs.pointerEvents, pos: cs.position, l: cs.left, rt: cs.right, bt: cs.bottom, h: cs.height, rad: cs.borderRadius, rel: rel(sb) },
     th: { w: Math.round(th.getBoundingClientRect().width), h: Math.round(th.getBoundingClientRect().height), tx: getComputedStyle(th).transform, l: Math.round(th.getBoundingClientRect().left - sb.getBoundingClientRect().left), bg: getComputedStyle(th).backgroundColor, rad: getComputedStyle(th).borderRadius },
     trackW: sb.clientWidth,
-    aria: q('.tt-btn[data-task-view="steps"]').getAttribute('aria-expanded'),
+    aria: q('#tkStepsToggle').getAttribute('aria-expanded'),
+    foldTxt: q('#tkStepsToggle').textContent.replace(/\s/g, ''),
     caret: getComputedStyle(q('.tt-caret')).transform,
     off: q('.panel-main').classList.contains('is-steps-off'),
     links: [...document.querySelectorAll('.ts-link')].filter(l => !l.hidden).length,
@@ -52,10 +53,14 @@ const M = p => p.evaluate(() => {
   for (const w of [1920, 1440]) {
     const p = await mk(w);
     const d = await M(p);
-    ok('A' + (w === 1920 ? '1' : '2') + ' ' + w + '：工序整体居中（左右空隙相等且 >0）',
-      d.gapL === d.gapR && d.gapL > 20, d.gapL + '/' + d.gapR);
-    ok('A' + (w === 1920 ? '1b' : '2b') + ' ' + w + '：放得下 → 无滚动、滚动条不出现',
-      d.sw <= d.cw + 1 && d.sb.on === false && d.sb.op === '0', d.sw + '/' + d.cw + ' op=' + d.sb.op);
+    /* 第 46 轮：工序项横排后整条更宽（1450），1440 窗已经放不下 —— 只有 1920 仍居中不滚 */
+    if (w === 1920) {
+      ok('A1 1920：工序整体居中（左右空隙相等且 >0）', d.gapL === d.gapR && d.gapL > 20, d.gapL + '/' + d.gapR);
+      ok('A1b 1920：放得下 → 无滚动、滚动条不出现', d.sw <= d.cw + 1 && d.sb.on === false && d.sb.op === '0', d.sw + '/' + d.cw + ' op=' + d.sb.op);
+    } else {
+      ok('A2 1440：放不下 → 贴左不裁（左空隙 0）', d.gapL === 0 && d.sw > d.cw + 1, d.gapL + ' ' + d.sw + '/' + d.cw);
+      ok('A2b 1440：滚动条按需出现', d.sb.on === true && d.sb.op === '1', d.sb.on + ' op=' + d.sb.op);
+    }
     await p.close();
   }
   const p = await mk(960);
@@ -103,20 +108,18 @@ const M = p => p.evaluate(() => {
 {
   const p = await mk(1440);
   let d = await M(p);
-  ok('C1 默认展开：122 / 166 / 206、箭头朝下、aria=true', d.bar.h === 122 && d.tabs.y === 166 && d.stage.y === 206 && d.aria === 'true' && d.caret === 'none', JSON.stringify([d.bar.h, d.tabs.y, d.stage.y, d.aria, d.caret]));
-  await p.click('.tt-btn[data-task-view="steps"]');
+  ok('C1 默认展开：87 / 131 / 171、收起⌃朝上、aria=true', d.bar.h === 87 && d.tabs.y === 131 && d.stage.y === 171 && d.aria === 'true' && d.caret === 'none' && /收起/.test(d.foldTxt), JSON.stringify([d.bar.h, d.tabs.y, d.stage.y, d.aria, d.caret, d.foldTxt]));
+  await p.click('#tkStepsToggle');
   await wait(450);
   d = await M(p);
-  ok('C2 点「工序进度」→ 工序栏折成 0、页签 44、内容区 84', d.off === true && d.bar.h === 0 && d.tabs.y === 44 && d.stage.y === 84, JSON.stringify([d.off, d.bar.h, d.tabs.y, d.stage.y]));
-  ok('C3 折叠态：aria=false、箭头翻上来 180°、连线不再残留', d.aria === 'false' && /matrix\(-1, 0, 0, -1/.test(d.caret) && d.links === 0, d.aria + ' / ' + d.caret + ' / links=' + d.links);
+  ok('C2 点「收起」→ 工序栏折成 0、页签 44、内容区 84', d.off === true && d.bar.h === 0 && d.tabs.y === 44 && d.stage.y === 84, JSON.stringify([d.off, d.bar.h, d.tabs.y, d.stage.y]));
+  ok('C3 折叠态：aria=false、箭头翻转 180°、文案变「展开」、连线不再残留', d.aria === 'false' && /matrix\(-1, 0, 0, -1/.test(d.caret) && /展开/.test(d.foldTxt) && d.links === 0, d.aria + ' / ' + d.caret + ' / ' + d.foldTxt + ' / links=' + d.links);
   ok('C4 折叠态：滚动条一并收起', d.sb.on === false && d.sb.op === '0', JSON.stringify([d.sb.on, d.sb.op]));
-  /* 切到「任务信息」再切回来 → 自动展开，不留空白 */
-  await p.click('.tt-btn[data-task-view="info"]');
-  await wait(120);
-  await p.click('.tt-btn[data-task-view="steps"]');
+  /* 再点一次「展开」→ 复原 */
+  await p.click('#tkStepsToggle');
   await wait(450);
   d = await M(p);
-  ok('C5 切走再切回「工序进度」→ 自动展开（122 / 166 / 206）', d.off === false && d.bar.h === 122 && d.tabs.y === 166 && d.stage.y === 206 && d.aria === 'true', JSON.stringify([d.off, d.bar.h, d.tabs.y, d.stage.y]));
+  ok('C5 再点「展开」→ 复原（87 / 131 / 171）', d.off === false && d.bar.h === 87 && d.tabs.y === 131 && d.stage.y === 171 && d.aria === 'true' && /收起/.test(d.foldTxt), JSON.stringify([d.off, d.bar.h, d.tabs.y, d.stage.y, d.foldTxt]));
   ok('C6 复原后连线 8 条、无 JS 报错', d.links === 8 && p.__e.length === 0, d.links + ' / ' + JSON.stringify(p.__e));
   await p.close();
 }

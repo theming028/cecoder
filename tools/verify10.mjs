@@ -82,9 +82,9 @@ const gap = await p.evaluate(() => {
     tail: +(sub.bottom - empty.bottom).toFixed(2)
   };
 });
-ok('2 上方留白 24', Math.abs(gap.top - 24) < 0.6, gap.top);
-ok('2 下方留白与上方一致 24', Math.abs(gap.bottom - gap.top) < 0.6, JSON.stringify(gap));
-ok('2 空态底边贴齐分组底（无多余空隙）', Math.abs(gap.tail) < 0.6, gap.tail);
+ok('2 上方留白 40（第 46 轮：分组体内距 16 + 空态自身 24）', Math.abs(gap.top - 40) < 0.6, gap.top);
+ok('2 下方留白 24（空态自身内距，不含容器 16）', Math.abs(gap.bottom - 24) < 0.6, JSON.stringify(gap));
+ok('2 空态下方只留分组体的 16 内距', Math.abs(gap.tail - 16) < 0.6, gap.tail);
 
 /* ========== 3 工序名一律正文色 ========== */
 await p.click('[data-quick="技术任务"]'); await new Promise(r => setTimeout(r, 350));

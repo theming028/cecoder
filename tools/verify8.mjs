@@ -20,10 +20,10 @@ const box = sel => p.evaluate(s => { const e = document.querySelector(s); if (!e
 
 /* ---------- 1 非选中 tab 的底线 ---------- */
 await p.click('.menu-btn'); await new Promise(r => setTimeout(r, 700));
-ok('1 tabs 容器底线 #E5E5E5', (await cs('.wd-tabs', 'boxShadow')).includes('rgb(229, 229, 229)'), await cs('.wd-tabs', 'boxShadow'));
-ok('1 未选中 tab 有底线', (await cs('.wd-tab:not(.is-active)', 'boxShadow')).includes('inset') && (await cs('.wd-tab:not(.is-active)', 'boxShadow')).includes('rgb(229, 229, 229)'), await cs('.wd-tab:not(.is-active)', 'boxShadow'));
-ok('1 选中 tab 无底线', (await cs('.wd-tab.is-active', 'boxShadow')) === 'none', await cs('.wd-tab.is-active', 'boxShadow'));
-ok('1 无遗留 ::before 分隔条', await p.evaluate(() => getComputedStyle(document.querySelector('.wd-tabs'), '::before').content === 'none'));
+ok('1 分段轨道 288×32 灰底 r4（::before，第 44 轮）', await p.evaluate(() => { const s = getComputedStyle(document.querySelector('.wd-tabs'), '::before'); return s.content !== 'none' && s.backgroundColor === 'rgba(229, 229, 229, 0.65)' && s.borderRadius === '4px' && s.height === '32px' && s.left === '16px' && s.right === '16px'; }));
+ok('1 分段块下方 1px #E5E5E5 分隔线（::after，左右各缩 16）', await p.evaluate(() => { const s = getComputedStyle(document.querySelector('.wd-tabs'), '::after'); return s.content !== 'none' && s.height === '1px' && s.backgroundColor === 'rgb(229, 229, 229)' && s.left === '16px' && s.right === '16px'; }));
+ok('1 选中段白底 + 1px #E5E5E5 描边', (await cs('.wd-tab.is-active', 'backgroundColor')) === 'rgb(255, 255, 255)' && (await cs('.wd-tab.is-active', 'borderTopColor')) === 'rgb(229, 229, 229)', await cs('.wd-tab.is-active', 'backgroundColor'));
+ok('1 未选中段透明底、无描边', (await cs('.wd-tab:not(.is-active)', 'backgroundColor')) === 'rgba(0, 0, 0, 0)' && (await cs('.wd-tab:not(.is-active)', 'borderTopColor')) === 'rgba(0, 0, 0, 0)', await cs('.wd-tab:not(.is-active)', 'backgroundColor'));
 
 /* ---------- 2 wd-newtask 默认文字色 ---------- */
 ok('2 newtask 文字 #6B6B6B', (await cs('.wd-newtask', 'color')) === 'rgb(107, 107, 107)', await cs('.wd-newtask', 'color'));

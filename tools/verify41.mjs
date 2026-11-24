@@ -66,9 +66,9 @@ await p.close();
 /* ============ B 图标与文字：8px 间距 + 墨迹同心 ============ */
 p = await mk('cecoder-home.html', () => { localStorage.setItem('cecoder.wsDrawer', JSON.stringify({ open: true })); localStorage.setItem('cecoder.wdTab', '任务'); });
 const g = await geo(p, 1);
-ok('B1 图标↔文字间距 8px', Math.abs(g.gap - 8) <= 0.6, String(g.gap));
+ok('B1 图标↔文字间距 8px（第 46 轮）', Math.abs(g.gap - 8) <= 0.6, String(g.gap));
 ok('B2 文件夹墨迹中心与文字墨迹中心对齐（≤0.6px）', Math.abs(g.folderInk.cy - g.textInkCy) <= 0.6, JSON.stringify([g.folderInk.cy, g.textInkCy]));
-ok('B3 图标盒 14×14、行高 36', g.boxW === 14 && g.boxH === 14 && g.headH === 36, JSON.stringify([g.boxW, g.boxH, g.headH]));
+ok('B3 图标盒 16×16、行高 36', g.boxW === 16 && g.boxH === 16 && g.headH === 36, JSON.stringify([g.boxW, g.boxH, g.headH]));
 
 /* ============ C 箭头绕自身圆心旋转 ============ */
 ok('C1 折叠态箭头墨迹中心＝盒中心（≤0.5px）', Math.abs(g.chevInk.cx - g.box.cx) <= 0.5 && Math.abs(g.chevInk.cy - g.box.cy) <= 0.5, JSON.stringify([g.chevInk, g.box]));

@@ -31,9 +31,9 @@ const T = p => p.evaluate(() => {
   const rel = e => { if (!e) return null; const b = e.getBoundingClientRect(); return { x: Math.round(b.x - pm.x), y: Math.round(b.y - pm.y), w: Math.round(b.width), h: Math.round(b.height) }; };
   const top = q('.task-top'), st = q('.task-steps'), tb = q('.task-tabs'), mb = q('.menu-btn'), fb = q('#tkFocus');
   return {
-    pmW: Math.round(pm.width), leftPad: getComputedStyle(top).paddingLeft,
+    pmW: Math.round(pm.width), leftPad: getComputedStyle(top).paddingLeft, titleX: rel(q('.tt-title')).x,
     menu: { ...rel(mb), op: getComputedStyle(mb).opacity, pe: getComputedStyle(mb).pointerEvents, dis: getComputedStyle(mb).display },
-    segs: [...document.querySelectorAll('.tt-btn')].map(x => ({ t: x.textContent.replace(/\s+/g, ' ').trim(), ...rel(x) })),
+    segs: [...document.querySelectorAll('.tt-links .tt-link')].map(x => ({ t: x.textContent.replace(/\s+/g, ' ').trim(), ...rel(x) })),
     top: rel(top), steps: rel(st), tabs: rel(tb), stage: rel(q('.stage')),
     topH: Math.round(top.getBoundingClientRect().height), stepsH: Math.round(st.getBoundingClientRect().height),
     focus: { pressed: fb.getAttribute('aria-pressed'), tip: fb.getAttribute('data-tip'), label: fb.getAttribute('aria-label'), ...rel(fb), inD: getComputedStyle(q('.tk-fm-in')).display, outD: getComputedStyle(q('.tk-fm-out')).display },
@@ -74,7 +74,7 @@ const S = p => p.evaluate(() => {
   ok('A3 抽屉曲线作参照（.26s + 同一贝塞尔）', /0\.26s/.test(d.tr.drawer) && /cubic-bezier\(0\.2, 0\.8, 0\.2, 1\)/.test(d.tr.drawer), d.tr.drawer);
   /* 折叠途中取样：工序条、页签条、内容区同步在途，谁也不许先跳 */
   const mid = await p.evaluate(async () => {
-    document.querySelector('.tt-btn[data-task-view="steps"]').click();
+    document.querySelector('#tkStepsToggle').click();
     await new Promise(r => setTimeout(r, 45));
     const pm = document.querySelector('.panel-main').getBoundingClientRect();
     const s = document.querySelector('.task-steps').getBoundingClientRect();
@@ -82,9 +82,9 @@ const S = p => p.evaluate(() => {
     const g = document.querySelector('.stage').getBoundingClientRect();
     return { stepsH: +s.height.toFixed(1), tabs: +(t.top - pm.top).toFixed(1), stage: +(g.top - pm.top).toFixed(1) };
   });
-  const travel = 122 - mid.stepsH;
+  const travel = 87 - mid.stepsH;
   ok('A4 折叠途中三块同步在途（工序条 / 页签条 / 内容区同行进量）',
-    mid.stepsH > 4 && mid.stepsH < 118 && Math.abs(travel - (166 - mid.tabs)) <= 6 && Math.abs(travel - (206 - mid.stage)) <= 6,
+    mid.stepsH > 4 && mid.stepsH < 83 && Math.abs(travel - (131 - mid.tabs)) <= 6 && Math.abs(travel - (171 - mid.stage)) <= 6,
     JSON.stringify(mid) + ' travel=' + travel.toFixed(1));
   await p.close();
 }
@@ -97,13 +97,13 @@ const S = p => p.evaluate(() => {
   await wait(500);
   let d = await T(p);
   ok('B1 左栏收起后菜单键可见、可点（在 task-top 之上）', d.drawerOpen === false && d.menu.op === '1' && d.menu.pe !== 'none' && d.menu.x === 7, JSON.stringify(d.menu));
-  ok('B2 task-top 左内距让到 44，任务信息按钮从 44 起', d.leftPad === '44px' && d.segs[0].x === 44, d.leftPad + ' / x=' + d.segs[0].x);
-  ok('B3 菜单键（7~35）与首按钮（44 起）不重叠', d.menu.x + d.menu.w <= d.segs[0].x, d.menu.x + d.menu.w + ' vs ' + d.segs[0].x);
+  ok('B2 task-top 左内距让到 44，标题从 44 起（第 46 轮顶栏左侧是任务标题）', d.leftPad === '44px' && d.titleX === 44, d.leftPad + ' / titleX=' + d.titleX);
+  ok('B3 菜单键（7~35）与标题（44 起）不重叠', d.menu.x + d.menu.w <= d.titleX, d.menu.x + d.menu.w + ' vs ' + d.titleX);
   /* 点菜单键能真的把左栏拉回来 */
   await p.click('.menu-btn');
   await wait(500);
   d = await T(p);
-  ok('B4 点菜单键左栏重新展开、task-top 回到左 8', d.drawerOpen === true && d.drawerW === 320 && d.leftPad === '8px' && d.segs[0].x === 8, d.drawerW + ' / ' + d.leftPad + ' / x=' + d.segs[0].x);
+  ok('B4 点菜单键左栏重新展开、task-top 回到左 19', d.drawerOpen === true && d.drawerW === 320 && d.leftPad === '19px' && d.titleX === 19, d.drawerW + ' / ' + d.leftPad + ' / titleX=' + d.titleX);
   ok('B5 无 JS 报错', p.__e.length === 0, JSON.stringify(p.__e));
   await p.close();
 }
@@ -112,7 +112,7 @@ const S = p => p.evaluate(() => {
 {
   const p = await mk('cecoder-task.html');
   let d = await T(p);
-  ok('C1 页签条右侧是专注模式键（进 = 四角外扩图标）', d.focus.tip === '专注模式' && d.focus.w === 28 && d.focus.inD !== 'none' && d.focus.outD === 'none', JSON.stringify(d.focus));
+  ok('C1 页签右侧是「专注模式」图标 + 文字（80×28，进 = 四角外扩）', d.focus.label === '专注模式' && d.focus.w === 80 && d.focus.inD !== 'none' && d.focus.outD === 'none', JSON.stringify(d.focus));
   ok('C2 不再是「收起工序资产栏」', await p.evaluate(() => !document.getElementById('tkTabsMore')), 'tkTabsMore 仍存在');
   await p.click('#tkFocus');
   await wait(600);
@@ -128,15 +128,15 @@ const S = p => p.evaluate(() => {
   await p.click('#tkFocus');
   await wait(600);
   d = await T(p);
-  ok('C7 再点退出：44 / 122 / 166 / 206，左栏还原为展开',
-    d.bodyFocus === false && d.topH === 44 && d.stepsH === 122 && d.tabs.y === 166 && d.stage.y === 206 && d.drawerOpen === true && d.focus.pressed === 'false', JSON.stringify([d.topH, d.stepsH, d.tabs.y, d.stage.y, d.drawerOpen]));
+  ok('C7 再点退出：44 / 87 / 131 / 171，左栏还原为展开',
+    d.bodyFocus === false && d.topH === 44 && d.stepsH === 87 && d.tabs.y === 131 && d.stage.y === 171 && d.drawerOpen === true && d.focus.pressed === 'false', JSON.stringify([d.topH, d.stepsH, d.tabs.y, d.stage.y, d.drawerOpen]));
   /* Esc 也能退 */
   await p.click('#tkFocus');
   await wait(500);
   await p.keyboard.press('Escape');
   await wait(600);
   d = await T(p);
-  ok('C8 Esc 退出专注', d.bodyFocus === false && d.topH === 44 && d.tabs.y === 166, JSON.stringify([d.bodyFocus, d.topH, d.tabs.y]));
+  ok('C8 Esc 退出专注', d.bodyFocus === false && d.topH === 44 && d.tabs.y === 131, JSON.stringify([d.bodyFocus, d.topH, d.tabs.y]));
   ok('C9 无 JS 报错', p.__e.length === 0, JSON.stringify(p.__e));
   await p.close();
 }

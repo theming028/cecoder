@@ -85,7 +85,7 @@ const geo = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); i
     const r = more.getBoundingClientRect(); const hr = h.getBoundingClientRect();
     return { rightGap: Math.round(hr.right - r.right), ml: getComputedStyle(more).marginLeft, w: Math.round(r.width) };
   });
-  ok('A7 无计数分组：按钮展开 20、左边距 8、右缘 8', d3.rightGap === 8 && d3.ml === '8px' && d3.w === 20, JSON.stringify(d3));
+  ok('A7 无计数分组：按钮展开 20、左边距 8、右缘 12（第 44 轮分组通栏后内距 12）', d3.rightGap === 12 && d3.ml === '8px' && d3.w === 20, JSON.stringify(d3));
   ok('A8 无 JS 报错', p.__e.length === 0, p.__e.join(' | '));
   await p.close();
 }
@@ -103,8 +103,8 @@ const geo = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); i
       text: document.querySelector('.stage').innerText.trim(),
     };
   });
-  ok('B1 三段 44 / 122 / 40 叠放', d.top.dy === 0 && d.top.h === 44 && d.steps.dy === 44 && d.steps.h === 122 && d.tabs.dy === 166 && d.tabs.h === 40, JSON.stringify(d));
-  ok('B2 旧标题栏与占位内容已移除、内容区从 206 起', !d.old && d.stage.dy === 206 && d.text === '', JSON.stringify(d.old) + ' ' + d.stage.dy + ' «' + d.text + '»');
+  ok('B1 三段 44 / 87 / 40 叠放（第 46 轮按稿 3124:47641 工序条 122 → 87）', d.top.dy === 0 && d.top.h === 44 && d.steps.dy === 44 && d.steps.h === 87 && d.tabs.dy === 131 && d.tabs.h === 40, JSON.stringify(d));
+  ok('B2 旧标题栏与占位内容已移除、内容区从 171 起', !d.old && d.stage.dy === 171 && d.text === '', JSON.stringify(d.old) + ' ' + d.stage.dy + ' «' + d.text + '»');
   ok('B3 输入卡收起', d.comp === 'none', d.comp);
   ok('B7 无 JS 报错', p.__e.length === 0, p.__e.join(' | '));
   await p.screenshot({ path: ROOT + '/.mg-d2c/R33-task.png' });

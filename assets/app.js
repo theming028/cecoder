@@ -2444,14 +2444,16 @@
      1) 工序连线按圆心算（宽度随工序名长短变化，CSS 算不出来）
      2) 顶部三段视图切换 / 底部工序资产页签（切换、关闭、新建、收起）
      ============================================================ */
-  var ttSeg = document.querySelector('.tt-seg');
+  /* 第 47 轮：顶部那两条是链接（不是 tab），只用于跳转，不再有单选态 */
+  var ttSeg = document.querySelector('.tt-links');
   var tkSteps = document.getElementById('tkStepBar');
   if (ttSeg && tkSteps) {
     var stepItems = [].slice.call(tkSteps.querySelectorAll('.ts-item'));
     var stepLinks = [].slice.call(tkSteps.querySelectorAll('.ts-link'));
     var stepScroll = document.getElementById('tkStepScroll');
     var panelMain = document.querySelector('.panel-main');
-    var stepsBtn = ttSeg.querySelector('.tt-btn[data-task-view="steps"]');
+    /* 第 46 轮：折叠开关从「工序进度」那段里独立出来，挂在自己的「收起」按钮上 */
+    var stepsBtn = document.getElementById('tkStepsToggle');
     /* 第 36 轮：底部那条是滚动条 —— 滑块按「视口/内容」算长度，跟着 scrollLeft 走 */
     var sb = document.getElementById('tkStepProg');
     var sbThumb = sb ? sb.querySelector('.ts-prog-thumb') : null;
@@ -2469,14 +2471,16 @@
          （track 用 margin:auto 居中时，这个左缘和滚动容器不一定重合） */
       var trackEl = document.getElementById('tkStepTrack');
       var base = trackEl ? trackEl.getBoundingClientRect().left : 0;
-      var centers = stepItems.map(function (it) {
+      /* 第 46 轮：工序项改成横排（图标在左、文字在右），连线要按「图标的左右缘 ±8」算，
+         不能再拿整个 item 的中心（名字一长，中心就跑到文字上去了） */
+      var boxes = stepItems.map(function (it) {
         var r = it.getBoundingClientRect();
-        return r.left - base + r.width / 2;
+        return { l: r.left - base, r: r.right - base };
       });
       stepLinks.forEach(function (lk, i) {
-        if (centers[i] == null || centers[i + 1] == null) { lk.hidden = true; return; }
+        if (!boxes[i] || !boxes[i + 1]) { lk.hidden = true; return; }
         lk.hidden = false;
-        var l = centers[i] + 20, rgt = centers[i + 1] - 20;
+        var l = boxes[i].r + 8, rgt = boxes[i + 1].l - 8;
         lk.style.left = Math.round(l) + 'px';
         lk.style.width = Math.max(0, Math.round(rgt - l)) + 'px';
       });
@@ -2550,7 +2554,12 @@
     function setStepsOff(off) {
       if (!panelMain) return;
       panelMain.classList.toggle('is-steps-off', off);
-      if (stepsBtn) stepsBtn.setAttribute('aria-expanded', off ? 'false' : 'true');
+      if (stepsBtn) {
+        stepsBtn.setAttribute('aria-expanded', off ? 'false' : 'true');
+        /* 文案跟着状态走：收起 ⇄ 展开 */
+        var t = stepsBtn.firstChild;
+        if (t && t.nodeType === 3) t.nodeValue = off ? '展开' : '收起';
+      }
       if (off) {
         /* 折起来时圆点宽高归零，连线/滚动条先收掉，别留一条贴在顶栏下沿 */
         stepLinks.forEach(function (lk) { lk.hidden = true; });
@@ -2558,23 +2567,18 @@
       } else requestAnimationFrame(layoutSteps);
     }
 
-    /* 顶部三段：切选中态；已选中的「工序进度」再点一次 = 折叠 / 展开 */
-    ttSeg.querySelectorAll('.tt-btn').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var isSteps = b.getAttribute('data-task-view') === 'steps';
-        if (b.classList.contains('is-on')) {
-          if (isSteps) setStepsOff(!panelMain.classList.contains('is-steps-off'));
-          return;
-        }
-        ttSeg.querySelectorAll('.tt-btn').forEach(function (x) {
-          x.classList.remove('is-on'); x.setAttribute('aria-selected', 'false');
-        });
-        b.classList.add('is-on');
-        b.setAttribute('aria-selected', 'true');
-        /* 切回工序进度时确保它是展开的（否则会是一片空白） */
-        if (isSteps && panelMain.classList.contains('is-steps-off')) setStepsOff(false);
+    /* 任务信息 / 工序资产：纯链接，点击不改变任何选中态 */
+    ttSeg.querySelectorAll('.tt-link').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        if (!a.getAttribute('href') || a.getAttribute('href').charAt(0) === '#') e.preventDefault();
       });
     });
+    /* 「收起 / 展开」：单独一颗键控制工序条 */
+    if (stepsBtn) {
+      stepsBtn.addEventListener('click', function () {
+        setStepsOff(!(panelMain && panelMain.classList.contains('is-steps-off')));
+      });
+    }
 
     var runBtn = document.getElementById('tkRun');
     if (runBtn) runBtn.addEventListener('click', function () { toast('已开始自动执行'); });
@@ -2637,6 +2641,9 @@
       focusBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
       focusBtn.setAttribute('aria-label', on ? '退出专注模式' : '专注模式');
       focusBtn.setAttribute('data-tip', on ? '退出专注模式' : '专注模式');
+      /* 第 47 轮：文字跟着状态走 —— 专注模式 ⇄ 退出专注模式 */
+      var ft = focusBtn.querySelector('.tk-focus-txt');
+      if (ft) ft.textContent = on ? '退出专注模式' : '专注模式';
       if (!on) requestAnimationFrame(layoutSteps);
     }
     if (focusBtn) {
@@ -2652,4 +2659,98 @@
     }
   }
 
+})();
+
+/* ============================================================
+   第 48 轮：任务页大容器里的可折叠块（主体 / 文件输入 / 参考代码源 / 代码源卡）
+   标题栏按钮带 data-tp-toggle，点一下切最近一层 .is-open ⇄ .is-closed
+   ============================================================ */
+(function () {
+  var btns = document.querySelectorAll('.tp-wrap [data-tp-toggle]');
+  [].forEach.call(btns, function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.closest('.tp-body, .tp-files, .tp-ref, .tp-repo');
+      if (!box) return;
+      var open = box.classList.toggle('is-open');
+      box.classList.toggle('is-closed', !open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+})();
+
+/* ============================================================
+   第 49 轮：① 上传本地资料 → 系统文件选择窗口
+              ② 补充 / 更改文字说明 → 480 宽弹窗（多行文本 + 保存关闭）
+   ============================================================ */
+(function () {
+  function tip(msg) {
+    var wrap = document.getElementById('toastWrap');
+    if (!wrap) return;
+    var el = document.createElement('div');
+    el.className = 'semi-toast';
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(function () { el.remove(); }, 1800);
+  }
+
+  var fileInp = document.getElementById('tpFileInput');
+  var pickBtn = document.querySelector('.tp-file-btn[data-file-pick]');
+  if (fileInp && pickBtn) {
+    pickBtn.addEventListener('click', function () {
+      fileInp.value = '';
+      fileInp.click();
+    });
+    fileInp.addEventListener('change', function () {
+      var n = fileInp.files ? fileInp.files.length : 0;
+      if (n) tip('已添加 ' + n + ' 个本地文件');
+      fileInp.value = '';
+    });
+  }
+
+  var modal = document.getElementById('tpNoteModal');
+  if (!modal) return;
+  var titleEl = document.getElementById('tpNoteTitle');
+  var taEl = document.getElementById('tpNoteText');
+  var saveEl = document.getElementById('tpNoteSave');
+  var curBtn = null;
+
+  function openNote(btn) {
+    curBtn = btn;
+    titleEl.textContent = btn.getAttribute('data-tp-note') || '补充文字说明';
+    taEl.value = btn.getAttribute('data-note-value') || '';
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(function () { taEl.focus(); });
+  }
+  function closeNote() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    curBtn = null;
+  }
+
+  document.addEventListener('click', function (e) {
+    var openBtn = e.target.closest ? e.target.closest('[data-tp-note]') : null;
+    if (openBtn) { e.preventDefault(); openNote(openBtn); return; }
+    if (e.target.closest && e.target.closest('[data-note-close]')) closeNote();
+  });
+
+  if (saveEl) {
+    saveEl.addEventListener('click', function () {
+      if (curBtn) {
+        var v = taEl.value;
+        curBtn.setAttribute('data-note-value', v);
+        var label = v.trim() ? '更改文字说明' : '补充文字说明';
+        curBtn.setAttribute('data-tp-note', label);
+        curBtn.textContent = label;
+      }
+      closeNote();
+    });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+      e.stopPropagation();
+      closeNote();
+    }
+  });
 })();

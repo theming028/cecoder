@@ -94,14 +94,14 @@ const gaps = await p.evaluate(() => [...document.querySelectorAll('#wdViewTask .
   const c = h.querySelector('.wd-caret').getBoundingClientRect();
   return +(n.left - c.right).toFixed(1);
 }));
-ok('分组头图标↔文字间距 8px（第 41 轮）', gaps.every(g => Math.abs(g - 8) <= 0.6), JSON.stringify(gaps));
+ok('分组头图标↔文字间距 8px（第 46 轮：16 盒 + 8 间距）', gaps.every(g => Math.abs(g - 8) <= 0.6), JSON.stringify(gaps));
 
 const tints = await p.evaluate(() => {
   const q = s => getComputedStyle(document.querySelector(s)).backgroundColor;
   return { open: q('.wd-grp.is-open .wd-grp-head'), closed: q('.wd-grp:not(.is-open) .wd-grp-head') };
 });
-ok('展开分组灰底 #F7F7F7', tints.open === 'rgb(247, 247, 247)', tints.open);
-ok('折叠分组默认白底', tints.closed === 'rgb(255, 255, 255)', tints.closed);
+ok('展开分组白底 #FFFFFF（第 44 轮稿面反转）', tints.open === 'rgb(255, 255, 255)', tints.open);
+ok('折叠分组灰底 #F7F7F7（第 44 轮稿面反转）', tints.closed === 'rgb(247, 247, 247)', tints.closed);
 
 /* 8 · 卡片选中 */
 await p.evaluate(() => document.querySelectorAll('.wd-card')[2].click());

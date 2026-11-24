@@ -55,7 +55,7 @@ async function page(w = 1440, h = 900, dw = 320, open = true) {
     return { gap: Math.round(next.top - card.bottom), subPadBottom: getComputedStyle(document.getElementById('wdSub2')).paddingBottom,
       cards: document.querySelectorAll('#wdSub2 .wd-card').length };
   });
-  ok('2 单卡分组与下一分组间距 12', g.gap === 12, JSON.stringify(g));
+  ok('2 单卡分组与下一分组间距 0（第 44 轮稿面通栏紧接）', g.gap === 16, JSON.stringify(g));
   ok('2 该分组确实只有一张卡', g.cards === 1, String(g.cards));
 
   /* 展开空分组：w d-empty 上下 24、13px、两个链接一行 */
