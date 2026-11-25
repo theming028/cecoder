@@ -511,7 +511,7 @@ body[theme-mode="dark"] {
   --semi-z-tagInput_drag_item_move: 2000;  /* 标签输入框中正在拖拽元素的z-index */
   --semi-z-resizable_handler: 10;  /* 伸缩框组件中handler的z-index，保持较低层级避免覆盖弹出层组件 */
   --semi-z-resizable_background: 2010;  /* 伸缩框组件中背景的z-index */
-  --semi-font-family-regular: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;  /* 预置字体回退 */
+  --semi-font-family-regular: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';  /* 全局唯一字体真值：纯系统字体栈，不含任何西文/中文具名字体（中文由系统自身回退） */
   --semi-font-size-small: 12px;  /* 小文本字号 */
   --semi-font-size-regular: 14px;  /* 常规文本字号 */
   --semi-font-size-header-6: 16px;  /* 六级标题字号 */

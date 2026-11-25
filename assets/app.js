@@ -351,6 +351,8 @@
     });
     dd.querySelectorAll('.semi-select-option').forEach(function (opt) {
       opt.addEventListener('click', function () {
+        /* 第 66 轮：参考代码源（本地目录）下拉 —— 选中回填触发器；末项调起系统目录选择 */
+        if (dd.dataset.dd === 'refsrc') { cRefPickOption(dd, opt); return; }
         /* 第 16 轮：工作目录下拉里的「选择其他目录…」不参与选中态，直接调起系统文件夹选择窗口 */
         if (dd.dataset.dd === 'dir' && /选择其他目录/.test(opt.textContent)) {
           dd.classList.remove('is-open');
@@ -377,9 +379,47 @@
      file:// 等受限环境退回 input[webkitdirectory]。
      命名 c* 前缀防撞：本 IIFE 后段已有 var dirPick（wdDirPick） */
   var cDirPick = document.getElementById('dirPick');
+  /* 第 66 轮：系统目录选择要给谁回填 —— 首页/任务页底部「工作目录」是默认目标，
+     参考代码源下拉会把它自己传进来（null = 工作目录） */
+  var cDirTarget = null;
+
+  /* 参考代码源下拉：点选项只回填触发器；末项「选择其他目录」走系统目录选择 */
+  function cRefPickOption(dd, opt) {
+    dd.classList.remove('is-open');
+    if (opt.classList.contains('semi-select-option-tail')) { cPickDirectory(dd); return; }
+    var v = dd.querySelector('.tp-sel-v');
+    if (v) { v.textContent = opt.textContent; v.classList.remove('is-ph'); }
+    dd.querySelectorAll('.semi-select-option').forEach(function (x) {
+      x.classList.remove('semi-select-option-selected');
+    });
+    opt.classList.add('semi-select-option-selected');
+    toast('参考代码源：' + opt.textContent);
+  }
+
+  /* 系统选完的目录要能进「最近使用」：置顶一条，列表只留 3 条（末项固定是「选择其他目录」） */
+  function cRefInsert(dd, folder) {
+    var list = dd.querySelector('.semi-select-option-list-wrapper');
+    var hit = null;
+    dd.querySelectorAll('.semi-select-option').forEach(function (x) {
+      if (!x.classList.contains('semi-select-option-tail') && x.textContent === folder) hit = x;
+    });
+    if (!hit) {
+      hit = document.createElement('li');
+      hit.className = 'semi-select-option';
+      hit.setAttribute('role', 'option');
+      hit.textContent = folder;
+      hit.addEventListener('click', function () { cRefPickOption(dd, hit); });
+      list.insertBefore(hit, list.firstChild);
+      var items = dd.querySelectorAll('.semi-select-option:not(.semi-select-option-tail)');
+      for (var i = 3; i < items.length; i++) items[i].parentNode.removeChild(items[i]);
+    }
+    cRefPickOption(dd, hit);
+  }
 
   function cApplyDir(folder) {
-    var dd = document.querySelector('.cds-dd[data-dd="dir"]');
+    var dd = cDirTarget || document.querySelector('.cds-dd[data-dd="dir"]');
+    cDirTarget = null;
+    if (dd && dd.dataset.dd === 'refsrc') { cRefInsert(dd, folder); return; }
     if (dd) {
       var opts = dd.querySelectorAll('.semi-select-option');
       opts.forEach(function (x) { x.classList.remove('semi-select-option-selected'); });
@@ -393,13 +433,14 @@
     toast('已切换工作目录：' + folder);
   }
 
-  async function cPickDirectory() {
+  async function cPickDirectory(target) {
+    cDirTarget = target || null;
     if (window.showDirectoryPicker) {
       try {
         var handle = await window.showDirectoryPicker({ id: 'cecoder-workdir', mode: 'read' });
         if (handle && handle.name) { cApplyDir(handle.name); return; }
       } catch (err) {
-        if (err && err.name === 'AbortError') return;  // 用户自己取消
+        if (err && err.name === 'AbortError') { cDirTarget = null; return; }  // 用户自己取消
         /* SecurityError 等（file:// 受限）→ 退回 input[webkitdirectory] */
       }
     }
@@ -2150,9 +2191,79 @@
   drawer.querySelectorAll('[data-sync-open]').forEach(function (b) {
     b.addEventListener('click', function (e) { e.stopPropagation(); cmOpen(); });
   });
+  /* 第 62 轮：顶部「任务证据链」按钮 —— 先只开一个空壳弹窗（正文待补）
+     第 63 轮：修正声明顺序 —— evModal 必须先取到，否则 var 提升为 undefined，按钮点了不响应 */
+  var evModal = document.getElementById('evModal');
+  var tkEvidence = document.getElementById('tkEvidence');
+  if (tkEvidence && evModal) {
+    tkEvidence.addEventListener('click', function (e) { e.stopPropagation(); openCdsModal(evModal); });
+  }
+  /* ============================================================
+     第 72 轮：右栏「任务产物」的文件卡 —— 不再开弹窗，改成在中栏 tk-tabs-l 新开一个
+     以文件名命名的页签，正文就地浏览（#docModal 已下线）。
+     同一个文件重复点只切页签，不重复开；关掉页签自动退回上一个页签 + 变更分析面板。
+     ============================================================ */
+  var tkDoc = document.getElementById('tkDoc');
+  var panelMainEl = document.getElementById('panelMain');
+  var tkTabsL = document.querySelector('.task-tabs .tk-tabs-l');
+  var DOC_ICON = '<span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.4 1.9h4.2l2.5 2.5v7.7H3.4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M7 2.1v2.6h2.6" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>';
+  var DOC_X = '<span class="tk-x"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.4 3.4 8.6 8.6M8.6 3.4 3.4 8.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span></span>';
+
+  /* 页签 ⇄ 中栏内容的联动：
+       · 亮的文件页签  → 文档视图（is-doc）
+       · 变更 / Git / 终端 / 浏览器 → 内容先留空（is-empty）
+       · 概要设计      → 回到变更分析（两者都不加） */
+  var syncDocPane = function () {
+    if (!tkDoc || !tkTabsL) return;
+    var on = tkTabsL.querySelector('.tk-tab.is-on');
+    var isFile = !!(on && on.dataset.docName);
+    var isEmpty = !!(on && on.dataset.empty) && !isFile;
+    if (panelMainEl) {
+      panelMainEl.classList.toggle('is-doc', isFile);
+      panelMainEl.classList.toggle('is-empty', isEmpty);
+    }
+    if (!isFile) return;
+    var kind = on.dataset.docKind || 'md';
+    tkDoc.querySelectorAll('[data-doc-pane]').forEach(function (pane) {
+      var match = pane.getAttribute('data-doc-pane') === kind;
+      pane.hidden = !match;
+      pane.classList.toggle('is-active', match);
+    });
+    tkDoc.scrollTop = 0;
+  };
+
+  if (tkDoc && tkTabsL) {
+    document.querySelectorAll('.ai-file').forEach(function (card) {
+      card.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var name = card.dataset.name || '未命名文件';
+        var kind = card.dataset.doc || 'md';
+        var tab = null;
+        tkTabsL.querySelectorAll('.tk-tab[data-doc-name]').forEach(function (t) {
+          if (t.dataset.docName === name) tab = t;
+        });
+        if (!tab) {
+          tab = document.createElement('button');
+          tab.className = 'tk-tab';
+          tab.type = 'button';
+          tab.setAttribute('role', 'tab');
+          tab.setAttribute('aria-selected', 'false');
+          tab.setAttribute('data-doc-name', name);
+          tab.setAttribute('data-doc-kind', kind);
+          tab.title = name;
+          tab.innerHTML = DOC_ICON + '<span class="tk-tab-name">' + name + '</span>' + DOC_X;
+          var vsep = tkTabsL.querySelector('.tk-vsep');
+          if (vsep) tkTabsL.insertBefore(tab, vsep); else tkTabsL.appendChild(tab);
+        }
+        tab.click();   /* 走页签的统一点击逻辑：只亮自己 + 联动文档面板 */
+      });
+    });
+  }
   /* 两个模态共用同一套关闭语义：点蒙层 / 点取消 / 点右上角 × */
   var stgModal = document.getElementById('stgModal');
-  [cmModal, qfModal, stgModal].forEach(function (m) {
+  /* 第 62 轮：任务页新增「任务证据链」弹窗，并入同一套开关与关闭语义。
+     它只在任务页存在，其余页面取到 null，所以要过滤掉空值再绑 */
+  [cmModal, qfModal, stgModal, evModal].filter(function (m) { return !!m; }).forEach(function (m) {
     m.querySelectorAll('[data-modal-close]').forEach(function (b) {
       b.addEventListener('click', function () { closeCdsModal(m); });
     });
@@ -2160,9 +2271,10 @@
   /* 模态在最上层：Esc 先关模态，不再触发抽屉收起 */
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
-    var top = stgModal.classList.contains('is-open') ? stgModal
+    var top = (evModal && evModal.classList.contains('is-open')) ? evModal
+      : (stgModal.classList.contains('is-open') ? stgModal
       : (qfModal.classList.contains('is-open') ? qfModal
-      : (cmModal.classList.contains('is-open') ? cmModal : null));
+      : (cmModal.classList.contains('is-open') ? cmModal : null)));
     if (!top) return;
     e.stopPropagation();
     closeCdsModal(top);
@@ -2444,10 +2556,10 @@
      1) 工序连线按圆心算（宽度随工序名长短变化，CSS 算不出来）
      2) 顶部三段视图切换 / 底部工序资产页签（切换、关闭、新建、收起）
      ============================================================ */
-  /* 第 47 轮：顶部那两条是链接（不是 tab），只用于跳转，不再有单选态 */
-  var ttSeg = document.querySelector('.tt-links');
+  /* 第 62 轮：顶部那条已收成单颗「任务证据链」按钮（宿主在模态那段里绑），
+     这里只剩工序条的逻辑，不再需要 .tt-links 容器 */
   var tkSteps = document.getElementById('tkStepBar');
-  if (ttSeg && tkSteps) {
+  if (tkSteps) {
     var stepItems = [].slice.call(tkSteps.querySelectorAll('.ts-item'));
     var stepLinks = [].slice.call(tkSteps.querySelectorAll('.ts-link'));
     var stepScroll = document.getElementById('tkStepScroll');
@@ -2472,7 +2584,8 @@
       var trackEl = document.getElementById('tkStepTrack');
       var base = trackEl ? trackEl.getBoundingClientRect().left : 0;
       /* 第 46 轮：工序项改成横排（图标在左、文字在右），连线要按「图标的左右缘 ±8」算，
-         不能再拿整个 item 的中心（名字一长，中心就跑到文字上去了） */
+         不能再拿整个 item 的中心（名字一长，中心就跑到文字上去了）
+         第 64 轮：按用户要求恢复这一版（圆心到圆心那版会横穿文字，效果不对） */
       var boxes = stepItems.map(function (it) {
         var r = it.getBoundingClientRect();
         return { l: r.left - base, r: r.right - base };
@@ -2549,6 +2662,23 @@
     if (window.ResizeObserver && stepScroll) {
       new ResizeObserver(function () { layoutSteps(); }).observe(stepScroll);
     }
+    /* 第 71 轮：进度推到第 5 道工序后，「当前」会落在可视区外 —— 首次进来把它居中，
+       否则只看得到前 4 道，看不出进度走到哪了 */
+    (function revealNow() {
+      var nowItem = tkSteps.querySelector('.ts-item.is-now');
+      if (!nowItem || !stepScroll) return;
+      function run() {
+        var r = nowItem.getBoundingClientRect(), vr = stepScroll.getBoundingClientRect();
+        var pad = 16, d = 0;                                    /* 只滚到「刚好露全」，留住左边上下文 */
+        if (r.right > vr.right - pad) d = r.right - (vr.right - pad);
+        else if (r.left < vr.left + pad) d = r.left - (vr.left + pad);
+        if (!d) return;
+        stepScroll.scrollLeft += d;
+        layoutSteps();
+      }
+      setTimeout(run, 120);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(run, 0); });
+    })();
 
     /* 折叠：点已选中的「工序进度」把整条工序栏收起，再点展开 */
     function setStepsOff(off) {
@@ -2567,12 +2697,6 @@
       } else requestAnimationFrame(layoutSteps);
     }
 
-    /* 任务信息 / 工序资产：纯链接，点击不改变任何选中态 */
-    ttSeg.querySelectorAll('.tt-link').forEach(function (a) {
-      a.addEventListener('click', function (e) {
-        if (!a.getAttribute('href') || a.getAttribute('href').charAt(0) === '#') e.preventDefault();
-      });
-    });
     /* 「收起 / 展开」：单独一颗键控制工序条 */
     if (stepsBtn) {
       stepsBtn.addEventListener('click', function () {
@@ -2581,7 +2705,143 @@
     }
 
     var runBtn = document.getElementById('tkRun');
-    if (runBtn) runBtn.addEventListener('click', function () { toast('已开始自动执行'); });
+    if (runBtn) runBtn.addEventListener('click', function () { setAiPanel(true); toast('已开始自动执行'); });
+
+    /* 第 68 轮：右栏「AI 协作」—— 默认展开（工序一开始执行就把它带出来）；
+       头部 ›| 向右收起，收起后工具条 tt-now 右侧长出「AI 协作」入口，点它再呼出 */
+    var aiSide = document.getElementById('aiSide');
+    var aiOpenBtn = document.getElementById('tkAiOpen');
+    var aiFoldBtn = document.getElementById('aiFold');
+    var panelBox = document.querySelector('.panel');
+    function setAiPanel(open) {
+      if (!panelBox || !aiSide) return;
+      panelBox.classList.toggle('is-ai-off', !open);
+      aiSide.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if (aiOpenBtn) aiOpenBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    if (aiFoldBtn) aiFoldBtn.addEventListener('click', function () { setAiPanel(false); toast('AI 协作已收起'); });
+    if (aiOpenBtn) aiOpenBtn.addEventListener('click', function () { setAiPanel(true); });
+
+    /* 第 69 轮：附件两张图各自可删；删空就整条收掉 */
+    var aiAtts = document.getElementById('aiAtts');
+    if (aiAtts) {
+      aiAtts.addEventListener('click', function (e) {
+        var x = e.target.closest('.ai-att-x');
+        if (!x) return;
+        var att = x.closest('.ai-att');
+        var left = aiAtts.querySelectorAll('.ai-att').length - 1;
+        if (att) att.remove();
+        if (!left) aiAtts.hidden = true;
+        toast(left ? '已移除参考图，还剩 ' + left + ' 张' : '已移除全部参考图');
+      });
+    }
+
+    /* 第 70 轮：截图带 —— 每张独立，点击开蒙层看大图；末张「+2」落到最后一张 */
+    var aiShots = document.getElementById('aiShots');
+    var shotViewer = document.getElementById('shotViewer');
+    if (aiShots && shotViewer) {
+      var shotImg = document.getElementById('shotViewerImg');
+      var shotCap = document.getElementById('shotViewerCap');
+      var shotTiles = [].slice.call(aiShots.querySelectorAll('.ai-shot'));
+      var shotFulls = shotTiles.filter(function (el) { return !!el.dataset.full; });
+      var shotIdx = 0;
+
+      function shotShow(i) {
+        if (!shotFulls.length) return;
+        shotIdx = (i + shotFulls.length) % shotFulls.length;
+        var tile = shotFulls[shotIdx];
+        shotImg.src = tile.dataset.full;
+        shotImg.alt = tile.dataset.cap || '';
+        shotCap.textContent = (shotIdx + 1) + ' / ' + shotFulls.length;
+        shotViewer.classList.add('is-open');
+        shotViewer.setAttribute('aria-hidden', 'false');
+      }
+      function shotClose() {
+        shotViewer.classList.remove('is-open');
+        shotViewer.setAttribute('aria-hidden', 'true');
+      }
+
+      shotTiles.forEach(function (tile) {
+        tile.addEventListener('click', function () {
+          var i = shotFulls.indexOf(tile);
+          shotShow(i < 0 ? shotFulls.length - 1 : i);
+        });
+      });
+      var shotPrev = document.getElementById('shotPrev');
+      var shotNext = document.getElementById('shotNext');
+      if (shotPrev) shotPrev.addEventListener('click', function () { shotShow(shotIdx - 1); });
+      if (shotNext) shotNext.addEventListener('click', function () { shotShow(shotIdx + 1); });
+      shotViewer.querySelectorAll('[data-shot-close]').forEach(function (el) {
+        el.addEventListener('click', shotClose);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (!shotViewer.classList.contains('is-open')) return;
+        if (e.key === 'Escape') { e.stopPropagation(); shotClose(); }
+        else if (e.key === 'ArrowLeft') shotShow(shotIdx - 1);
+        else if (e.key === 'ArrowRight') shotShow(shotIdx + 1);
+      });
+    }
+
+    /* 第 69 轮：左缘拖拽调宽 —— --ai-w 写在 .cds-frame，右栏与右下悬浮球同步跟着走。
+       下限 400（稿面 450 是默认值），上限取 min(720, 面板宽 - 480)，保证主区不至于被挤死 */
+    var aiResize = document.getElementById('aiResize');
+    var cdsFrame = document.querySelector('.cds-frame');
+    var AI_MIN = 400, AI_MAX = 720;
+    function aiMaxW() {
+      var pw = panelBox ? panelBox.clientWidth : 1440;
+      return Math.max(AI_MIN, Math.min(AI_MAX, pw - 480));
+    }
+    function aiSetW(w) {
+      if (!cdsFrame) return;
+      w = Math.max(AI_MIN, Math.min(aiMaxW(), Math.round(w)));
+      cdsFrame.style.setProperty('--ai-w', w + 'px');
+    }
+    if (aiResize && cdsFrame && aiSide) {
+      var aiDragging = false, aiStartX = 0, aiStartW = 0;
+      aiResize.addEventListener('pointerdown', function (e) {
+        if (panelBox && panelBox.classList.contains('is-ai-off')) return;
+        aiDragging = true;
+        aiStartX = e.clientX;
+        aiStartW = aiSide.getBoundingClientRect().width;
+        aiResize.classList.add('is-drag');
+        document.body.classList.add('is-ai-resizing');
+        if (aiResize.setPointerCapture) aiResize.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      });
+      aiResize.addEventListener('pointermove', function (e) {
+        if (!aiDragging) return;
+        aiSetW(aiStartW + (aiStartX - e.clientX));
+      });
+      function aiEndDrag() {
+        if (!aiDragging) return;
+        aiDragging = false;
+        aiResize.classList.remove('is-drag');
+        document.body.classList.remove('is-ai-resizing');
+      }
+      aiResize.addEventListener('pointerup', aiEndDrag);
+      aiResize.addEventListener('pointercancel', aiEndDrag);
+      /* 键盘可调：← 加宽 / → 收窄，Shift 步进 40 */
+      aiResize.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        e.preventDefault();
+        var step = e.shiftKey ? 40 : 16;
+        aiSetW(aiSide.getBoundingClientRect().width + (e.key === 'ArrowLeft' ? step : -step));
+      });
+      /* 窗口变窄时把宽度收回上限内 */
+      window.addEventListener('resize', function () {
+        if (!cdsFrame.style.getPropertyValue('--ai-w')) return;
+        if (panelBox && panelBox.classList.contains('is-ai-off')) return;
+        aiSetW(aiSide.getBoundingClientRect().width);
+      });
+    }
+
+    /* 第 73 轮：目标区三条独立可编辑行 —— 清空后把残留的 <br>/<div> 一并抹掉，
+       让 :empty 重新成立、占位符「请输入」回来 */
+    document.querySelectorAll('.tp-ta-in').forEach(function (el) {
+      el.addEventListener('input', function () {
+        if (!el.textContent.trim() && !el.querySelector('img')) el.innerHTML = '';
+      });
+    });
 
     /* 底部工序资产页签 */
     var tabsBar = document.querySelector('.task-tabs');
@@ -2591,14 +2851,17 @@
         var x = e.target.closest('.tk-x');
         var tab = e.target.closest('.tk-tab');
         if (!tab) return;
-        if (x) {                       /* 关闭：摘掉页签，选中态交给前一个 */
+        if (x) {                       /* 关闭：摘掉页签，选中态交给前一个（没有就退到第一个） */
           e.stopPropagation();
           var wasOn = tab.classList.contains('is-on');
           var prev = tab.previousElementSibling;
           tab.remove();
-          if (wasOn && prev && prev.classList.contains('tk-tab')) {
-            prev.classList.add('is-on'); prev.setAttribute('aria-selected', 'true');
+          if (wasOn) {
+            var nextOn = (prev && prev.classList.contains('tk-tab')) ? prev : tabsL.querySelector('.tk-tab');
+            if (nextOn) { nextOn.classList.add('is-on'); nextOn.setAttribute('aria-selected', 'true'); }
           }
+          /* 第 72 轮：关掉文件页签 → 中栏退回变更分析 */
+          if (syncDocPane) syncDocPane();
           return;
         }
         tabsL.querySelectorAll('.tk-tab').forEach(function (t) {
@@ -2606,6 +2869,8 @@
         });
         tab.classList.add('is-on');
         tab.setAttribute('aria-selected', 'true');
+        /* 第 72 轮：亮的是文件页签就看文档，否则回到变更分析 */
+        if (syncDocPane) syncDocPane();
       });
 
       var addBtn = tabsL.querySelector('.tk-icon-btn');

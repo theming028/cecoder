@@ -6,3 +6,7 @@ node_modules/
 .token
 # 旧快照包
 *.zip
+
+# 系统与本地工作区
+.DS_Store
+.workbuddy/
