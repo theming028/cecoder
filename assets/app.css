@@ -2744,17 +2744,17 @@ body.is-focus[data-page="task"] .tp-wrap { top: 40px; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .tp-ref.is-closed .tp-ref-sub { color: var(--cds-text-tertiary); }
+/* 第 74 轮：上内距归零 —— padding 不是可压缩的，留着 20 会让 grid 的 0fr 行被撑到 20，
+   收起后比「文件输入」多出一截。间距改由首元素 margin 提供，收起就真收成 36 的头栏 */
 .tp-ref-in {
-  min-width: 0; min-height: 0; overflow: hidden; padding: 20px 20px 20px 30px;
-  /* 第 72 轮：和「文件输入」对齐 —— 只动 padding-bottom，上内距常驻 20，
-     收起时内容是「被裁掉」而不是「整体上移」，两块的动效手感一致 */
+  min-width: 0; min-height: 0; overflow: hidden; padding: 0 20px 20px 30px;
   transition: padding-bottom .26s cubic-bezier(.22, .85, .2, 1), opacity .18s linear;
 }
 .tp-ref.is-closed .tp-ref-in {
   padding-bottom: 0; opacity: 0;
   transition: padding-bottom .26s cubic-bezier(.22, .85, .2, 1), opacity .1s linear;
 }
-.tp-ref-tip { margin: 0 0 12px; font-size: 14px; line-height: 22px; color: #868686; }
+.tp-ref-tip { margin: 20px 0 12px; font-size: 14px; line-height: 22px; color: #868686; }
 
 /* 选择条：994×80（#F7F7F7 / #E5E5E5，内距 12） */
 .tp-pick {
@@ -3082,13 +3082,13 @@ body.is-focus[data-page="task"] .tp-wrap { top: 40px; }
   flex: 0 0 auto; width: 88px; height: 88px; padding: 0;
   box-sizing: border-box;
   display: flex; align-items: center; justify-content: center;
-  border: 1px solid #E5E5E5;
-  border-radius: 4px; overflow: hidden; background: #FFFFFF;
+  border: 1px solid #EBEBEB;
+  border-radius: 8px; overflow: hidden; background: #FFFFFF;
   cursor: zoom-in;
   transition: border-color .18s var(--cds-motion-ease);
 }
 .ai-shot img { display: block; width: 72px; height: 72px; object-fit: contain; }
-.ai-shot:hover { border-color: #D9D9D9; }
+.ai-shot:hover { border-color: #DCDCDC; }
 .ai-shot:focus-visible { outline: none; border-color: var(--cds-color-primary); }
 .ai-shot.is-more { cursor: pointer; }
 
@@ -3280,49 +3280,71 @@ body.is-ai-resizing .float { transition: none !important; }
    第 70 轮：右栏截图大图预览（蒙层 + 左右翻）
    素材是稿件 2x 裁图（174×176），预览按 348 宽显示刚好 1:1 于视网膜屏
    ============================================================ */
+/* 第 74 轮：大图预览重做 —— 毛玻璃压暗蒙层、白卡 + 亮边 + 三层投影、胶囊计数、
+   翻页按钮常态半透/悬停提亮、进出场轻微缩放淡入 */
 .shot-viewer {
   position: fixed; inset: 0; z-index: 3000;
   display: flex; align-items: center; justify-content: center;
   opacity: 0; visibility: hidden;
-  transition: opacity .18s linear, visibility .18s linear;
+  transition: opacity .2s ease, visibility .2s ease;
 }
 .shot-viewer.is-open { opacity: 1; visibility: visible; }
-.shot-viewer-mask { position: absolute; inset: 0; background: rgba(0, 0, 0, .55); }
+.shot-viewer-mask {
+  position: absolute; inset: 0;
+  background: radial-gradient(120% 120% at 50% 40%, rgba(16, 20, 28, .52) 0%, rgba(10, 13, 19, .72) 100%);
+  -webkit-backdrop-filter: blur(6px) saturate(1.04);
+  backdrop-filter: blur(6px) saturate(1.04);
+}
 .shot-viewer-body {
   position: relative; z-index: 1;
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-  transform: scale(.98);
-  transition: transform .2s var(--cds-motion-ease);
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  transform: scale(.965);
+  transition: transform .24s cubic-bezier(.22, .9, .24, 1);
 }
 .shot-viewer.is-open .shot-viewer-body { transform: none; }
 .shot-viewer-img {
-  display: block; width: 348px; max-width: 80vw; max-height: 72vh; height: auto;
-  border-radius: 6px; background: #FFFFFF;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, .38);
+  display: block; width: 348px; max-width: 78vw; max-height: 70vh; height: auto;
+  border-radius: 10px; background: #FFFFFF;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .22),
+              0 28px 72px rgba(0, 0, 0, .52),
+              0 4px 14px rgba(0, 0, 0, .28);
+  transition: opacity .16s linear;
 }
 .shot-viewer-cap {
-  font-size: 12px; line-height: 20px; color: rgba(255, 255, 255, .82);
-  font-variant-numeric: tabular-nums;
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 26px; padding: 0 12px; border-radius: 999px;
+  background: rgba(255, 255, 255, .10);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  font-size: 12px; line-height: 20px; color: rgba(255, 255, 255, .88);
+  letter-spacing: .01em; font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
+.shot-viewer-cap b { font-weight: 500; color: #FFFFFF; }
 .shot-viewer-nav {
-  position: absolute; top: calc(50% - 16px); margin-top: -18px;
-  width: 36px; height: 36px; border-radius: 50%;
+  position: absolute; top: calc(50% - 20px); margin-top: -20px;
+  width: 40px; height: 40px; border-radius: 50%;
   display: inline-flex; align-items: center; justify-content: center;
-  background: rgba(255, 255, 255, .14); color: #FFFFFF;
-  backdrop-filter: blur(4px);
-  transition: background .14s linear;
+  background: rgba(255, 255, 255, .10); color: #FFFFFF;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18), 0 8px 24px rgba(0, 0, 0, .28);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  transition: background .14s linear, transform .14s var(--cds-motion-ease);
 }
-.shot-viewer-nav:hover { background: rgba(255, 255, 255, .26); }
-.shot-viewer-nav.is-prev { left: -56px; }
-.shot-viewer-nav.is-next { right: -56px; }
+.shot-viewer-nav:hover { background: rgba(255, 255, 255, .22); }
+.shot-viewer-nav:active { transform: scale(.94); }
+.shot-viewer-nav.is-prev { left: -60px; }
+.shot-viewer-nav.is-next { right: -60px; }
 .shot-viewer-x {
-  position: absolute; right: 0; top: -44px;
-  width: 28px; height: 28px; border-radius: 4px;
+  position: absolute; right: -6px; top: -46px;
+  width: 32px; height: 32px; border-radius: 8px;
   display: inline-flex; align-items: center; justify-content: center;
-  color: rgba(255, 255, 255, .9);
+  color: rgba(255, 255, 255, .82);
+  background: rgba(255, 255, 255, .08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   transition: background .14s linear, color .14s linear;
 }
-.shot-viewer-x:hover { background: rgba(255, 255, 255, .18); color: #FFFFFF; }
+.shot-viewer-x:hover { background: rgba(255, 255, 255, .2); color: #FFFFFF; }
 @media (max-width: 560px) {
   .shot-viewer-nav.is-prev { left: 4px; }
   .shot-viewer-nav.is-next { right: 4px; }

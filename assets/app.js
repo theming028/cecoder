@@ -2750,9 +2750,16 @@
         if (!shotFulls.length) return;
         shotIdx = (i + shotFulls.length) % shotFulls.length;
         var tile = shotFulls[shotIdx];
-        shotImg.src = tile.dataset.full;
+        var next = tile.dataset.full;
+        /* 第 74 轮：换图时淡入，避免大图硬切；同图重开不重置透明度 */
+        if (shotImg.getAttribute('src') !== next) {
+          shotImg.style.opacity = '0';
+          shotImg.onload = function () { shotImg.style.opacity = '1'; };
+          shotImg.src = next;
+        }
         shotImg.alt = tile.dataset.cap || '';
-        shotCap.textContent = (shotIdx + 1) + ' / ' + shotFulls.length;
+        shotCap.innerHTML = (tile.dataset.cap ? '<b>' + tile.dataset.cap + '</b><span>·</span>' : '')
+          + '<span>' + (shotIdx + 1) + ' / ' + shotFulls.length + '</span>';
         shotViewer.classList.add('is-open');
         shotViewer.setAttribute('aria-hidden', 'false');
       }
