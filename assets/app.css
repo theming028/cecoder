@@ -207,8 +207,9 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
    选中底板用独立 .seg-pill 做「滑动」——底板位移动画，按钮本身只换字重，所以切换有滑动感 */
 .tb-seg {
   position: absolute; left: 50%; top: 8px; transform: translateX(-50%);
-  width: 300px; height: 32px;
-  display: flex; align-items: center; gap: 0; padding: 2px;
+  /* 第 80 轮：三个 tab 之间 2px（宽度改由内容撑开，竖线也进流） */
+  width: max-content; height: 32px;
+  display: flex; align-items: center; gap: 2px; padding: 2px;
   /* 第 39 轮：轨道改成稿件里的半透明深蓝 rgba(31,68,118,.12)，压在渐变底上不显脏 */
   background: rgba(31, 68, 118, .12); border-radius: 8px;
 }
@@ -229,7 +230,7 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 }
 .seg-item.is-active { background: transparent; font-weight: 500; }
 .seg-item:not(.is-active):hover { background: rgba(255, 255, 255, .45); }
-.seg-div { position: absolute; left: 209.5px; top: 8px; width: 1px; height: 16px; background: var(--cds-seg-divider); z-index: 0; pointer-events: none; }
+.seg-div { flex: 0 0 1px; width: 1px; height: 16px; background: var(--cds-seg-divider); pointer-events: none; }
 
 /* 右侧按钮：贴面板右缘 */
 .tb-actions { position: absolute; right: var(--cds-gutter); top: 8px; display: flex; gap: 8px; }
@@ -1030,9 +1031,15 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
     #f96bd6 .42turn, #fc413d .46turn, #ff6b2b .5turn, #fec700 .54turn,
     #0ebc5f .62turn, #00a9bb .68turn, #3186ff .73turn, transparent .82turn);
   transform: translate(-50%, -50%) rotate(-110deg);
-  animation: c-color-sweep 2100ms linear infinite;
+  /* 第 80 轮：只转一轮，转完停在收尾角度，不再持续绕 */
+  animation: c-color-sweep 2100ms linear 1 forwards;
   will-change: transform;
 }
+/* 一轮结束后整层淡出（省电，也不抢输入区的视线） */
+.c-beam {
+  animation: c-beam-off 520ms ease 2050ms forwards;
+}
+@keyframes c-beam-off { to { opacity: 0; visibility: hidden; } }
 @keyframes c-color-sweep { to { transform: translate(-50%, -50%) rotate(250deg); } }
 @media (prefers-reduced-motion: reduce) {
   .c-wave::before { animation: none; }
@@ -3494,11 +3501,14 @@ body.is-ai-resizing .float { transition: none !important; }
 }
 .shot-viewer.is-open .shot-viewer-body { transform: none; }
 .shot-viewer-img {
-  display: block; width: 348px; max-width: 78vw; max-height: 70vh; height: auto;
-  border-radius: 10px; background: #FFFFFF;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .22),
-              0 28px 72px rgba(0, 0, 0, .52),
-              0 4px 14px rgba(0, 0, 0, .28);
+  /* 第 80 轮：原尺寸呈现（素材 696–720 宽），上限 86vw / 78vh，不再固定 348 缩小 */
+  display: block; width: auto; height: auto;
+  max-width: min(1120px, 86vw); max-height: 78vh;
+  image-rendering: -webkit-optimize-contrast;
+  /* 素材是带透明边的 RGBA 截图：不铺白底、不用方框阴影，改用跟着像素形状走的 drop-shadow */
+  border-radius: 0; background: transparent;
+  box-shadow: none;
+  filter: drop-shadow(0 22px 46px rgba(0, 0, 0, .55)) drop-shadow(0 3px 10px rgba(0, 0, 0, .32));
   transition: opacity .16s linear;
 }
 .shot-viewer-cap {
@@ -3551,6 +3561,9 @@ body.is-ai-resizing .float { transition: none !important; }
 body[data-page="summary"] { --sum-col: 1024px; }
 /* 任务总结页的交互全在 panel-main 里，不需要底部输入区 */
 body[data-page="summary"] .stage.is-chat { display: none; }
+/* 第 80 轮：UI设计工序页 —— 顶栏 44 + 工序条 87，中栏留空 */
+body[data-page="ui"] .stage.is-chat { display: none; }
+.ui-blank { position: absolute; left: 0; right: 0; top: 131px; bottom: 0; z-index: 3; background: var(--cds-bg-container); }
 
 .sum-back {
   height: 28px; padding: 0 10px; border-radius: 4px;
@@ -3693,6 +3706,9 @@ body[data-page="summary"] .stage.is-chat { display: none; }
 .sa-tr > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sa-tr.is-th { height: 32px; font-size: 12px; line-height: 20px; font-weight: 500; color: #6B6B6B; }
 .sa-tr.is-th > span:first-child { color: #1F1F1F; }
+/* 第 80 轮：表格序号一律偏灰；状态列「待产出」走橙 */
+.sa-tr:not(.is-th) > span:first-child { color: #868686; }
+.sa-st.is-warn { color: #FF7D00; }
 .sa-sort { display: inline-flex; align-items: center; gap: 2px; }
 .sa-sort-ico { width: 14px; height: 14px; display: inline-flex; }
 .sa-sort-ico svg { width: 14px; height: 14px; display: block; }
@@ -3706,8 +3722,9 @@ body[data-page="summary"] .stage.is-chat { display: none; }
   width: 1200px; max-width: calc(100% - 48px);
   height: 804px; max-height: calc(100% - 48px);
   display: flex; flex-direction: column; overflow: hidden;
-  background: #FFFFFF; border-radius: 8px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, .22);
+  /* 第 80 轮：稿面底色 #F2F2F2（右列画布），头 / 底 / 左列底栏另铺白 */
+  background: #F2F2F2; border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, .12);
   animation: dp-pop 200ms cubic-bezier(.2, .8, .2, 1);
 }
 @keyframes dp-pop {
@@ -3716,6 +3733,7 @@ body[data-page="summary"] .stage.is-chat { display: none; }
 }
 .dp-head {
   flex: 0 0 48px; padding: 0 20px; display: flex; align-items: center;
+  background: #FFFFFF;
   box-shadow: inset 0 -1px 0 0 #EBECED;
 }
 .dp-title { margin: 0; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--cds-text-primary); }
@@ -3733,21 +3751,28 @@ body[data-page="summary"] .stage.is-chat { display: none; }
 .dp-left {
   flex: 0 0 400px; min-height: 0;
   display: flex; flex-direction: column;
-  box-shadow: 1px 0 0 0 #F0F1F2;
+  /* 第 80 轮：左列画布 #F7F7F7（稿 3395:57747），右缘 1px #EBECED */
+  background: #F7F7F7;
+  box-shadow: inset -1px 0 0 0 #EBECED;
 }
 .dp-left-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 20px; scrollbar-width: thin; }
 .dp-left-scroll::-webkit-scrollbar { width: 6px; }
 .dp-left-scroll::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, .16); border-radius: 6px; }
 .dp-l-t { margin: 0; font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); }
-.dp-l-d { margin: 4px 0 0; font-size: 14px; line-height: 18px; color: var(--cds-text-secondary); }
+.dp-l-d { margin: 4px 0 0; font-size: 12px; line-height: 18px; color: #6B6B6B; }
 .dp-grp {
-  position: relative; margin-top: 8px; padding: 16px 12px; border-radius: 4px;
-  background: #FFFFFF; box-shadow: inset 0 0 0 1px #EEEEEE, 0 1px 2px rgba(0, 0, 0, .06);
+  position: relative; margin-top: 7px; padding: 16px 12px; border-radius: 4px;
+  /* 第 80 轮：稿里白卡只有 0 1px 2px 的影子，没有 1px 描边 */
+  background: #FFFFFF; box-shadow: 0 1px 2px rgba(0, 0, 0, .08);
 }
+/* 工序名那颗勾比卡内左缘再缩进 5（稿：卡 x=20 → 勾 x=37） */
+.dp-grp > .dp-ck.is-grp { margin-left: 5px; }
 .dp-grp:first-of-type { margin-top: 16px; }
-.dp-subs { margin: 10px 0 0 25px; display: flex; flex-direction: column; gap: 8px; }
+.dp-subs { margin: 8px 0 0 25px; padding: 1px 0; display: flex; flex-direction: column; gap: 8px; }
+/* 空工序（代码开发）：说明行紧贴工序名，卡高 77 与稿一致 */
+.dp-grp.is-empty .dp-subs { margin-top: 4px; padding: 0; }
 .dp-none { margin: 0; font-size: 14px; line-height: 18px; color: var(--cds-text-secondary); }
-.dp-grp-state { position: absolute; right: 12px; bottom: 12px; font-size: 12px; line-height: 18px; color: #FF7D00; }
+.dp-grp-state { position: absolute; right: 16px; bottom: 16px; font-size: 12px; line-height: 18px; color: #FF7D00; }
 
 .dp-ck {
   display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
@@ -3756,11 +3781,11 @@ body[data-page="summary"] .stage.is-chat { display: none; }
 .dp-ck input { position: absolute; opacity: 0; width: 0; height: 0; }
 .dp-box {
   flex: 0 0 auto; width: 14px; height: 14px; border-radius: 2px; position: relative;
-  background: #FFFFFF; box-shadow: inset 0 0 0 1.5px #C4C7C9;
+  background: #FFFFFF; box-shadow: inset 0 0 0 2px #C4C7C9;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease),
               box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.dp-ck:hover .dp-box { box-shadow: inset 0 0 0 1.5px var(--cds-color-primary); }
+.dp-ck:hover .dp-box { box-shadow: inset 0 0 0 2px var(--cds-color-primary); }
 .dp-ck input:checked + .dp-box { background: var(--cds-color-primary); box-shadow: none; }
 .dp-ck input:checked + .dp-box::after {
   content: ''; position: absolute; left: 2.4px; top: 4.4px; width: 9px; height: 5px;
@@ -3772,6 +3797,7 @@ body[data-page="summary"] .stage.is-chat { display: none; }
 
 .dp-left-foot {
   flex: 0 0 48px; padding: 0 20px; display: flex; align-items: center; gap: 12px;
+  background: #FFFFFF;
   box-shadow: inset 0 1px 0 0 #EBECED;
 }
 .dp-all-btn {
@@ -3780,14 +3806,14 @@ body[data-page="summary"] .stage.is-chat { display: none; }
   box-shadow: inset 0 0 0 1px #E5E5E5;
 }
 .dp-all-btn:hover { background: #FAFAFA; }
-.dp-count { font-size: 14px; line-height: 22px; color: var(--cds-text-tertiary); }
+.dp-count { font-size: 14px; line-height: 22px; color: #868686; }
 
 /* ---- 右列：智能拆分的任务 ---- */
 .dp-right { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; flex-direction: column; padding: 20px 20px 0; }
 .dp-r-t { margin: 0; font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); }
-.dp-r-d { margin: 4px 0 0; font-size: 14px; line-height: 18px; color: var(--cds-text-secondary); }
+.dp-r-d { margin: 4px 0 0; font-size: 12px; line-height: 18px; color: #6B6B6B; }
 .dp-list {
-  margin-top: 8px; flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  margin-top: 16px; flex: 1 1 auto; min-height: 0; overflow-y: auto;
   display: flex; flex-direction: column; gap: 8px; padding-bottom: 20px; scrollbar-width: thin;
 }
 .dp-list::-webkit-scrollbar { width: 6px; }
@@ -3796,10 +3822,12 @@ body[data-page="summary"] .stage.is-chat { display: none; }
 .dp-empty {
   flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 12px;
+  background: #FAFAFA; border-radius: 4px;
+  box-shadow: inset 0 0 0 1px #C9C9C9;
 }
 .dp-empty-t { margin: 0; font-size: 14px; line-height: 22px; color: var(--cds-text-primary); }
 .dp-split {
-  height: 36px; padding: 0 20px; border-radius: 4px;
+  min-width: 180px; height: 36px; padding: 0 20px; border-radius: 4px;
   font-size: 14px; line-height: 22px; color: var(--cds-text-primary); background: #FFFFFF;
   box-shadow: inset 0 0 0 1px #E5E5E5;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
@@ -3809,7 +3837,7 @@ body[data-page="summary"] .stage.is-chat { display: none; }
 /* 任务卡 */
 .dp-card {
   position: relative; flex: 0 0 auto; padding: 16px;
-  border-radius: 4px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #EEEEEE;
+  border-radius: 4px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
 }
 .dp-card-tags { position: absolute; left: 16px; top: 17px; display: flex; gap: 8px; }
 .dp-type, .dp-state {
@@ -3854,14 +3882,16 @@ body[data-page="summary"] .stage.is-chat { display: none; }
 }
 .dp-detail p { margin: 0; font-size: 12px; line-height: 18px; color: var(--cds-text-secondary); }
 .dp-detail p + p { margin-top: 4px; }
-.dp-detail-k { color: var(--cds-text-secondary); }
-.dp-dv { margin: 12px 0 0; display: flex; align-items: center; gap: 12px; }
+.dp-detail-k { font-weight: 500; color: #6B6B6B; }
+.dp-dv { margin: 16px 0 0; display: flex; align-items: center; gap: 16px; }
 .dp-dv-line { flex: 1 1 0; height: 1px; background: #E5E5E5; }
-.dp-dv-t { font-size: 12px; line-height: 22px; color: var(--cds-text-primary); white-space: nowrap; }
-.dp-dv-list { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+.dp-dv-t { font-size: 14px; line-height: 22px; font-weight: 500; color: #1F1F1F; white-space: nowrap; }
+.dp-dv-list { margin-top: 16px; padding: 1px 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; row-gap: 4px; }
+.dp-dv-list .dp-ck { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .dp-foot {
   flex: 0 0 56px; display: flex; align-items: center; justify-content: center; gap: 12px;
+  background: #FFFFFF;
   box-shadow: inset 0 1px 0 0 #EBECED;
 }
 .dp-foot .dp-btn { min-width: 60px; justify-content: center; }

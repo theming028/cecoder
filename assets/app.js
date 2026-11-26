@@ -38,6 +38,11 @@
   }
   seg.querySelectorAll('.seg-item').forEach(function (b) {
     b.addEventListener('click', function () {
+      /* 第 80 轮：顶栏中间的「研发工作台」= 回首页（在首页上再点就不动） */
+      if (b.dataset.seg === '研发工作台') {
+        if (document.body.dataset.page !== 'home') location.href = 'cecoder-home.html';
+        return;
+      }
       if (b.classList.contains('is-active')) return;
       seg.querySelectorAll('.seg-item').forEach(function (x) { x.classList.remove('is-active'); x.setAttribute('aria-selected', 'false'); });
       b.classList.add('is-active');
@@ -62,7 +67,7 @@
 
   /* 工序真值：技术任务 8 道取自 layers/quick-flow.json（2960:44863） */
   var QF_STEPS = {
-    '技术任务': ['概要设计', '详细设计', '程序设计', '代码开发', '代码审查', '白盒测试', '提交流水线', '任务总结'],
+    '技术任务': ['概要设计', '详细设计', 'UI设计', '代码开发', '代码审查', '白盒测试', '提交流水线', '任务总结'],
     '缺陷修复': ['问题复现', '根因定位', '修复实现', '回归验证'],
     '需求编写': ['需求澄清', '需求分析', '需求文档', '评审确认'],
     '需求优化': ['现状梳理', '优化方案', '方案评审', '落地实施']
@@ -81,6 +86,7 @@
       step.tabIndex = 0;
       step.dataset.i = i;
       if (name === '任务总结') step.dataset.go = 'summary';
+      if (name === 'UI设计') step.dataset.go = 'ui';
       var no = document.createElement('span');
       no.className = 'qf-no';
       no.textContent = pad2(i + 1);
@@ -330,6 +336,7 @@
       step.classList.add('is-active');
       /* 第 77 轮：工序链末步「任务总结」→ 直接进任务总结工序页 */
       if (step.dataset.go === 'summary') location.href = 'cecoder-summary.html?id=0';
+      if (step.dataset.go === 'ui') location.href = 'cecoder-ui.html?id=0';
     });
   }
   window.addEventListener('resize', qfMeasure);
@@ -3000,6 +3007,18 @@
       });
     });
 
+    /* 第 80 轮：「差异对比」= 切到中栏的「变更」页签 */
+    var diffBtn = document.getElementById('tpDiff');
+    if (diffBtn) {
+      diffBtn.addEventListener('click', function () {
+        var tab = null;
+        [].slice.call(document.querySelectorAll('.task-tabs .tk-tabs-l .tk-tab')).forEach(function (t) {
+          if (!tab && t.textContent.trim().indexOf('变更') === 0) tab = t;
+        });
+        if (tab) tab.click();
+      });
+    }
+
     /* 底部工序资产页签 */
     var tabsBar = document.querySelector('.task-tabs');
     var tabsL = tabsBar ? tabsBar.querySelector('.tk-tabs-l') : null;
@@ -3325,14 +3344,7 @@
   var listEl = document.getElementById('dpList');
   var emptyEl = document.getElementById('dpEmpty');
   var CARD_RULES = [
-    {
-      key: 'arch', grp: ['design', 'detail', 'program'],
-      type: '架构设计', muted: true, owner: '架构师 · 周宁',
-      src: '概要设计、详细设计、程序设计',
-      goal: '基于已完成的设计资产，补齐架构方案、接口契约与数据设计。',
-      assets: ['变动范围分析报告.md · 概要设计', '改动设计要点分析报告.md · 概要设计', '【概要设计】-登录失败提示.md · 概要设计',
-               '代码变更规划.md · 详细设计', '登录失败提示_详细设计.md · 详细设计', '程序设计资产清单.yaml · 程序设计']
-    },
+    /* 第 80 轮：卡片堆叠顺序与稿一致 —— 代码开发 / 架构设计（默认展开）/ 缺陷修复 */
     {
       key: 'dev', grp: ['code'],
       type: '代码开发', muted: false, owner: '研发经理 · 陈昊',
@@ -3341,7 +3353,15 @@
       assets: []
     },
     {
-      key: 'fix', grp: ['defect'],
+      key: 'arch', grp: ['design', 'detail', 'program'],
+      type: '架构设计', muted: true, owner: '架构师 · 周宁',
+      src: '概要设计、详细设计、UI设计',
+      goal: '基于已完成的设计资产，补齐架构方案、接口契约与数据设计。',
+      assets: ['变动范围分析报告.md · 概要设计', '改动设计要点分析报告.md · 概要设计', '【概要设计】-登录失败提示.md · 概要设计',
+               '代码变更规划.md · 详细设计', '登录失败提示_详细设计.md · 详细设计', 'UI设计资产清单.yaml · UI设计']
+    },
+    {
+      key: 'fix', grp: ['code'],
       type: '缺陷修复', muted: false, warn: true, owner: '测试经理 · 赵小敏',
       src: '白盒测试、提交流水线',
       goal: '按测试结论修复登录失败分支的边界缺陷并回归。',
@@ -3368,7 +3388,8 @@
             '<span class="dp-sel"><span class="dp-sel-k">选择受理岗位/人员：</span><span class="dp-sel-v">' + rule.owner + '</span>' +
               '<span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.8 5.6 7 8.8l3.2-3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>' +
             '<div class="dp-card-btns">' +
-              '<button class="dp-btn" type="button" data-dp-detail>' + (rule.assets.length ? '收起详情' : '任务详情') + '</button>' +
+              '<button class="dp-btn" type="button" data-dp-detail>' + (rule.assets.length ? '收起详情' : '任务详情') +
+                '<span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.8 5.6 7 8.8l3.2-3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>' +
               '<button class="dp-btn" type="button" data-dp-remove>移除</button>' +
             '</div>' +
           '</div>' +

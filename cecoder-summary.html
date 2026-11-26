@@ -483,10 +483,7 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
          ④ 派发入口收进派发卡右侧「打开任务派发」，不再单独做底栏
          ============================================================ -->
     <div class="task-top">
-      <a class="tt-home" href="cecoder-home.html">
-        <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.2 6.4 7 2.6l4.8 3.8v5.2a.8.8 0 0 1-.8.8H8.4V9.2H5.6v3.2H3a.8.8 0 0 1-.8-.8z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></span>首页
-      </a>
-      <span class="tt-home-sep" aria-hidden="true"></span>
+      <!-- 第 80 轮：顶栏左上角已有「首页」，中栏这枚去掉 -->
       <span class="tt-title">登录成功时未提示信息</span>
       <div class="tt-right">
         <a class="sum-back" href="cecoder-task.html?id=0">
@@ -511,9 +508,9 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
             <span class="ts-name">详细设计</span>
             <span class="ts-state">已完成</span>
           </a>
-          <a class="ts-item is-done" href="cecoder-task.html?id=0" data-step="3">
+<a class="ts-item is-done ts-go" href="cecoder-ui.html?id=0" data-step="3">
             <span class="ts-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-            <span class="ts-name">程序设计</span>
+            <span class="ts-name">UI设计</span>
             <span class="ts-state">已完成</span>
           </a>
           <a class="ts-item is-done" href="cecoder-task.html?id=0" data-step="4">
@@ -604,8 +601,7 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
                 <span class="sa-state is-warn">2 项待产出</span>
               </button>
               <div class="sa-body">
-                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web、paa-auth</i></span><span class="sa-tag"><b>影响文件</b><i class="is-muted">LoginForm.tsx、errorMessage.ts、AuthService.ts、LoginAudit.ts、LegacyLoginHint.ts</i></span></div>
-                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>代码变更分析.md</span><span>MD</span><span>18 KB</span><span>已产出</span></div><div class="sa-tr"><span>#2</span><span>影响脑图.json</span><span>JSON</span><span>32 KB</span><span>已产出</span></div><div class="sa-tr"><span>#3</span><span>login-fix.patch</span><span>PATCH</span><span>182 KB</span><span>待产出</span></div><div class="sa-tr"><span>#4</span><span>概要设计资产清单.yaml</span><span>YAML</span><span>36 KB</span><span>待产出</span></div></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>代码变更分析.md</span><span>MD</span><span>18 KB</span><span class="sa-st">已产出</span></div><div class="sa-tr"><span>#2</span><span>影响脑图.json</span><span>JSON</span><span>32 KB</span><span class="sa-st">已产出</span></div><div class="sa-tr"><span>#3</span><span>login-fix.patch</span><span>PATCH</span><span>182 KB</span><span class="sa-st is-warn">待产出</span></div><div class="sa-tr"><span>#4</span><span>概要设计资产清单.yaml</span><span>YAML</span><span>36 KB</span><span class="sa-st is-warn">待产出</span></div></div>
               </div>
             </div>
 
@@ -617,21 +613,19 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
                 <span class="sa-state is-ok"><span class="sa-state-ico" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.3 4.8 8.6 9.5 3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>已就绪</span>
               </button>
               <div class="sa-body">
-                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span><span class="sa-tag"><b>影响文件</b><i class="is-muted">LoginFailHint.tsx、i18n/login.ts</i></span></div>
-                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>登录失败提示_详细设计.md</span><span>MD</span><span>24 KB</span><span>已产出</span></div><div class="sa-tr"><span>#2</span><span>登录失败提示_接口清单.yaml</span><span>YAML</span><span>12 KB</span><span>已产出</span></div></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>登录失败提示_详细设计.md</span><span>MD</span><span>24 KB</span><span class="sa-st">已产出</span></div><div class="sa-tr"><span>#2</span><span>登录失败提示_接口清单.yaml</span><span>YAML</span><span>12 KB</span><span class="sa-st">已产出</span></div></div>
               </div>
             </div>
 
 <div class="sa-row">
               <button class="sa-row-h" type="button" aria-expanded="false">
                 <span class="sa-caret" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.6 5.4 7 8.8l3.4-3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                <span class="sa-name">程序设计</span>
+                <span class="sa-name">UI设计</span>
                 <span class="sa-cnt">11 项资产</span>
                 <span class="sa-state is-ok"><span class="sa-state-ico" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.3 4.8 8.6 9.5 3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>已就绪</span>
               </button>
               <div class="sa-body">
-                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web、paa-auth</i></span><span class="sa-tag"><b>影响文件</b><i class="is-muted">AuthService.ts、LoginForm.tsx、errorMessage.ts</i></span></div>
-                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>程序设计文档.md</span><span>MD</span><span>48 KB</span><span>已产出</span></div><div class="sa-tr"><span>#2</span><span>程序设计资产清单.yaml</span><span>YAML</span><span>36 KB</span><span>已产出</span></div></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>UI设计文档.md</span><span>MD</span><span>48 KB</span><span class="sa-st">已产出</span></div><div class="sa-tr"><span>#2</span><span>UI设计资产清单.yaml</span><span>YAML</span><span>36 KB</span><span class="sa-st">已产出</span></div></div>
               </div>
             </div>
 
@@ -644,7 +638,7 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
               </button>
               <div class="sa-body">
                 <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span><span class="sa-tag"><b>影响文件</b><i class="is-muted">LoginForm.tsx、errorMessage.ts</i></span></div>
-                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>login-fix.patch</span><span>PATCH</span><span>182 KB</span><span>已产出</span></div><div class="sa-tr"><span>#2</span><span>变更说明.md</span><span>MD</span><span>9 KB</span><span>已产出</span></div></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>login-fix.patch</span><span>PATCH</span><span>182 KB</span><span class="sa-st">已产出</span></div><div class="sa-tr"><span>#2</span><span>变更说明.md</span><span>MD</span><span>9 KB</span><span class="sa-st">已产出</span></div></div>
               </div>
             </div>
 
@@ -656,8 +650,7 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
                 <span class="sa-state is-warn">4 项待产出</span>
               </button>
               <div class="sa-body">
-                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span><span class="sa-tag"><b>影响文件</b><i class="is-muted">LoginForm.tsx</i></span></div>
-                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>代码审查报告.md</span><span>MD</span><span>—</span><span>待产出</span></div></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>代码审查报告.md</span><span>MD</span><span>—</span><span class="sa-st is-warn">待产出</span></div></div>
               </div>
             </div>
 
@@ -669,8 +662,7 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
                 <span class="sa-state is-warn">4 项待产出</span>
               </button>
               <div class="sa-body">
-                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span><span class="sa-tag"><b>影响文件</b><i class="is-muted">LoginForm.tsx</i></span></div>
-                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>黑盒测试用例.md</span><span>MD</span><span>—</span><span>待产出</span></div></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>黑盒测试用例.md</span><span>MD</span><span>—</span><span class="sa-st is-warn">待产出</span></div></div>
               </div>
             </div>
 
@@ -682,8 +674,7 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
                 <span class="sa-state is-ok is-quiet">无产出记录</span>
               </button>
               <div class="sa-body">
-                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span></div>
-                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>完成确认单.md</span><span>MD</span><span>—</span><span>待产出</span></div></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>完成确认单.md</span><span>MD</span><span>—</span><span class="sa-st is-warn">待产出</span></div></div>
               </div>
             </div>
           </div>
@@ -1221,21 +1212,14 @@ M41.99980306625366,43.999827879333495C41.99980306625366,43.999827879333495,5.999
             </div>
 
             <div class="dp-grp" data-grp="program">
-              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>程序设计</label>
+              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>UI设计</label>
               <div class="dp-subs">
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>程序设计文档.md</label>
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>程序设计资产清单.yaml</label>
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>程序设计模板.md</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>UI设计文档.md</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>UI设计资产清单.yaml</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>UI设计模板.md</label>
               </div>
             </div>
 
-            <div class="dp-grp" data-grp="defect">
-              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>缺陷修复</label>
-              <div class="dp-subs">
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>黑盒测试用例.md</label>
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>缺陷修复说明.md</label>
-              </div>
-            </div>
 
             <div class="dp-grp is-empty" data-grp="code">
               <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>代码开发</label>

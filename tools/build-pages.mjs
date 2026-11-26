@@ -27,6 +27,8 @@ const P = {
   /* 第 76 轮：任务总结工序页 + 任务智能派发弹窗 */
   summaryview: R('src/summaryview.html'),
   dispatch: R('src/dispatch.html'),
+  /* 第 80 轮：UI设计工序专属页（中栏空） */
+  uiview: R('src/uiview.html'),
 };
 
 /* 会话页 / 任务页沿用 is-chat 那套「单卡输入区」样式，但不需要 hero 等首页块 */
@@ -92,6 +94,13 @@ const task = wrap({
   body: chrome(pmChat, P.taskview, stageChat, '', P.aiside),
 });
 
+/* ---------- 3.5 UI设计工序页：顶栏 + 工序条，中栏留空 ---------- */
+const ui = wrap({
+  title: 'Cecoder · UI设计',
+  page: 'ui',
+  body: chrome(pmChat, P.uiview, stageChat, '', '', ''),
+});
+
 /* ---------- 4 任务总结工序页：工序条 6 步 + 内容 1024 列 + 派发弹窗 ---------- */
 const summary = wrap({
   title: 'Cecoder · 任务总结',
@@ -103,6 +112,7 @@ for (const [name, html] of [
   ['cecoder-home.html', home],
   ['cecoder-session.html', session],
   ['cecoder-task.html', task],
+  ['cecoder-ui.html', ui],
   ['cecoder-summary.html', summary],
 ]) {
   fs.writeFileSync(path.join(ROOT, name), html, 'utf8');

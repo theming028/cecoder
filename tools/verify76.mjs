@@ -40,7 +40,7 @@ async function mk(url, w = 1920, h = 1200) {
   });
   ok('A1 工序条沿用任务页容器：87 高、贴顶栏 44', a.bar.h === 87 && a.bar.y === 44, JSON.stringify(a.bar));
   ok('A2 9 道工序、名称与「代码开发」一致',
-    a.names.join('/') === '概要设计/详细设计/程序设计/代码变更分析/代码开发/代码审查/白盒测试/提交流水线/任务总结', a.names.join('/'));
+    a.names.join('/') === '概要设计/详细设计/UI设计/代码变更分析/代码开发/代码审查/白盒测试/提交流水线/任务总结', a.names.join('/'));
   ok('A3 末位 = 任务总结（当前，实心主色圆点）；前 8 道已完成',
     a.now === '任务总结' && a.nowIconBg === 'rgb(55, 112, 247)' && a.states.slice(0, 8).every(s => s === '已完成') && a.states[8] === '当前',
     a.nowIconBg + ' ' + a.states.join('/'));
@@ -96,8 +96,9 @@ async function mk(url, w = 1920, h = 1200) {
       over: document.querySelector('.sum-wrap').scrollWidth - document.querySelector('.sum-wrap').clientWidth,
     };
   });
-  ok('B1 内容列 1024×802；标题 28 高、20/500、两侧 456 横线',
-    c.col.w === 1024 && c.col.h === 802 && c.h.h === 28 && c.hTxt === '20px/500' && c.lines.join('/') === '456/456',
+  /* 第 80 轮：非「代码开发」行不再带标签行，展开卡 288 → 248，内容列总高 762 */
+  ok('B1 内容列 1024×762；标题 28 高、20/500、两侧 456 横线',
+    c.col.w === 1024 && c.col.h === 762 && c.h.h === 28 && c.hTxt === '20px/500' && c.lines.join('/') === '456/456',
     JSON.stringify([c.col, c.h, c.lines]));
   ok('B2 派发卡 1024×96 @52、底 #F7F7F7、r4、内描边且卡身无投影',
     c.dp.y === 52 && c.dp.w === 1024 && c.dp.h === 96 && c.dpBg === 'rgb(247, 247, 247)' &&
@@ -113,16 +114,16 @@ async function mk(url, w = 1920, h = 1200) {
   ok('B5 工序资产自 168 起、头部 42、右上按钮 32×32 贴右',
     c.assets.y === 168 && c.head.h === 42 && c.all.w === 32 && c.all.x + c.all.w === 1024 && c.all.y - c.head.y === 10,
     JSON.stringify([c.assets, c.head, c.all]));
-  ok('B6 展开卡 1024×288 自 226 起、行头 40、标签 2 条 24 高、底 #F5F8FF',
-    c.row1.y === 226 && c.row1.h === 288 && c.row1H.h === 40 && c.tags.length === 2 && c.tags.every(v => v === 24) && c.tagBg === 'rgb(245, 248, 255)',
+  ok('B6 展开卡 1024×248 自 226 起、行头 40、无标签行（标签只留给「代码开发」）',
+    c.row1.y === 226 && c.row1.h === 248 && c.row1H.h === 40 && c.tags.length === 0,
     JSON.stringify([c.row1, c.tags]));
   ok('B7 表格 992×176（表头 32 + 4 行 36）',
     c.table.w === 992 && c.table.h === 176 && c.th === 32 && c.trH === 36, JSON.stringify([c.table, c.th, c.trH]));
   ok('B8 表格列 12 / 68 / 692 / 812 / 902',
     c.colX.join('/') === '12/68/692/812/902', c.colX.join('/'));
-  ok('B9 7 行：首行展开 288 + 6 行 40、行距 8（末行收在 802）',
-    c.rowH.length === 7 && c.rowH[0] === 288 && c.rowH.slice(1).every(v => v === 40) &&
-    c.row2.y === c.row1.y + 288 + 8 && c.row2.y + 6 * 40 + 5 * 8 === 802,
+  ok('B9 7 行：首行展开 248 + 6 行 40、行距 8（末行收在 762）',
+    c.rowH.length === 7 && c.rowH[0] === 248 && c.rowH.slice(1).every(v => v === 40) &&
+    c.row2.y === c.row1.y + 248 + 8 && c.row2.y + 6 * 40 + 5 * 8 === 762,
     c.rowH.join('/') + ' row2@' + c.row2.y);
   ok('B10 状态：已就绪/无产出记录 #30953B（带勾）、待产出 #FF7D00',
     c.oks.every(v => v === 'rgb(48, 149, 59)') && c.warns.every(v => v === 'rgb(255, 125, 0)'),
@@ -138,7 +139,7 @@ async function mk(url, w = 1920, h = 1200) {
   const before = await h();
   await p.tap('.sa-row:nth-child(2) .sa-row-h'); await wait(120);
   const opened = await h();
-  ok('C1 点折叠行 → 展开（40 → 约 288）', before[1] === 40 && opened[1] > 200, before[1] + ' → ' + opened[1]);
+  ok('C1 点折叠行 → 展开（40 → 行头 40 + 16 + 表 104 + 16 = 176）', before[1] === 40 && opened[1] === 176, before[1] + ' → ' + opened[1]);
 
   await p.tap('.sa-row:nth-child(2) .sa-row-h'); await wait(120);
   const shut = await h();
@@ -172,7 +173,7 @@ async function mk(url, w = 1920, h = 1200) {
   ok('D1 派发卡按钮 → 弹窗打开，1200×804', d.open && d.dlg.w === 1200 && d.dlg.h === 804, JSON.stringify(d.dlg));
   ok('D2 头 48 / 左列 400×700 / 左列底 48 / 底部 56',
     d.head.h === 48 && d.left.w === 400 && d.left.h === 700 && d.lfoot.h === 48 && d.foot.h === 56, JSON.stringify([d.head, d.left]));
-  ok('D3 拆分前：空态 + 5 个工序组 + 计数 0 项', d.empty && d.grps === 5 && d.cards === 0 && /已选 0 项/.test(d.count), d.count);
+  ok('D3 拆分前：空态 + 4 个工序组 + 计数 0 项（与稿一致，缺陷修复不再单列）', d.empty && d.grps === 4 && d.cards === 0 && /已选 0 项/.test(d.count), d.count);
 
   await p.evaluate(() => document.getElementById('dpSelectAll').click()); await wait(220);
   const all = await p.evaluate(() => {
@@ -180,15 +181,15 @@ async function mk(url, w = 1920, h = 1200) {
     return {
       n: cards.length, types: cards.map(c => c.querySelector('.dp-type').textContent),
       count: document.getElementById('dpCount').textContent,
-      h0: Math.round(cards[0].getBoundingClientRect().height),
-      dv: cards[0].querySelectorAll('.dp-dv-list .dp-ck').length,
-      btns: [...cards[0].querySelectorAll('.dp-card-btns .dp-btn')].map(b => b.textContent),
+      h0: Math.round(document.querySelector('.dp-card[data-key="arch"]').getBoundingClientRect().height),
+      dv: document.querySelectorAll('.dp-card[data-key="arch"] .dp-dv-list .dp-ck').length,
+      btns: [...document.querySelectorAll('.dp-card[data-key="arch"] .dp-card-btns .dp-btn')].map(b => b.textContent),
     };
   });
-  ok('D4 全选 → 三张卡（架构设计 / 代码开发 / 缺陷修复）', all.n === 3 && all.types.join('/') === '架构设计/代码开发/缺陷修复', all.types.join('/'));
-  ok('D5 架构设计卡展开详情 340、传递资产 6 项、按钮「收起详情/移除」',
-    all.h0 === 340 && all.dv === 6 && all.btns.join('/') === '收起详情/移除', all.h0 + ' ' + all.dv + ' ' + all.btns.join('/'));
-  ok('D6 计数 = 共 15 项，已选 15 项', all.count === '共 15 项，已选 15 项', all.count);
+  ok('D4 全选 → 三张卡（代码开发 / 架构设计 / 缺陷修复）', all.n === 3 && all.types.join('/') === '代码开发/架构设计/缺陷修复', all.types.join('/'));
+  ok('D5 架构设计卡展开详情 342、传递资产 6 项、按钮「收起详情/移除」',
+    all.h0 === 342 && all.dv === 6 && all.btns.join('/') === '收起详情/移除', all.h0 + ' ' + all.dv + ' ' + all.btns.join('/'));
+  ok('D6 计数 = 共 12 项，已选 12 项', all.count === '共 12 项，已选 12 项', all.count);
 
   await p.evaluate(() => document.getElementById('dpGo').click()); await wait(240);
   const t = await p.evaluate(() => ({ hidden: document.getElementById('dpToast').hidden, txt: document.getElementById('dpToastTxt').textContent }));
@@ -210,16 +211,16 @@ async function mk(url, w = 1920, h = 1200) {
   ok('E1 「任务执行」→ 任务页', /cecoder-task\.html/.test(p.url()), p.url());
 
   const p2 = await mk('cecoder-task.html?id=0');
-  await p2.tap('a.tk-sum-link'); await wait(600);
-  ok('E2 任务页页签「任务总结」→ 总结页', /cecoder-summary\.html/.test(p2.url()), p2.url());
+  await p2.tap('#tkStepTrack .ts-item[data-step="9"]'); await wait(600);
+  ok('E2 任务页工序条第 9 道「任务总结」→ 总结页', /cecoder-summary\.html/.test(p2.url()), p2.url());
 
   const p3 = await mk('cecoder-summary.html?id=0');
   await p3.tap('#tkStepTrack .ts-item[data-step="1"]'); await wait(600);
   ok('E3 工序条第 1 道 → 任务页', /cecoder-task\.html/.test(p3.url()), p3.url());
 
   const p4 = await mk('cecoder-summary.html?id=0');
-  await p4.tap('.tt-home'); await wait(600);
-  ok('E4 顶栏「首页」→ 首页', /cecoder-home\.html/.test(p4.url()), p4.url());
+  await p4.tap('.tb-home'); await wait(600);
+  ok('E4 顶栏左上「首页」→ 首页', /cecoder-home\.html/.test(p4.url()), p4.url());
   await p4.close(); await p3.close(); await p2.close();
 }
 

@@ -82,21 +82,22 @@ const file = u => 'file:///' + BASE + '/cecoder-' + u + '.html';
       names: items.map(i => i.querySelector('.ts-name').textContent),
       lastTag: last.tagName, lastNow: last.classList.contains('is-now'),
       links: items.slice(0, 8).map(i => i.getAttribute('href')),
-      home: (document.querySelector('.tt-home') || {}).getAttribute ? document.querySelector('.tt-home').getAttribute('href') : '',
+      home: !!document.querySelector('.task-top .tt-home'),
       back: (document.querySelector('.sum-back') || {}).href ? document.querySelector('.sum-back').getAttribute('href') : '',
     };
   });
   ok('C1 9 道工序、末步 = 任务总结（当前态，非链接）',
     c.names.length === 9 && c.names[8] === '任务总结' && c.lastTag === 'SPAN' && c.lastNow, c.names.join('/'));
-  ok('C2 前 8 道工序都能回任务页', c.links.length === 8 && c.links.every(h => h === 'cecoder-task.html?id=0'), c.links.join(','));
-  ok('C3 顶部「首页 / 任务执行」双入口', c.home === 'cecoder-home.html' && c.back === 'cecoder-task.html?id=0', c.home + ' ' + c.back);
+  ok('C2 第 3 道 UI设计 → 独立页，其余前 8 道回任务页',
+    c.links.length === 8 && c.links[2] === 'cecoder-ui.html?id=0' && c.links.filter((h, i) => i !== 2).every(h => h === 'cecoder-task.html?id=0'), c.links.join(','));
+  ok('C3 中栏 task-top 不再放「首页」，右侧仍留「任务执行」', c.home === false && c.back === 'cecoder-task.html?id=0', c.home + ' ' + c.back);
   await p.close();
 }
 
 /* ============ D 四页互跳闭环 ============ */
 {
   /* 每页顶栏都有「首页」；首页卡片进会话 / 任务；会话页抽屉卡片进任务 */
-  const pages = ['home', 'session', 'task', 'summary'];
+  const pages = ['home', 'session', 'task', 'ui', 'summary'];
   for (const pg of pages) {
     const p = await mk('cecoder-' + pg + '.html' + (pg === 'home' ? '' : '?id=0'));
     const hasHome = await p.evaluate(() => !!document.querySelector('.tb-home') && document.querySelector('.tb-home').getAttribute('href') === 'cecoder-home.html');
@@ -126,10 +127,16 @@ const file = u => 'file:///' + BASE + '/cecoder-' + u + '.html';
   await p.close();
 
   const q = await mk('cecoder-task.html?id=0');
-  await q.evaluate(() => document.querySelector('.tk-sum-link').click());
+  await q.evaluate(() => document.querySelector('#tkStepTrack .ts-item[data-step="9"]').click());
   await wait(900);
-  ok('D5 任务页页签「任务总结」→ 总结页', /cecoder-summary\.html/.test(q.url()), q.url());
+  ok('D5 任务页工序条第 9 道「任务总结」→ 总结页', /cecoder-summary\.html/.test(q.url()), q.url());
   await q.close();
+
+  const u = await mk('cecoder-ui.html?id=0');
+  ok('D7-1 UI设计页：第 3 道当前、中栏留空', await u.evaluate(() => document.querySelector('.ts-item.is-now .ts-name').textContent === 'UI设计' && !!document.querySelector('.ui-blank')));
+  await u.evaluate(() => document.querySelector('.ts-item[data-step="5"]').click()); await wait(900);
+  ok('D7-2 UI设计页第 5 道 → 代码开发任务页', /cecoder-task\.html/.test(u.url()), u.url());
+  await u.close();
 
   const h = await mk('cecoder-home.html');
   await h.evaluate(() => { const b = document.querySelector('.menu-btn'); if (b) b.click(); });
