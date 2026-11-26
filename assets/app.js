@@ -2201,7 +2201,7 @@
   /* ============================================================
      第 76 轮：变更分析完成态（稿 3376:53726）
      点「开始变更分析」→ 模拟比对 → 输入区收起成「资料输入」条，
-     下方列出变更点；卡片支持 忽略/恢复、收起范围、变更点证据链。
+     下方列出变更点；卡片支持 忽略/恢复、收起/展开、变更点证据链。
      ============================================================ */
   (function () {
     var wrap = document.querySelector('.tp-wrap');
@@ -2283,24 +2283,7 @@
       toast('已确认变更范围，开始生成代码');
     });
 
-    /* 忽略 / 恢复：整卡转灰的同时把仓库、分支链接一起停用（键盘也进不去） */
-    function setIgnored(card, on) {
-      card.classList.toggle('is-ignored', on);
-      var links = card.querySelectorAll('.cp-link');
-      for (var i = 0; i < links.length; i++) {
-        if (on) {
-          links[i].setAttribute('aria-disabled', 'true');
-          links[i].setAttribute('tabindex', '-1');
-        } else {
-          links[i].removeAttribute('aria-disabled');
-          links[i].removeAttribute('tabindex');
-        }
-      }
-    }
-    if (list) {
-      var pre = list.querySelectorAll('.cp.is-ignored');
-      for (var pi = 0; pi < pre.length; pi++) setIgnored(pre[pi], true);
-    }
+    function setIgnored(card, on) { card.classList.toggle('is-ignored', on); }
 
     /* 卡片上的三个操作 + 恢复 */
     if (list) list.addEventListener('click', function (e) {
@@ -2318,7 +2301,7 @@
       } else if (btn.hasAttribute('data-cp-range')) {
         var off = card.classList.toggle('is-range-off');
         var t = btn.querySelector('.cp-range-t');
-        if (t) t.textContent = off ? '展开范围' : '收起范围';
+        if (t) t.textContent = off ? '展开' : '收起';
       } else if (btn.hasAttribute('data-cp-evidence') && evModal) {
         openCdsModal(evModal);
       }

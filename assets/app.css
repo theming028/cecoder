@@ -2979,7 +2979,7 @@ body.is-focus[data-page="task"] .tp-wrap { top: 40px; }
 .tp-chg-sep { height: 1px; margin: 2px 0; background: #EEEEEE; }
 .cp {
   display: flex; align-items: flex-start; flex-wrap: wrap; gap: 10px 12px;
-  padding: 14px 16px; border: 1px solid #EEEEEE; border-radius: 8px; background: #FFFFFF;
+  padding: 14px 16px; border: 1px solid #EEEEEE; border-radius: 4px; background: #FFFFFF;
   transition: border-color .18s var(--cds-motion-ease), background .18s var(--cds-motion-ease);
 }
 .cp:hover { border-color: #DCE3EE; }
@@ -2993,10 +2993,10 @@ body.is-focus[data-page="task"] .tp-wrap { top: 40px; }
 .cp-risk.is-high { background: #FFECE8; box-shadow: inset 0 0 0 1px #FDCDC5; color: #F53F3F; }
 /* 栏宽不足（右栏展开时内容列会被压到 600 上下）时，操作按钮换到第二行右对齐 */
 .cp-main { flex: 1 1 320px; min-width: 0; }
-.cp-title { margin: 0; font-size: 14px; line-height: 22px; color: var(--cds-text-primary); }
+.cp-title { margin: 0; font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); }
 .cp-meta { margin: 2px 0 0; font-size: 13px; line-height: 20px; color: var(--cds-text-tertiary); }
-.cp-link { color: var(--cds-color-link); }
-.cp-link:hover { text-decoration: underline; }
+/* 仓库／分支就是纯文本，不做链接形态（颜色跟随 .cp-meta） */
+.cp-link { color: inherit; text-decoration: none; }
 .cp-dot { margin: 0 6px; color: var(--cds-text-disabled); }
 .cp-note { margin: 6px 0 0; font-size: 13px; line-height: 20px; }
 .cp[data-risk="low"] .cp-note { color: var(--cds-text-tertiary); }
@@ -3019,9 +3019,8 @@ body.is-focus[data-page="task"] .tp-wrap { top: 40px; }
 /* 已忽略：整卡转灰，只留「恢复」 */
 .cp.is-ignored { background: #FAFAFA; border-color: #F0F0F0; }
 .cp.is-ignored .cp-title, .cp.is-ignored .cp-meta, .cp.is-ignored .cp-note { color: var(--cds-text-disabled); }
-/* 忽略后仓库／分支链接一起失效：变灰、不可点、不参与 Tab */
-.cp.is-ignored .cp-link { color: var(--cds-text-disabled); pointer-events: none; cursor: default; }
-.cp.is-ignored .cp-dot { color: var(--cds-text-disabled); }
+/* 忽略后仓库／分支文本随 .cp-meta 一起转灰 */
+.cp.is-ignored .cp-link, .cp.is-ignored .cp-dot { color: inherit; }
 .cp.is-ignored .cp-risk { background: #F2F3F5; box-shadow: inset 0 0 0 1px #E9EAEC; color: var(--cds-text-tertiary); }
 .cp.is-ignored [data-cp-evidence],
 .cp.is-ignored [data-cp-ignore],
