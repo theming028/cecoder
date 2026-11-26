@@ -2199,6 +2199,153 @@
     tkEvidence.addEventListener('click', function (e) { e.stopPropagation(); openCdsModal(evModal); });
   }
   /* ============================================================
+     第 76 轮：变更分析完成态（稿 3376:53726）
+     点「开始变更分析」→ 模拟比对 → 输入区收起成「资料输入」条，
+     下方列出变更点；卡片支持 忽略/恢复、收起/展开、变更点证据链。
+     ============================================================ */
+  (function () {
+    var wrap = document.querySelector('.tp-wrap');
+    var body = document.getElementById('tpBody');
+    var chg = document.getElementById('tpChg');
+    var list = document.getElementById('tpChgList');
+    var countEl = document.getElementById('tpChgCount');
+    var startBtn = document.getElementById('tpStart');
+    var confirmBtn = document.getElementById('tpConfirm');
+    var reBtn = document.getElementById('tpReanalyze');
+    var statusEl = document.getElementById('tpBodyStatus');
+    var bodyT = document.getElementById('tpBodyT');
+    var sectBtn = body ? body.querySelector('[data-tp-toggle="body"]') : null;
+    var steps = document.querySelectorAll('.tp-head .tp-step');
+    var step1 = steps[0], step2 = steps[1];
+    if (!wrap || !chg || !startBtn) return;
+
+    var CHECK = '<span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+    /* 每张步骤卡自己的原始数字，重置时要各归各位（别都用 1） */
+    var savedNo = {};
+    [step1, step2].forEach(function (st) {
+      if (st) savedNo[st.dataset.stepKey || (st.dataset.stepKey = 'k' + Math.random())] = st.querySelector('.tp-step-no').innerHTML;
+    });
+    function origNo(st) { return savedNo[st.dataset.stepKey] || ''; }
+
+    function recount() {
+      var n = list.querySelectorAll('.cp:not(.is-ignored)').length;
+      if (countEl) countEl.textContent = '（' + n + '个）';
+    }
+
+    function markStep(step, mode) {
+      if (!step) return;
+      var no = step.querySelector('.tp-step-no');
+      step.classList.toggle('is-on', mode === 'on');
+      step.classList.toggle('is-done', mode === 'done');
+      if (no) no.innerHTML = (mode === 'done') ? CHECK : origNo(step);
+    }
+
+    function setAnalyzed(on) {
+      wrap.classList.toggle('is-analyzed', on);
+      if (body) {
+        body.classList.toggle('is-open', !on);
+        body.classList.toggle('is-closed', on);
+      }
+      if (sectBtn) sectBtn.setAttribute('aria-expanded', on ? 'false' : 'true');
+      if (bodyT) bodyT.textContent = on ? '资料输入' : '变更分析';
+      if (statusEl) statusEl.hidden = !on;
+      chg.hidden = !on;
+      if (startBtn) startBtn.hidden = on;
+      if (confirmBtn) confirmBtn.hidden = !on;
+      if (reBtn) reBtn.hidden = !on;
+      markStep(step1, on ? 'done' : 'on');
+      if (!on) markStep(step2, 'idle');
+      if (on) { recount(); wrap.scrollTop = 0; }
+    }
+
+    /* 开始变更分析：先给 900ms 的「比对中」反馈，再落到完成态 */
+    startBtn.addEventListener('click', function () {
+      if (startBtn.disabled) return;
+      var old = startBtn.textContent;
+      startBtn.disabled = true;
+      startBtn.textContent = '正在比对仓库与分支…';
+      setTimeout(function () {
+        startBtn.disabled = false;
+        startBtn.textContent = old;
+        setAnalyzed(true);
+        toast('已比对 2 个仓库 · 发现 4 个变更点');
+      }, 900);
+    });
+
+    if (reBtn) reBtn.addEventListener('click', function () {
+      setAnalyzed(false);
+      toast('已重新打开资料输入，可调整后再分析');
+    });
+
+    if (confirmBtn) confirmBtn.addEventListener('click', function () {
+      markStep(step1, 'done');
+      markStep(step2, 'on');
+      toast('已确认变更范围，开始生成代码');
+    });
+
+    function setIgnored(card, on) { card.classList.toggle('is-ignored', on); }
+
+    /* 卡片上的三个操作 + 恢复 */
+    if (list) list.addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      var card = btn.closest('.cp');
+      if (!card) return;
+      if (btn.hasAttribute('data-cp-ignore')) {
+        setIgnored(card, true);
+        recount();
+        toast('已忽略该变更点');
+      } else if (btn.hasAttribute('data-cp-restore')) {
+        setIgnored(card, false);
+        recount();
+      } else if (btn.hasAttribute('data-cp-range')) {
+        var off = card.classList.toggle('is-range-off');
+        var t = btn.querySelector('.cp-range-t');
+        if (t) t.textContent = off ? '展开' : '收起';
+      } else if (btn.hasAttribute('data-cp-evidence') && evModal) {
+        openCdsModal(evModal);
+      }
+    });
+
+    /* 添加变更点：把焦点交给右栏 AI 输入框（提示词描述 → AI 补全） */
+    var addBtn = document.getElementById('tpChgAdd');
+    if (addBtn) addBtn.addEventListener('click', function () {
+      var ai = document.querySelector('.ai-input');
+      if (ai) {
+        var side = document.querySelector('.panel');
+        if (side && side.classList.contains('is-ai-off')) {
+          var open = document.getElementById('aiOpen');
+          if (open) open.click();
+        }
+        setTimeout(function () { ai.focus(); }, 60);
+        toast('在右栏描述要补充的变更，AI 会补全变更点');
+      } else {
+        toast('已添加变更点');
+      }
+    });
+
+    /* 排序：实现时间 ⇄ 风险 */
+    var sortBtn = document.getElementById('tpChgSort');
+    var sortT = document.getElementById('tpChgSortT');
+    var order = [].slice.call(list.querySelectorAll('.cp'));
+    var byRisk = false;
+    if (sortBtn) sortBtn.addEventListener('click', function () {
+      byRisk = !byRisk;
+      var weight = { high: 3, mid: 2, low: 1 };
+      var arr = order.slice();
+      if (byRisk) {
+        arr.sort(function (a, b) { return (weight[b.dataset.risk] || 0) - (weight[a.dataset.risk] || 0); });
+      }
+      arr.forEach(function (c) { list.appendChild(c); });
+      /* 分隔线始终留在一组已忽略项之前 */
+      var sep = list.querySelector('.tp-chg-sep');
+      var firstIgnored = list.querySelector('.cp.is-ignored');
+      if (sep && firstIgnored) list.insertBefore(sep, firstIgnored);
+      if (sortT) sortT.textContent = byRisk ? '按风险排序' : '按实现时间排序';
+    });
+  })();
+
+  /* ============================================================
      第 72 轮：右栏「任务产物」的文件卡 —— 不再开弹窗，改成在中栏 tk-tabs-l 新开一个
      以文件名命名的页签，正文就地浏览（#docModal 已下线）。
      同一个文件重复点只切页签，不重复开；关掉页签自动退回上一个页签 + 变更分析面板。
