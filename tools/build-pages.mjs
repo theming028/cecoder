@@ -21,6 +21,9 @@ const P = {
   closemain: R('src/closemain.html'),
   floats: R('src/floats.html'),
   tail: R('src/tail.html'),
+  /* 第 76 轮：任务总结工序页 + 任务智能派发弹窗 */
+  summaryview: R('src/summaryview.html'),
+  dispatch: R('src/dispatch.html'),
 };
 
 /* 会话页 / 任务页沿用 is-chat 那套「单卡输入区」样式，但不需要 hero 等首页块 */
@@ -51,9 +54,9 @@ ${body}
    所以关闭 panel-main 的 </div> 由这里显式给出，不再用 closemain 的两个连写。 */
 const CLOSE_STAGE = '  </div><!-- /stage -->';
 const CLOSE_PM = '  </div><!-- /panel-main -->';
-const chrome = (pm, pre, stage, main, side) =>
+const chrome = (pm, pre, stage, main, side, extra) =>
   [P.top, P.drawer, pm, pre, stage, main, P.composer,
-   CLOSE_STAGE, CLOSE_PM, side || '', P.floats, P.tail]
+   CLOSE_STAGE, CLOSE_PM, side || '', P.floats, extra || '', P.tail]
     .filter(Boolean).join('\n');
 
 /* ---------- 1 首页：hero + 场景卡 + 工具栏 + 工序条 + 输入区 ---------- */
@@ -77,10 +80,18 @@ const task = wrap({
   body: chrome(pmChat, P.taskview, stageChat, ''),
 });
 
+/* ---------- 4 任务总结工序页：工序条 6 步 + 内容 1024 列 + 派发弹窗 ---------- */
+const summary = wrap({
+  title: 'Cecoder · 任务总结',
+  page: 'summary',
+  body: chrome(pmChat, P.summaryview, stageChat, '', '', P.dispatch),
+});
+
 for (const [name, html] of [
   ['cecoder-home.html', home],
   ['cecoder-session.html', session],
   ['cecoder-task.html', task],
+  ['cecoder-summary.html', summary],
 ]) {
   fs.writeFileSync(path.join(ROOT, name), html, 'utf8');
   console.log(name.padEnd(22), (Buffer.byteLength(html) / 1024).toFixed(1) + ' KB');

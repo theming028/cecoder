@@ -1,0 +1,94 @@
+
+  <!-- ============================================================
+       第 76 轮：任务智能派发弹窗（稿 3495:55225 拆分前 / 3495:55277 拆分后）
+       ① 头 48：标题 + 关闭
+       ② 中 700：左列 360（选择派发来源 · 可滚动 + 底部全选 / 计数）
+                 右列 760（智能拆分的任务 · 空态 / 任务卡）
+       ③ 底 56：取消 / 派发任务
+       两态在同一弹窗里：左列勾选 → 右侧出现任务卡（拆分后）
+       ============================================================ -->
+  <div class="cds-modal dp-modal" id="dpModal" aria-hidden="true">
+    <div class="cm-mask" data-dp-close></div>
+    <div class="dp-dlg" role="dialog" aria-modal="true" aria-labelledby="dpTitle">
+      <header class="dp-head">
+        <h2 class="dp-title" id="dpTitle">任务智能派发</h2>
+        <button class="dp-x" type="button" data-dp-close aria-label="关闭"><span class="ico ico16"><svg viewBox="0.268 0.268 13.454 13.454" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M5.3932272999999995,6.3023109C4.5517561,5.4608417,3.1618684999999997,4.0709572000000005,2.45028523,3.3593756C2.19924629,3.1083372000000002,2.20691663,2.7021755,2.45795518,2.45113683C2.46136415,2.44772783,2.46477288,2.44431907,2.46818063,2.44091135C2.71921921,2.18987256,3.1083372000000002,2.19924587,3.3593755,2.45028484C4.0709569000000005,3.1618681,5.4608417,4.5517559,6.3023109,5.3932272999999995C6.6928339,5.7837512,7.3071384,5.7837493,7.6976633,5.3932272999999995C8.5391417,4.5517561,9.9290404,3.1618681,10.6406288,2.4502848999999998C10.8916683,2.19924775,11.2807875,2.18987206,11.5318241,2.44091129C11.5352325,2.44431907,11.538641,2.44772783,11.5420504,2.45113683C11.7930861,2.7021752599999997,11.8007526,3.1083385,11.549715,3.3593755C10.8381329,4.0709569000000005,9.448244599999999,5.4608417,8.6067734,6.3023109C8.2162495,6.6928339,8.2162514,7.3071384,8.6067734,7.6976633C9.4482446,8.5391417,10.8381329,9.9290404,11.549716,10.6406288C11.8007507,10.8916664,11.793087,11.2978315,11.5420504,11.5488682C11.2978315,11.793087,10.8916664,11.8007507,10.6406288,11.549715C9.9290404,10.8381329,8.5391417,9.448244599999999,7.6976638,8.6067734C7.3071384,8.2162514,6.6928339,8.2162495,6.3023109,8.6067734C5.4608417,9.448244599999999,4.0709572000000005,10.8381329,3.3593756,11.549716C3.1083385,11.8007526,2.7021755999999997,11.793086,2.45113683,11.5420504C2.44772783,11.538641,2.44431907,11.5352325,2.44091135,11.5318251C2.18987206,11.2807875,2.19924775,10.8916683,2.45028484,10.6406288C3.1618681,9.9290404,4.5517559,8.5391417,5.3932272999999995,7.6976638C5.7837493,7.3071384,5.7837514,6.6928339,5.3932272999999995,6.3023109" fill="currentColor" fill-rule="evenodd"/></svg></span></button>
+      </header>
+
+      <div class="dp-main">
+        <aside class="dp-left">
+          <div class="dp-left-scroll">
+            <h3 class="dp-l-t">选择派发来源</h3>
+            <p class="dp-l-d">勾选工序或资产后，系统按任务类型自动拆分，并按岗位角色预分配受理人。</p>
+
+            <div class="dp-grp" data-grp="design">
+              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>概要设计</label>
+              <div class="dp-subs">
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>变动范围分析报告.md</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>改动设计要点分析报告.md</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>【概要设计】-登录失败提示.md</label>
+              </div>
+            </div>
+
+            <div class="dp-grp" data-grp="detail">
+              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>详细设计</label>
+              <div class="dp-subs">
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>代码变更规划.md</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>登录失败提示_详细设计.md</label>
+              </div>
+            </div>
+
+            <div class="dp-grp" data-grp="program">
+              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>程序设计</label>
+              <div class="dp-subs">
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>程序设计文档.md</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>程序设计资产清单.yaml</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>程序设计模板.md</label>
+              </div>
+            </div>
+
+            <div class="dp-grp" data-grp="defect">
+              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>缺陷修复</label>
+              <div class="dp-subs">
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>黑盒测试用例.md</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>缺陷修复说明.md</label>
+              </div>
+            </div>
+
+            <div class="dp-grp is-empty" data-grp="code">
+              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>代码开发</label>
+              <div class="dp-subs">
+                <p class="dp-none">该工序暂无已记录资产</p>
+              </div>
+              <span class="dp-grp-state">4 项待产出</span>
+            </div>
+          </div>
+          <div class="dp-left-foot">
+            <button class="dp-all-btn" type="button" id="dpSelectAll">全选</button>
+            <span class="dp-count" id="dpCount">共 30 项，已选 0 项</span>
+          </div>
+        </aside>
+
+        <section class="dp-right">
+          <h3 class="dp-r-t">智能拆分的任务</h3>
+          <p class="dp-r-d">按任务类型拆分，受理人已按岗位角色预分配，可逐条调整或忽略。</p>
+          <div class="dp-list" id="dpList">
+            <div class="dp-empty" id="dpEmpty">
+              <p class="dp-empty-t">还没有派发的任务</p>
+              <button class="dp-split" type="button" id="dpSplitAll">一键智能拆分全部工序</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer class="dp-foot">
+        <button class="dp-btn" type="button" data-dp-close>取消</button>
+        <button class="dp-btn is-primary" type="button" id="dpGo">派发任务</button>
+      </footer>
+
+      <div class="dp-toast" id="dpToast" hidden>
+        <span class="ico ico20"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8.4" fill="#30953B"/><path d="M6.2 10.3 8.7 12.8 13.9 7.6" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="dp-toast-t" id="dpToastTxt">已派发 3 项任务，任务已完成</span>
+      </div>
+    </div>
+  </div>

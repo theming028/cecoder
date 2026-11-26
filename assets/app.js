@@ -3026,3 +3026,285 @@
     }
   });
 })();
+
+/* ============================================================
+   第 76 轮：任务总结工序页
+   ① 工序资产逐行折叠 + 右上「全部展开 / 收起」
+   ② 底栏「智能派发任务」/ 卡内「打开任务派发」→ 任务智能派发弹窗
+   ③ 弹窗：组 ⇄ 子项联动、全选、计数、按工序生成任务卡、派发提示
+   ============================================================ */
+(function () {
+  if (document.body.getAttribute('data-page') !== 'summary') return;
+
+  function tip(msg) {
+    var wrap = document.getElementById('toastWrap');
+    if (!wrap) return;
+    var el = document.createElement('div');
+    el.className = 'semi-toast';
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(function () { el.remove(); }, 1800);
+  }
+
+  /* ---------- ① 工序资产 ---------- */
+  var list = document.getElementById('saList');
+  var allBtn = document.getElementById('saAll');
+
+  function rows() { return [].slice.call(list.querySelectorAll('.sa-row')); }
+  function syncAllBtn() {
+    if (!allBtn) return;
+    var all = rows().every(function (r) { return r.classList.contains('is-open'); });
+    allBtn.setAttribute('aria-expanded', all ? 'true' : 'false');
+  }
+  function setRow(row, open) {
+    row.classList.toggle('is-open', open);
+    var h = row.querySelector('.sa-row-h');
+    if (h) h.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  if (list) {
+    list.addEventListener('click', function (e) {
+      var h = e.target.closest ? e.target.closest('.sa-row-h') : null;
+      if (!h) return;
+      var row = h.closest('.sa-row');
+      if (!row) return;
+      setRow(row, !row.classList.contains('is-open'));
+      syncAllBtn();
+    });
+    syncAllBtn();
+  }
+  if (allBtn) {
+    allBtn.addEventListener('click', function () {
+      var open = allBtn.getAttribute('aria-expanded') !== 'true';
+      rows().forEach(function (r) { setRow(r, open); });
+      allBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+
+  /* ---------- ② 弹窗开关 ---------- */
+  var modal = document.getElementById('dpModal');
+  if (!modal) return;
+  var dlg = modal.querySelector('.dp-dlg');
+
+  function openDp() {
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(function () {
+      var first = modal.querySelector('.dp-left-scroll input');
+      if (first) { try { first.focus({ preventScroll: true }); } catch (err) {} }
+    });
+  }
+  function closeDp() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    hideToast();
+  }
+  function hideToast() {
+    var t = document.getElementById('dpToast');
+    if (t) t.hidden = true;
+  }
+
+  ['sumDispatch', 'sumOpenDispatch'].forEach(function (id) {
+    var b = document.getElementById(id);
+    if (b) b.addEventListener('click', openDp);
+  });
+  modal.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('[data-dp-close]')) closeDp();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+      e.stopPropagation();
+      closeDp();
+    }
+  });
+
+  /* ---------- ③ 勾选联动 ---------- */
+  var countEl = document.getElementById('dpCount');
+  var groups = [].slice.call(modal.querySelectorAll('.dp-grp'));
+
+  function itemsOf(g) { return [].slice.call(g.querySelectorAll('[data-dp-item]')); }
+  function allOf(g) { return g.querySelector('[data-dp-all]'); }
+  function checkedOf(g) {
+    var list = itemsOf(g).filter(function (i) { return i.checked; });
+    return list.length;
+  }
+  function refreshCount() {
+    var boxes = [].slice.call(modal.querySelectorAll('.dp-left-scroll input[type="checkbox"]'));
+    var n = boxes.filter(function (i) { return i.checked; }).length;
+    if (countEl) countEl.textContent = '共 ' + boxes.length + ' 项，已选 ' + n + ' 项';
+  }
+  function syncGroup(g) {
+    var all = allOf(g);
+    if (!all) return;
+    var items = itemsOf(g);
+    if (!items.length) return;
+    var n = items.filter(function (i) { return i.checked; }).length;
+    all.checked = n === items.length;
+    all.indeterminate = n > 0 && n < items.length;
+  }
+
+  groups.forEach(function (g) {
+    var all = allOf(g);
+    if (all) {
+      all.addEventListener('change', function () {
+        itemsOf(g).forEach(function (i) { i.checked = all.checked; });
+        render();
+      });
+    }
+    itemsOf(g).forEach(function (i) {
+      i.addEventListener('change', function () { syncGroup(g); render(); });
+    });
+  });
+
+  var allBtn2 = document.getElementById('dpSelectAll');
+  if (allBtn2) {
+    allBtn2.addEventListener('click', function () {
+      var boxes = [].slice.call(modal.querySelectorAll('.dp-left-scroll input[type="checkbox"]'));
+      var turnedOn = boxes.filter(function (i) { return i.checked; }).length !== boxes.length;
+      boxes.forEach(function (i) { i.checked = turnedOn; });
+      groups.forEach(syncGroup);
+      render();
+    });
+  }
+
+  /* ---------- ④ 按工序生成任务卡 ---------- */
+  var listEl = document.getElementById('dpList');
+  var emptyEl = document.getElementById('dpEmpty');
+  var CARD_RULES = [
+    {
+      key: 'arch', grp: ['design', 'detail', 'program'],
+      type: '架构设计', muted: true, owner: '架构师 · 周宁',
+      src: '概要设计、详细设计、程序设计',
+      goal: '基于已完成的设计资产，补齐架构方案、接口契约与数据设计。',
+      assets: ['变动范围分析报告.md · 概要设计', '改动设计要点分析报告.md · 概要设计', '【概要设计】-登录失败提示.md · 概要设计',
+               '代码变更规划.md · 详细设计', '登录失败提示_详细设计.md · 详细设计', '程序设计资产清单.yaml · 程序设计']
+    },
+    {
+      key: 'dev', grp: ['code'],
+      type: '代码开发', muted: false, owner: '研发经理 · 陈昊',
+      src: '代码开发、代码审查',
+      goal: '按设计资产落地登录失败提示的错误码映射与文案。',
+      assets: []
+    },
+    {
+      key: 'fix', grp: ['defect'],
+      type: '缺陷修复', muted: false, warn: true, owner: '测试经理 · 赵小敏',
+      src: '白盒测试、提交流水线',
+      goal: '按测试结论修复登录失败分支的边界缺陷并回归。',
+      assets: []
+    }
+  ];
+
+  function cardHtml(rule, assetCount) {
+    var tags = '<span class="dp-type' + (rule.muted ? ' is-muted' : '') + (rule.warn ? ' is-warn' : '') + '">' + rule.type + '</span>';
+    var dv = rule.assets.length
+      ? '<div class="dp-dv"><span class="dp-dv-line"></span><span class="dp-dv-t">传递资产 · 已选 ' + rule.assets.length + ' 项</span><span class="dp-dv-line"></span></div>' +
+        '<div class="dp-dv-list">' + rule.assets.map(function (a) {
+          return '<label class="dp-ck"><input type="checkbox" checked><span class="dp-box"></span>' + a + '</label>';
+        }).join('') + '</div>'
+      : '';
+    return '' +
+      '<article class="dp-card" data-key="' + rule.key + '">' +
+        '<div class="dp-card-tags">' + tags + '</div>' +
+        '<span class="dp-state is-right">待派发</span>' +
+        '<div class="dp-card-main">' +
+          '<h4 class="dp-card-t">统一登录失败提示</h4>' +
+          '<p class="dp-card-s">来源：' + rule.src + ' · ' + assetCount + ' 项资产</p>' +
+          '<div class="dp-card-row">' +
+            '<span class="dp-sel"><span class="dp-sel-k">选择受理岗位/人员：</span><span class="dp-sel-v">' + rule.owner + '</span>' +
+              '<span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.8 5.6 7 8.8l3.2-3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>' +
+            '<div class="dp-card-btns">' +
+              '<button class="dp-btn" type="button" data-dp-detail>' + (rule.assets.length ? '收起详情' : '任务详情') + '</button>' +
+              '<button class="dp-btn" type="button" data-dp-remove>移除</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="dp-detail"' + (rule.assets.length ? '' : ' hidden') + '>' +
+          '<p><span class="dp-detail-k">目标：</span>' + rule.goal + '</p>' +
+          '<p><span class="dp-detail-k">背景：</span>来源任务 #1042「统一登录失败提示」。工作空间：数字构建实验室。</p>' +
+          dv +
+        '</div>' +
+      '</article>';
+  }
+
+  function render() {
+    if (!listEl) return;
+    var html = '';
+    var shown = 0;
+    CARD_RULES.forEach(function (rule) {
+      var hit = rule.grp.some(function (k) {
+        var g = modal.querySelector('.dp-grp[data-grp="' + k + '"]');
+        if (!g) return false;
+        return checkedOf(g) > 0 || (allOf(g) && allOf(g).checked);
+      });
+      if (!hit) return;
+      var assets = rule.grp.reduce(function (acc, k) {
+        var g = modal.querySelector('.dp-grp[data-grp="' + k + '"]');
+        return acc + (g ? checkedOf(g) : 0);
+      }, 0);
+      html += cardHtml(rule, assets);
+      shown++;
+    });
+    if (emptyEl) emptyEl.remove();
+    [].slice.call(listEl.querySelectorAll('.dp-card')).forEach(function (c) { c.remove(); });
+    if (shown) listEl.insertAdjacentHTML('beforeend', html);
+    else if (!listEl.querySelector('.dp-empty')) {
+      listEl.insertAdjacentHTML('beforeend',
+        '<div class="dp-empty" id="dpEmpty"><p class="dp-empty-t">还没有派发的任务</p>' +
+        '<button class="dp-split" type="button" id="dpSplitAll">一键智能拆分全部工序</button></div>');
+      bindSplit();
+    }
+    refreshCount();
+  }
+
+  function bindSplit() {
+    var b = document.getElementById('dpSplitAll');
+    if (!b) return;
+    b.addEventListener('click', function () {
+      var boxes = [].slice.call(modal.querySelectorAll('.dp-left-scroll input[type="checkbox"]'));
+      boxes.forEach(function (i) { i.checked = true; });
+      groups.forEach(syncGroup);
+      render();
+    });
+  }
+  bindSplit();
+  refreshCount();
+
+  /* 卡内：任务详情 / 收起详情 / 移除 */
+  if (listEl) {
+    listEl.addEventListener('click', function (e) {
+      var d = e.target.closest ? e.target.closest('[data-dp-detail]') : null;
+      if (d) {
+        var card = d.closest('.dp-card');
+        var det = card.querySelector('.dp-detail');
+        var open = det.hidden;
+        det.hidden = !open;
+        d.textContent = open ? '收起详情' : '任务详情';
+        return;
+      }
+      var r = e.target.closest ? e.target.closest('[data-dp-remove]') : null;
+      if (r) {
+        var c2 = r.closest('.dp-card');
+        if (c2) c2.remove();
+        if (!listEl.querySelector('.dp-card')) render();
+      }
+    });
+  }
+
+  /* ---------- ⑤ 派发 ---------- */
+  var goBtn = document.getElementById('dpGo');
+  if (goBtn) {
+    goBtn.addEventListener('click', function () {
+      var n = listEl ? listEl.querySelectorAll('.dp-card').length : 0;
+      if (!n) { tip('请先勾选要派发的工序或资产'); return; }
+      var t = document.getElementById('dpToast');
+      var txt = document.getElementById('dpToastTxt');
+      if (txt) txt.textContent = '已派发 ' + n + ' 项任务，任务已完成';
+      if (t) t.hidden = false;
+      setTimeout(function () {
+        closeDp();
+        tip('已派发 ' + n + ' 项任务');
+      }, 1400);
+    });
+  }
+})();
