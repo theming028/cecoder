@@ -3576,32 +3576,53 @@
     });
   }
 
-  /* ---------- 进度条 ---------- */
+  /* ---------- 第 84 轮：进度条跟卡片生成实时推进，最后一张生成完 = 100% ---------- */
   var bar = document.getElementById('cgBar');
   var numGen = document.getElementById('cgNumGen');
   var numWait = document.getElementById('cgNumWait');
-  var STEP_PX = 150, BAR_PX = 1094, TOTAL = 6;
-  var pxBase = 450, genBase = 2, doneCards = 0;
+  var numOk = document.getElementById('cgNumOk');
+  var list = document.getElementById('cgList');
+  var CHIP_N = 5;
 
+  function liveCards() {
+    return list ? [].slice.call(list.querySelectorAll('.cg-card')) : [];
+  }
+  function stateOf(card) { return card.getAttribute('data-state') || 'todo'; }
+  function countState(st) {
+    return liveCards().filter(function (c) { return stateOf(c) === st; }).length;
+  }
+  /* 单卡进度：已生成/已确认 = 1；生成中 = 打钩的 chip 数 / 5；待生成 = 0 */
+  function cardFrac(card) {
+    var st = stateOf(card);
+    if (st === 'confirm' || st === 'done') return 1;
+    if (st !== 'running') return 0;
+    return card.querySelectorAll('.cg-chip.is-done').length / CHIP_N;
+  }
   function paintBar() {
+    var cards = liveCards();
+    var total = cards.length || 1;
+    var sum = 0;
+    for (var i = 0; i < cards.length; i++) sum += cardFrac(cards[i]);
+    var n = countState('confirm') + countState('done');
     if (bar) {
-      var px = Math.min(pxBase + STEP_PX * doneCards, BAR_PX);
-      bar.style.width = (px / BAR_PX * 100).toFixed(1) + '%';
-      if (bar.parentNode) bar.parentNode.setAttribute('aria-valuenow', Math.min(genBase + doneCards, TOTAL));
+      bar.style.width = (sum / total * 100).toFixed(1) + '%';
+      if (bar.parentNode) {
+        bar.parentNode.setAttribute('aria-valuemax', total);
+        bar.parentNode.setAttribute('aria-valuenow', n);
+      }
     }
-    if (numGen) numGen.textContent = Math.min(genBase + doneCards, TOTAL) + '/' + TOTAL;
-    if (numWait) numWait.textContent = doneCards;
+    if (numGen) numGen.textContent = n + '/' + total;
+    if (numWait) numWait.textContent = countState('confirm');
+    if (numOk) numOk.textContent = countState('done') + '/' + total;
   }
 
-  /* ---------- 变更卡逐张生成 ---------- */
+  /* ---------- 变更卡逐张生成（从第一张开始，全部生成完进度条跑满） ---------- */
   var CHIPS = ['读取Spec', '对比现有代码', '生成代码', '规则检查', '核对Spec'];
   var SVG_CHECK = '<svg viewBox="0 0 12 12" fill="none"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var SVG_SPIN = '<svg viewBox="0 0 12 12" fill="none"><path d="M6 1.4a4.6 4.6 0 1 1-3.3 1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
   var SVG_CHEV = '<svg viewBox="0 0 12 12" fill="none"><path d="M4.4 2.4 7.6 6l-3.2 3.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var CHIP_MS = 700, CARD_GAP_MS = 420;
   var timer = null;
-
-  var list = document.getElementById('cgList');
 
   function flowHtml() {
     var out = '<div class="cg-flow"><span class="cg-flow-k">生成流程：</span><span class="cg-flow-in">';
@@ -3640,7 +3661,6 @@
     tagOf(card, '待确认', 'is-warn');
     var flow = card.querySelector('.cg-flow');
     if (flow) flow.remove();
-    doneCards += 1;
     paintBar();
     var nx = nextTodo();
     if (nx) timer = setTimeout(function () { startCard(nx, 0); }, CARD_GAP_MS);
@@ -3654,6 +3674,7 @@
     chipState(chips[i], 'run');
     timer = setTimeout(function () {
       chipState(chips[i], 'done');
+      paintBar();
       pump(card, i + 1);
     }, CHIP_MS);
   }
@@ -3671,6 +3692,7 @@
     }
     var chips = flow.querySelectorAll('.cg-chip');
     for (var i = 0; i < chips.length; i++) chipState(chips[i], '');
+    paintBar();
     pump(card, from || 0);
   }
 
@@ -3682,34 +3704,45 @@
   }
 
   if (list) {
-    /* 稿面快照：第 1 颗 chip 已打勾、第 2 颗在跑 → 从第 2 颗接着跑 */
+    /* 第一张卡在稿里就是「生成中」，从第 1 颗 chip 开始跑，跑完顺次向下 */
     var running = list.querySelector('.cg-card[data-state="running"]');
-    if (running) {
-      var rc = running.querySelectorAll('.cg-chip');
-      pump(running, rc.length > 1 ? 1 : 0);
-    }
-
-    /* 进度条入场：0 → 41.1% */
-    setTimeout(paintBar, 60);
+    paintBar();
+    if (running) pump(running, 0);
 
     list.addEventListener('click', function (e) {
       var ig = e.target.closest ? e.target.closest('[data-cg-ignore]') : null;
       if (!ig) return;
       var card = ig.closest('.cg-card');
       if (card) card.remove();
+      paintBar();
       tip('已忽略该变更点');
     });
   }
+
+  /* ---------- 选择本地仓库：真实调起本地文件夹选择器 ---------- */
+  [].forEach.call(document.querySelectorAll('.cg-pick'), function (btn) {
+    var host = btn.parentNode;
+    var inp = host ? host.querySelector('.cg-dir') : null;
+    if (!inp) return;
+    btn.addEventListener('click', function () { inp.click(); });
+    inp.addEventListener('change', function () {
+      var f = inp.files && inp.files[0];
+      if (!f) return;
+      var rel = f.webkitRelativePath || f.name || '';
+      var name = rel.split('/')[0] || f.name;
+      var t = btn.querySelector('.cg-pick-t');
+      if (t) t.textContent = name;
+      btn.setAttribute('title', name);
+      tip('已选择本地仓库：' + name);
+    });
+  });
 
   /* ---------- 底栏 ---------- */
   var regen = document.getElementById('cgRegen');
   if (regen) {
     regen.addEventListener('click', function () {
       if (timer) clearTimeout(timer);
-      doneCards = 0; pxBase = 0; genBase = 0;
       if (bar) bar.style.width = '0';
-      if (numGen) numGen.textContent = '0/' + TOTAL;
-      if (numWait) numWait.textContent = '0';
       var cards = list ? [].slice.call(list.querySelectorAll('.cg-card')) : [];
       cards.forEach(resetCard);
       setTimeout(function () {

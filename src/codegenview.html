@@ -110,7 +110,8 @@
                 <span class="cg-repo-k">分析代码源：</span>
                 <span class="cg-repo-v is-mag">paa-web</span>
                 <span class="cg-repo-tag is-mag">前端</span>
-                <button class="cg-pick" type="button"><span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M1.6 3.4h3.5l1.2 1.4h6.1c.4 0 .7.3.7.7v5c0 .4-.3.7-.7.7H1.6a.7.7 0 0 1-.7-.7v-6c0-.4.3-.7.7-.7Z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>选择本地仓库</button>
+                <button class="cg-pick" type="button"><span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 48 48" fill="currentColor"><path d="M3 40V8q0-1.66 1.17-2.83Q5.34 4 7 4h12q.6 0 1.16.26.56.26.96.66L24.94 10H41q1.66 0 2.83 1.17Q45 12.34 45 14v26q0 1.66-1.17 2.83Q42.66 44 41 44H7q-1.66 0-2.83-1.17Q3 41.66 3 40Zm38 0V14H24q-.6 0-1.16-.26-.56-.26-.96-.66L18.06 8H7v32h34Z"/><path d="M5 20h38v4H5z"/><path d="M3 16v12a2 2 0 1 0 4 0V16a2 2 0 1 0-4 0Z"/><path d="M41 16v12a2 2 0 1 0 4 0V16a2 2 0 1 0-4 0Z"/></svg></span><span class="cg-pick-t">选择本地仓库</span></button>
+                <input type="file" class="cg-dir" webkitdirectory directory multiple hidden tabindex="-1" aria-hidden="true" />
               </div>
 
               <div class="cg-repo">
@@ -121,7 +122,9 @@
                 <div class="cg-sels">
                   <span class="cg-sel"><span class="cg-sel-t">paa-web · feat/task-1048…</span><span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.8 5.6 7 8.8l3.2-3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
                   <span class="cg-sel is-sm"><span class="cg-sel-t">feat/login-error</span><span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.8 5.6 7 8.8l3.2-3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-                  <button class="cg-pick" type="button"><span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M1.6 3.4h3.5l1.2 1.4h6.1c.4 0 .7.3.7.7v5c0 .4-.3.7-.7.7H1.6a.7.7 0 0 1-.7-.7v-6c0-.4.3-.7.7-.7Z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></span>选择本地仓库</button>
+                  <span class="cg-div" aria-hidden="true"></span>
+                  <button class="cg-pick" type="button"><span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 48 48" fill="currentColor"><path d="M3 40V8q0-1.66 1.17-2.83Q5.34 4 7 4h12q.6 0 1.16.26.56.26.96.66L24.94 10H41q1.66 0 2.83 1.17Q45 12.34 45 14v26q0 1.66-1.17 2.83Q42.66 44 41 44H7q-1.66 0-2.83-1.17Q3 41.66 3 40Zm38 0V14H24q-.6 0-1.16-.26-.56-.26-.96-.66L18.06 8H7v32h34Z"/><path d="M5 20h38v4H5z"/><path d="M3 16v12a2 2 0 1 0 4 0V16a2 2 0 1 0-4 0Z"/><path d="M41 16v12a2 2 0 1 0 4 0V16a2 2 0 1 0-4 0Z"/></svg></span><span class="cg-pick-t">选择本地仓库</span></button>
+                  <input type="file" class="cg-dir" webkitdirectory directory multiple hidden tabindex="-1" aria-hidden="true" />
                 </div>
               </div>
             </div>
@@ -132,41 +135,26 @@
         <section class="cg-prog">
           <div class="cg-prog-head">
             <h3 class="cg-prog-t">生成进度</h3>
-            <p class="cg-prog-s" id="cgStats"><span>已生成 <b id="cgNumGen">2/6</b></span><span class="cg-dotsep">·</span><span>待确认 <b id="cgNumWait">0</b></span><span class="cg-dotsep">·</span><span>已确认 <b id="cgNumOk">1/6</b></span></p>
-            <div class="cg-bar" role="progressbar" aria-label="生成进度" aria-valuemin="0" aria-valuemax="6" aria-valuenow="2"><span class="cg-bar-in" id="cgBar" style="width:0"></span></div>
+            <p class="cg-prog-s" id="cgStats"><span>已生成 <b id="cgNumGen">0/4</b></span><span class="cg-dotsep">·</span><span>待确认 <b id="cgNumWait">0</b></span><span class="cg-dotsep">·</span><span>已确认 <b id="cgNumOk">0/4</b></span></p>
+            <div class="cg-bar" role="progressbar" aria-label="生成进度" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0"><span class="cg-bar-in" id="cgBar" style="width:0"></span></div>
           </div>
 
           <div class="cg-list" id="cgList">
-            <!-- 中风险 · 待确认 -->
-            <article class="cg-card" data-risk="mid" data-state="confirm">
+            <!-- 中风险 · 生成中（带生成流程，第 84 轮：从第一张开始生成） -->
+            <article class="cg-card" data-risk="mid" data-state="running">
               <span class="cg-risk is-mid">中风险</span>
               <div class="cg-card-main">
                 <div class="cg-card-t">
                   <span class="cg-t">补充凭证失效、账号锁定等错误码枚举，并建立错误码到提示文案的映射关系。</span>
-                  <span class="cg-st is-warn">待确认</span>
-                </div>
-                <p class="cg-meta">写入仓库：paa-web · feat/login-error · 1 个文件 · 2 处变更</p>
-              </div>
-              <div class="cg-acts">
-                <button class="cg-act is-line" type="button"><span class="ico ico12" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M7.9 1.9 10.1 4.1 4.3 9.9 1.7 10.3l.4-2.6z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M6.7 3.1 8.9 5.3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>修改</button>
-              </div>
-            </article>
-
-            <!-- 低风险 · 生成中（带生成流程） -->
-            <article class="cg-card" data-risk="low" data-state="running">
-              <span class="cg-risk is-low">低风险</span>
-              <div class="cg-card-main">
-                <div class="cg-card-t">
-                  <span class="cg-t">把登录失败提示从硬编码文案改为统一错误码映射，失败原因直接对用户可读。</span>
                   <span class="cg-st is-run">生成中</span>
                 </div>
                 <p class="cg-meta">写入仓库：paa-web · feat/login-error · 1 个文件 · 2 处变更</p>
                 <div class="cg-flow">
                   <span class="cg-flow-k">生成流程：</span>
                   <span class="cg-flow-in">
-                    <span class="cg-chip is-done" data-chip="0"><span class="ico" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>读取Spec</span>
+                    <span class="cg-chip" data-chip="0">读取Spec</span>
                     <span class="cg-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M4.4 2.4 7.6 6l-3.2 3.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                    <span class="cg-chip is-run" data-chip="1"><span class="ico cg-mini-spin" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1.4a4.6 4.6 0 1 1-3.3 1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>对比现有代码</span>
+                    <span class="cg-chip" data-chip="1">对比现有代码</span>
                     <span class="cg-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M4.4 2.4 7.6 6l-3.2 3.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                     <span class="cg-chip" data-chip="2">生成代码</span>
                     <span class="cg-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M4.4 2.4 7.6 6l-3.2 3.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -177,6 +165,22 @@
                 </div>
               </div>
               <div class="cg-acts">
+                <button class="cg-act is-line" type="button"><span class="ico ico12" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M7.9 1.9 10.1 4.1 4.3 9.9 1.7 10.3l.4-2.6z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M6.7 3.1 8.9 5.3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>修改</button>
+              </div>
+            </article>
+
+            <!-- 低风险 · 待生成 -->
+            <article class="cg-card" data-risk="low" data-state="todo">
+              <span class="cg-risk is-low">低风险</span>
+              <div class="cg-card-main">
+                <div class="cg-card-t">
+                  <span class="cg-t">把登录失败提示从硬编码文案改为统一错误码映射，失败原因直接对用户可读。</span>
+                  <span class="cg-st">待生成</span>
+                </div>
+                <p class="cg-meta">写入仓库：paa-web · feat/login-error · 1 个文件 · 2 处变更</p>
+              </div>
+              <div class="cg-acts">
+                <button class="cg-act" type="button" data-cg-ignore>忽略</button>
                 <button class="cg-act is-line" type="button"><span class="ico ico12" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M7.9 1.9 10.1 4.1 4.3 9.9 1.7 10.3l.4-2.6z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M6.7 3.1 8.9 5.3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>修改</button>
               </div>
             </article>

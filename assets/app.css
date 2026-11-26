@@ -3982,6 +3982,7 @@ body[data-page="codegen"] .stage.is-chat { display: none; }
 .panel-main.is-steps-off .cg-wrap { top: 44px; }
 .cg-col { flex: 1 0 auto; width: 100%; max-width: var(--cg-col); padding-bottom: 24px; }
 
+
 /* ---- ① 子工序条 ---- */
 .cg-head { display: flex; align-items: center; gap: 10px; }
 .cg-step {
@@ -3990,7 +3991,8 @@ body[data-page="codegen"] .stage.is-chat { display: none; }
   background: #F7F7F7; box-shadow: inset 0 0 0 1px #EEEEEE;
 }
 a.cg-step { transition: background var(--cds-motion-duration) var(--cds-motion-ease); }
-a.cg-step:hover { background: #F5F8FF; }
+/* 第 84 轮：已确认的「变更分析」卡 hover 只把底色换成白（稿面卡片自身灰壳保留描边） */
+a.cg-step:hover { background: #FFFFFF; }
 /* 稿：已完成卡仍是灰壳（3154:50594 #F7F7F7/#EEEEEE），当前卡才是浅蓝壳（3154:50576 #F5F8FF/#DAE4FE） */
 .cg-step.is-on { background: #F5F8FF; box-shadow: inset 0 0 0 1px #DAE4FE; }
 .cg-step-no {
@@ -4063,8 +4065,8 @@ a.cg-step:hover { background: #F5F8FF; }
 .cg-set-t { margin: 15px 0 0; font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); }
 .cg-repos { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
 .cg-repo {
-  height: 44px; padding: 0 8px 0 16px; border-radius: 4px;
-  display: flex; align-items: center; gap: 4px;
+  height: auto; min-height: 44px; padding: 7px 8px 7px 16px; border-radius: 4px;
+  display: flex; align-items: center; flex-wrap: wrap; row-gap: 8px; column-gap: 4px;
   background: #F7F7F7; box-shadow: inset 0 0 0 1px #EEEEEE;
 }
 .cg-repo-k { flex: 0 0 auto; font-size: 14px; line-height: 22px; color: #6B6B6B; white-space: nowrap; }
@@ -4083,11 +4085,17 @@ a.cg-step:hover { background: #F5F8FF; }
   flex: 0 0 auto; margin-left: auto; height: 28px; padding: 0 12px; border-radius: 4px;
   display: inline-flex; align-items: center; gap: 4px;
   background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
-  font-size: 14px; line-height: 20px; color: #6B6B6B;
+  font-size: 14px; line-height: 20px; color: var(--cds-text-primary);
   transition: background var(--cds-motion-duration) var(--cds-motion-ease),
-              box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
+              box-shadow var(--cds-motion-duration) var(--cds-motion-ease),
+              color var(--cds-motion-duration) var(--cds-motion-ease);
 }
+/* 稿：按钮文字 text-1(#1F1F1F)，文件夹图标才是 text-2(#6B6B6B) */
+.cg-pick .ico { color: #6B6B6B; transition: color var(--cds-motion-duration) var(--cds-motion-ease); }
 .cg-pick:hover { background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--cds-color-primary); color: var(--cds-color-primary); }
+.cg-pick:hover .ico { color: var(--cds-color-primary); }
+.cg-pick-t { max-width: 168px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cg-dir { display: none; }
 .cg-ck {
   flex: 0 0 auto; margin-left: auto; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
   font-size: 14px; line-height: 22px; color: var(--cds-text-primary); white-space: nowrap; user-select: none;
@@ -4104,17 +4112,20 @@ a.cg-step:hover { background: #F5F8FF; }
   content: ''; width: 8px; height: 4px; margin-top: -2px;
   border-left: 1.4px solid #FFFFFF; border-bottom: 1.4px solid #FFFFFF; transform: rotate(-45deg);
 }
-.cg-sels { margin-left: 8px; min-width: 0; display: flex; align-items: center; gap: 8px; }
+.cg-sels { margin-left: 8px; min-width: 0; display: flex; align-items: center; }
 .cg-sel {
   height: 28px; padding: 0 8px; border-radius: 4px; width: 216px; min-width: 0; flex: 0 1 auto;
   display: inline-flex; align-items: center; gap: 4px;
   background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
   font-size: 14px; line-height: 22px; color: var(--cds-text-primary); white-space: nowrap;
 }
+.cg-sel + .cg-sel { margin-left: 8px; }
 .cg-sel.is-sm { width: 138px; }
 .cg-sel-t { overflow: hidden; text-overflow: ellipsis; }
 .cg-sel .ico { color: var(--cds-text-disabled); flex: 0 0 auto; }
-.cg-sels .cg-pick { margin-left: 16px; }
+/* 稿 3154:52805：两个 select 与「选择本地仓库」之间有一根 1×16 竖间隔线（左 8 右 15） */
+.cg-div { flex: 0 0 auto; width: 1px; height: 16px; margin: 0 15px 0 8px; background: #E5E5E5; }
+.cg-sels .cg-pick { margin-left: 0; }
 
 /* ---- ③ 生成进度 ---- */
 .cg-prog { margin-top: 24px; }
@@ -4164,9 +4175,10 @@ a.cg-step:hover { background: #F5F8FF; }
 .cg-st.is-run { color: var(--cds-color-primary); background: #FFFFFF; box-shadow: inset 0 0 0 1px #DAE4FE; }
 .cg-st.is-warn { color: #FF7D00; background: #FFF7E8; box-shadow: inset 0 0 0 1px #FFE4BA; }
 .cg-meta { margin: 4px 0 0; font-size: 12px; line-height: 22px; color: #868686; }
-.cg-flow { margin-top: 5px; display: flex; align-items: center; gap: 0; }
+.cg-flow { margin-top: 5px; display: flex; align-items: flex-start; gap: 0; }
 .cg-flow-k { flex: 0 0 auto; font-size: 12px; line-height: 22px; color: #868686; }
-.cg-flow-in { display: flex; align-items: center; }
+/* 中栏被 AI 对话栏挤窄时 chip 折行，不再被卡片裁掉 */
+.cg-flow-in { display: flex; align-items: center; flex-wrap: wrap; row-gap: 4px; min-width: 0; }
 .cg-chip {
   height: 22px; padding: 0 8px; border-radius: 4px;
   display: inline-flex; align-items: center; gap: 4px;
@@ -4193,6 +4205,24 @@ a.cg-step:hover { background: #F5F8FF; }
 }
 .cg-act.is-line:hover { background: #FAFAFA; }
 .cg-act .ico { width: 12px; height: 12px; display: inline-flex; }
+
+/* 第 84 轮：本页补了右栏 AI 对话栏（450），中栏收窄到 ~640：
+   子工序条改为上下两块（箭头隐藏），设置区与流程条内边距收紧，保证不裁字、不溢出 */
+.cg-wrap { container-type: inline-size; }
+@container (max-width: 940px) {
+  .cg-head { flex-wrap: wrap; row-gap: 8px; }
+  .cg-step { flex: 1 1 100%; width: auto; padding: 0 12px; }
+  .cg-step + .cg-arrow + .cg-step { flex: 1 1 auto; }
+  .cg-head .cg-arrow { display: none; }
+  .cg-set-body { padding: 16px; }
+  /* 折行时箭头会孤零零挂在行首，窄栏改「chip + 6px 间距」表达顺序 */
+  .cg-flow-in { column-gap: 6px; }
+  .cg-flow-in .cg-chev { display: none; }
+  /* 再窄（~400）时：生成方式一行放不下就折行，各标签整体不拆字，底栏按钮也不换行 */
+  .cg-method { height: auto; flex-wrap: wrap; row-gap: 8px; }
+  .cg-k, .cg-radio, .cg-pick-t, .cg-foot .cg-btn { white-space: nowrap; }
+  .cg-foot { gap: 8px; }
+}
 
 /* ---- ④ 底栏 ---- */
 .cg-foot {

@@ -116,10 +116,11 @@ const summary = wrap({
 });
 
 /* ---------- 5 代码生成与确认页：第 5 道「代码开发」确认变更范围之后 ---------- */
+/* 第 84 轮：补上右栏 AI 对话栏（与任务页/UI设计页同一片段） */
 const codegen = wrap({
   title: 'Cecoder · 代码生成与确认',
   page: 'codegen',
-  body: chrome(pmChat, P.tasktop + P.codegenview, stageChat, '', '', ''),
+  body: chrome(pmChat, P.tasktop + P.codegenview, stageChat, '', P.aiside, ''),
 });
 
 for (const [name, html] of [

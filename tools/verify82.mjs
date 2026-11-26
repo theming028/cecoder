@@ -71,7 +71,8 @@ const R = (p, s) => p.evaluate(sel => { const e = document.querySelector(sel); i
 
 /* ============ C 代码生成与确认页 ============ */
 {
-  const p = await mk('cecoder-codegen.html', 1440, 1000);
+  /* 第 84 轮：右栏补了 AI 450，按设计稿宽度 1094 验收（1920 视口） */
+  const p = await mk('cecoder-codegen.html', 1920, 1080);
   const c = await p.evaluate(() => {
     const col = document.querySelector('.cg-col').getBoundingClientRect();
     const f = s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return [Math.round(r.x - col.x), Math.round(r.y - col.y), Math.round(r.width), Math.round(r.height)]; };
@@ -103,13 +104,13 @@ const R = (p, s) => p.evaluate(sel => { const e = document.querySelector(sel); i
   ok('C3 已完成那块右侧挂「已确认」', c.tag === '已确认', c.tag);
   ok('C4 生成设置卡 1094×262，头 36', c.set[2] === 1094 && c.set[3] === 262 && c.setHead[3] === 36, [c.set, c.setHead].join(' '));
   ok('C5 两行仓库各 1044×44', c.repos.length === 2 && c.repos.every(r => r[1] === 44 && r[2] === 1044), JSON.stringify(c.repos));
-  ok('C6 生成进度块 427（稿 426）、进度条 6 高、填充 450',
-    Math.abs(c.prog[3] - 426) <= 1 && c.bar[3] === 6 && Math.abs(c.barIn - 450) <= 2, [c.prog[3], c.bar[3], c.barIn].join('/'));
-  ok('C7 统计文案与稿一致（小圆点间距由 CSS 给）', c.stats.replace(/\s+/g, '') === '已生成2/6·待确认0·已确认1/6', c.stats);
-  ok('C8 四张卡 80/106/80/80，纵向 418/506/620/708',
-    JSON.stringify(c.cards.map(x => [x[0], x[1]])) === JSON.stringify([[418, 80], [506, 106], [620, 80], [708, 80]]),
+  ok('C6 生成进度块 427（稿 426）、进度条 6 高、起手从 0 开始涨',
+    Math.abs(c.prog[3] - 426) <= 1 && c.bar[3] === 6 && c.barIn < 80, [c.prog[3], c.bar[3], c.barIn].join('/'));
+  ok('C7 统计文案（第 84 轮起从 0 开始，总数 = 卡数 4）', c.stats.replace(/\s+/g, '') === '已生成0/4·待确认0·已确认0/4', c.stats);
+  ok('C8 四张卡 106/80/80/80（第一张即生成中），纵向 418 起',
+    JSON.stringify(c.cards.map(x => [x[0], x[1]])) === JSON.stringify([[418, 106], [532, 80], [620, 80], [708, 80]]),
     JSON.stringify(c.cards));
-  ok('C9 风险徽标与状态文案齐全', c.risks.join('/') === '中风险/低风险/高风险/低风险' && c.states.join('/') === '待确认/生成中/待生成/待生成', c.risks.join('/') + ' | ' + c.states.join('/'));
+  ok('C9 风险徽标与状态文案齐全', c.risks.join('/') === '中风险/低风险/高风险/低风险' && c.states.join('/') === '生成中/待生成/待生成/待生成', c.risks.join('/') + ' | ' + c.states.join('/'));
   ok('C10 生成流程 5 步（读取Spec/对比现有代码/生成代码/规则检查/核对Spec）',
     c.chips.join('/') === '读取Spec/对比现有代码/生成代码/规则检查/核对Spec', c.chips.join('/'));
   ok('C11 底栏 = 代码生成中（禁用，带转圈）+ 全部重新生成',

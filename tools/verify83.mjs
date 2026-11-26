@@ -11,7 +11,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 const p = await b.newPage(); p.__e = [];
 p.on('pageerror', e => p.__e.push('pageerror: ' + e.message));
 p.on('console', m => { if (m.type() === 'error') p.__e.push('console: ' + m.text()); });
-await p.setViewport({ width: 1440, height: 1000 });
+await p.setViewport({ width: 1920, height: 1080 });
 await p.goto('file:///' + BASE + '/cecoder-codegen.html', { waitUntil: 'load' });
 
 /* ---------- A 子工序条：第 2 步为当前 + 差异对比 ---------- */
@@ -98,15 +98,15 @@ const d = await p.evaluate(() => {
 });
 ok('D1 统计里的「·」左右各 8px', d.n === 2 && d.ml === '8px' && d.mr === '8px', JSON.stringify([d.n, d.ml, d.mr]));
 ok('D2 标签灰 #868686、数字深 #1F1F1F', d.label === 'rgb(134, 134, 134)' && d.num === 'rgb(31, 31, 31)', JSON.stringify([d.label, d.num]));
-/* 另开一页：load 瞬间读 0，再等 700ms 读 450 */
+/* 另开一页：load 瞬间读 0，再等 800ms 读已推进的宽度 */
 const p2 = await b.newPage();
-await p2.setViewport({ width: 1440, height: 1000 });
+await p2.setViewport({ width: 1920, height: 1080 });
 await p2.goto('file:///' + BASE + '/cecoder-codegen.html', { waitUntil: 'domcontentloaded' });
 const d0 = await p2.evaluate(() => document.querySelector('.cg-bar-in').style.width || 'auto');
 await wait(800);
 const d2 = await p2.evaluate(() => Math.round(document.querySelector('.cg-bar-in').getBoundingClientRect().width));
 await p2.close();
-ok('D3 进度条入场从 0 动到 450px（41.1%）', parseFloat(d0) === 0 && Math.abs(d2 - 450) <= 2, d0 + ' → ' + d2);
+ok('D3 进度条从 0 起步、随卡片生成推进', parseFloat(d0) === 0 && d2 > 20, d0 + ' → ' + d2);
 
 /* ---------- E 生成中的卡 = 稿面样式 ---------- */
 await wait(1200);
@@ -140,7 +140,7 @@ ok('E5 生成中只留「修改」，不给「忽略」', e1.ignore === false, S
 /* ---------- F 逐张生成：卡内逐颗点亮 → 整卡转待确认 → 下一张 ---------- */
 const p3 = await b.newPage(); p3.__e = [];
 p3.on('pageerror', e => p3.__e.push(e.message));
-await p3.setViewport({ width: 1440, height: 1000 });
+await p3.setViewport({ width: 1920, height: 1080 });
 await p3.goto('file:///' + BASE + '/cecoder-codegen.html', { waitUntil: 'load' });
 const snap = () => p3.evaluate(() => [...document.querySelectorAll('.cg-card')].map(c => {
   const chips = [...c.querySelectorAll('.cg-chip')];
@@ -151,23 +151,23 @@ const f1 = await snap();
 await wait(2000);
 const f2 = await snap();
 ok('F1 卡内 5 颗 chip 依次点亮（同一张卡的 done 数随时间递增）',
-  f1[1].s === 'running' && f1[1].run === 1 && f2[1].s === 'running' && f2[1].done > f1[1].done,
-  JSON.stringify([f1[1], f2[1]]));
+  f1[0].s === 'running' && f1[0].run === 1 && f2[0].s === 'running' && f2[0].done > f1[0].done,
+  JSON.stringify([f1[0], f2[0]]));
 ok('F2 同时只有一张在生成，且自上而下推进（前面已转待确认、后面还在等）',
-  f2.filter(x => x.s === 'running').length === 1 && f2.findIndex(x => x.s === 'running') >= 1 &&
+  f2.filter(x => x.s === 'running').length === 1 && f2.findIndex(x => x.s === 'running') >= 0 &&
   f2.slice(0, f2.findIndex(x => x.s === 'running')).every(x => x.s === 'confirm') &&
   f2.slice(f2.findIndex(x => x.s === 'running') + 1).every(x => x.s === 'todo'),
   JSON.stringify(f2));
-await wait(11000);
+await wait(16000);
 const f3 = await p3.evaluate(() => ({
   cards: [...document.querySelectorAll('.cg-card')].map(c => [c.dataset.state, Math.round(c.getBoundingClientRect().height), c.querySelector('.cg-st').textContent, !!c.querySelector('.cg-flow')]),
   stats: document.getElementById('cgStats').textContent.replace(/\s+/g, ''),
   bar: Math.round(document.querySelector('.cg-bar-in').getBoundingClientRect().width),
 }));
-ok('F3 全部跑完：四张都转「待确认」、flow 收起回 80 高、进度条收尾 900px',
-  f3.cards.every(x => x[0] === 'confirm' && x[1] === 80 && x[2] === '待确认' && x[3] === false) && Math.abs(f3.bar - 900) <= 2,
-  JSON.stringify(f3.cards));
-ok('F4 统计随生成推进（已生成 5/6 · 待确认 3）', f3.stats === '已生成5/6·待确认3·已确认1/6', f3.stats);
+ok('F3 全部跑完：四张都转「待确认」、flow 收起回 80 高、进度条跑满',
+  f3.cards.every(x => x[0] === 'confirm' && x[1] === 80 && x[2] === '待确认' && x[3] === false) && Math.abs(f3.bar - 1094) <= 1,
+  JSON.stringify([f3.cards, f3.bar]));
+ok('F4 统计随生成推进（已生成 4/4 · 待确认 4 · 已确认 0/4）', f3.stats === '已生成4/4·待确认4·已确认0/4', f3.stats);
 ok('F5 A→F 期间无脚本报错（续跑页）', p3.__e.length === 0, p3.__e.join(' | '));
 await p3.close();
 
