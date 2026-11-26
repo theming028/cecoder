@@ -48,7 +48,12 @@
   --cds-page-grad: linear-gradient(180deg, #B2D0F9 0%, #D4E6FF 58%, #D5D4FD 100%);
   --cds-glass: rgba(255, 255, 255, .6);
   --cds-glass-hover: rgba(255, 255, 255, .85);
-  --cds-tb-ink: #455973;         /* 顶栏文字/图标（稿件 textColor paint_3119:45447） */
+  /* 第 79 轮：顶栏控件按新稿（3395:63207 / 3395:63223 / 3395:63224）改「磨砂白 + 淡蓝描边」
+     常态 rgba(255,255,255,.5)、首页按钮 rgba(255,255,255,.8)、描边 #C5D7F0、文字 #1F1F1F */
+  --cds-glass-soft: rgba(255, 255, 255, .5);
+  --cds-glass-strong: rgba(255, 255, 255, .8);
+  --cds-glass-line: #C5D7F0;
+  --cds-tb-ink: #1F1F1F;         /* 顶栏文字/图标（第 79 轮稿件 textColor #1F1F1F） */
   /* 第 60 轮：「待确认」卡的行走虚线（原 1px 实线 #FFE4BA 线索太浅，虚线位移看不出来，深一档） */
   --cds-dash-todo: #FFB259;
 }
@@ -163,28 +168,38 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .tb-traffic .t-yellow { background: var(--cds-color-warning); }
 .tb-traffic .t-green { background: var(--cds-color-success); }
 
-/* 工作空间切换 @(88,8) 178x32 */
-/* 注意：.cds-dd 的 position:relative 定义在文件后部，同权重会被后者覆盖，
-   导致 .tb-ws 变成整行宽的相对定位块（下拉因此撑到 1440 宽）。这里提高特异性锁死绝对定位。 */
-.tb .cds-dd.tb-ws { position: absolute; left: 88px; top: 8px; }
+/* 左上按钮组 @(88,8)：工作空间切换 + 首页入口（稿 3395:63223 / 3395:63224，间距 8）
+   第 79 轮：两块都换成「磨砂白胶囊 + 1px #C5D7F0 描边 + blur15」，文字由 #455973 改 #1F1F1F */
+.tb-left { position: absolute; left: 88px; top: 8px; display: flex; align-items: center; gap: 8px; }
+.tb .cds-dd.tb-ws { position: relative; }
 .tb-ws-btn {
   display: inline-flex; align-items: center; gap: 8px;
-  /* 第 16 轮：宽度随选中的工作空间名自适应（去掉稿件定宽 178），封顶 272 防撞居中的分段控件
-     第 39 轮：按稿件改成「磨砂白胶囊」—— 半透明白 + blur15 + 无描边，文字 #455973 */
-  height: 32px; padding: 0 6px; border-radius: 8px;
-  background: var(--cds-glass); border: 0;
+  /* 第 16 轮：宽度随选中的工作空间名自适应（去掉稿件定宽 178），封顶 272 防撞居中的分段控件 */
+  height: 32px; padding: 5px 6px; border-radius: 8px;
+  background: var(--cds-glass-soft); border: 1px solid var(--cds-glass-line);
   -webkit-backdrop-filter: blur(15px); backdrop-filter: blur(15px);
   color: var(--cds-tb-ink);
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.tb-ws-btn:hover { background: var(--cds-glass-hover); }
+.tb-ws-btn:hover { background: var(--cds-glass-strong); }
 .tb-ws-avatar {
   width: 20px; height: 20px; border-radius: 4px; flex: 0 0 20px;
   background: #3491FA; color: var(--cds-text-inverse);
   font-size: 12px; font-weight: 500; line-height: 20px; text-align: center;
 }
-.tb-ws-btn .tb-ws-name { flex: 0 1 auto; max-width: 224px; font-size: 14px; line-height: 22px; text-align: left; white-space: nowrap; overflow: hidden; color: var(--cds-tb-ink); }
+.tb-ws-btn .tb-ws-name { flex: 0 1 auto; max-width: 224px; font-size: 14px; font-weight: 500; line-height: 22px; text-align: left; white-space: nowrap; overflow: hidden; color: var(--cds-tb-ink); }
 .tb-ws-caret { color: #868686; margin-left: -4px; }
+/* 首页入口 72×32：底色比旁边两个白一档（稿 rgba(255,255,255,.8)），图标 14、文字 14/500 */
+.tb-home {
+  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 7px 12px;
+  border-radius: 8px; background: var(--cds-glass-strong); border: 1px solid var(--cds-glass-line);
+  -webkit-backdrop-filter: blur(15px); backdrop-filter: blur(15px);
+  font-size: 14px; font-weight: 500; line-height: 22px; color: var(--cds-tb-ink);
+  text-decoration: none; white-space: nowrap;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tb-home:hover { background: #FFFFFF; }
+.tb-home .ico { color: var(--cds-tb-ink); }
 
 /* 分段控件 300x32，水平居中；三按钮 120/88/88（padding 16，无间距，取自任务-3 的 radio-button-group）
    选中底板用独立 .seg-pill 做「滑动」——底板位移动画，按钮本身只换字重，所以切换有滑动感 */
@@ -217,14 +232,14 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 /* 右侧按钮：贴面板右缘 */
 .tb-actions { position: absolute; right: var(--cds-gutter); top: 8px; display: flex; gap: 8px; }
 .tb-btn {
-  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px;
-  /* 第 39 轮：同「磨砂白胶囊」—— 半透明白 + blur15 + 无描边，文字 #455973 */
-  border-radius: 8px; background: var(--cds-glass); border: 0;
+  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 7px 12px;
+  /* 第 79 轮：与工作空间同一套「磨砂白胶囊 + 1px #C5D7F0 描边」，内距 7/12、文字 #1F1F1F */
+  border-radius: 8px; background: var(--cds-glass-soft); border: 1px solid var(--cds-glass-line);
   -webkit-backdrop-filter: blur(15px); backdrop-filter: blur(15px);
   font-size: 14px; font-weight: 500; line-height: 22px; color: var(--cds-tb-ink);
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.tb-btn:hover { background: var(--cds-glass-hover); } /* 第 16 轮：顶栏 hover 底色统一改白（工作空间 / 使用帮助 / 设置） */
+.tb-btn:hover { background: var(--cds-glass-strong); } /* 第 16 轮：顶栏 hover 底色统一改白（工作空间 / 使用帮助 / 设置） */
 
 /* ===== 侧边栏折叠按钮：panel 内容区左上 (16,56) 28x28 ===== */
 .menu-btn {
@@ -985,6 +1000,38 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .c-card:focus-within {
   border-color: var(--cds-line-hover);
   box-shadow: 0 0 0 4px rgba(0, 0, 0, .05);
+}
+
+/* ===== 第 79 轮：输入卡外圈的彩色流光（照搬 allan.xin 的 .ai-search-beam / .ai-color-wave）
+   做法：一张 160% 宽的 conic-gradient 圆盘在遮罩里自转；遮罩用「内容盒 + 整体」两层异或，
+   只留下 1.5px 的边，再 blur(2px) 柔化居中；--sharp 那层 1px / blur(.2px) 压一道实边。 ===== */
+.c-beam {
+  position: absolute; left: -1px; right: -1px; top: -1px; z-index: 2;
+  height: calc(var(--ci-h, 46px) + 84px + var(--c-tag-h, 0px));
+  border-radius: 9px; pointer-events: none;
+}
+.c-wave {
+  position: absolute; inset: 0; border-radius: inherit; overflow: hidden;
+  padding: 1.5px; filter: blur(2px); opacity: .55;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+.c-wave--sharp { padding: 1px; filter: blur(.2px); opacity: .78; }
+.c-wave::before {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 160%; aspect-ratio: 1; border-radius: 50%;
+  background: conic-gradient(transparent 0 .12turn, #3186ff .34turn, #9378ff .38turn,
+    #f96bd6 .42turn, #fc413d .46turn, #ff6b2b .5turn, #fec700 .54turn,
+    #0ebc5f .62turn, #00a9bb .68turn, #3186ff .73turn, transparent .82turn);
+  transform: translate(-50%, -50%) rotate(-110deg);
+  animation: c-color-sweep 2100ms linear infinite;
+  will-change: transform;
+}
+@keyframes c-color-sweep { to { transform: translate(-50%, -50%) rotate(250deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .c-wave::before { animation: none; }
 }
 .c-input {
   position: absolute; left: 11px; right: 11px; top: calc(11px + var(--c-tag-h, 0px));
