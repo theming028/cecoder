@@ -2917,6 +2917,132 @@ body.is-focus[data-page="task"] .tp-wrap { top: 40px; }
 .tp-primary:active { background: #2A58C4; }
 
 /* ============================================================
+   第 76 轮：变更分析完成态（稿 3376:53726）
+   ① 输入区收成一条「资料输入」+ 右侧状态摘要
+   ② 下方「变更点（N 个）」列表：风险徽标 + 描述 + 写入范围 + 操作
+   ③ 底部换成「全部重新分析 / 确认变更范围，开始生成代码」
+   ============================================================ */
+.tp-body-head { display: flex; align-items: center; }
+.tp-body-head .tp-sect { flex: 1 1 auto; min-width: 0; }
+/* 状态摘要：浅橙底 + 橙字，只在完成态出现 */
+.tp-body-status {
+  flex: 0 0 auto; height: 20px; margin-right: 12px; padding: 0 6px; border-radius: 4px;
+  display: inline-flex; align-items: center; white-space: nowrap;
+  background: #FFF6E0; box-shadow: inset 0 0 0 1px #FFE4BA;
+  font-size: 12px; line-height: 20px; color: #E37318;
+}
+.tp-body-status[hidden] { display: none; }
+/* 完成态：容器收成一条 40 高的灰条，圆角 8，与列表拉开 */
+.tp-wrap.is-analyzed .tp-body { margin-bottom: 0; border-radius: 8px; }
+.tp-wrap.is-analyzed .tp-body-head { flex-basis: 40px; }
+
+/* ---- ① 变更点列表 ---- */
+.tp-chg { width: 100%; max-width: var(--tp-col); margin: 20px 0 8px; }
+.tp-chg[hidden] { display: none; }
+.tp-chg:not([hidden]) { animation: tpChgIn .26s cubic-bezier(.22, .9, .24, 1) both; }
+@keyframes tpChgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.tp-chg-title { margin: 0 0 2px; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--cds-text-primary); }
+.tp-chg-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+/* 说明只占一行，栏窄时省略，别把「按实现时间排序」挤到第二行 */
+.tp-chg-sub {
+  flex: 1 1 auto; min-width: 0; margin: 0;
+  font-size: 13px; line-height: 20px; color: var(--cds-text-tertiary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tp-chg-sort {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px; height: 24px;
+  padding: 0 4px; border-radius: 4px; font-size: 12px; line-height: 20px;
+  color: var(--cds-text-secondary);
+  transition: color var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-chg-sort:hover { color: var(--cds-color-primary); }
+
+/* 添加变更点：浅蓝底 + 虚线蓝边 */
+.tp-chg-add {
+  display: flex; align-items: center; gap: 10px; width: 100%; height: 44px;
+  margin-top: 14px; padding: 0 14px; text-align: left;
+  border: 1px dashed #B7CBF8; border-radius: 6px; background: #F5F8FF;
+  transition: border-color var(--cds-motion-duration) var(--cds-motion-ease),
+              background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-chg-add:hover { border-color: var(--cds-color-primary); background: #EEF3FF; }
+.tp-chg-add-p { font-size: 16px; line-height: 1; color: var(--cds-color-primary); }
+.tp-chg-add b { font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-color-primary); }
+.tp-chg-add-h { font-size: 13px; line-height: 20px; color: var(--cds-text-tertiary); }
+
+/* ---- ② 单条变更点 ---- */
+.tp-chg-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.tp-chg-sep { height: 1px; margin: 2px 0; background: #EEEEEE; }
+.cp {
+  display: flex; align-items: flex-start; flex-wrap: wrap; gap: 10px 12px;
+  padding: 14px 16px; border: 1px solid #EEEEEE; border-radius: 8px; background: #FFFFFF;
+  transition: border-color .18s var(--cds-motion-ease), background .18s var(--cds-motion-ease);
+}
+.cp:hover { border-color: #DCE3EE; }
+.cp-risk {
+  flex: 0 0 auto; height: 22px; padding: 0 8px; border-radius: 4px;
+  display: inline-flex; align-items: center;
+  font-size: 12px; line-height: 20px; white-space: nowrap;
+}
+.cp-risk.is-low { background: #ECF7EC; box-shadow: inset 0 0 0 1px #D0F0D1; color: #30953B; }
+.cp-risk.is-mid { background: #FFF7E8; box-shadow: inset 0 0 0 1px #FFE4BA; color: #FF7D00; }
+.cp-risk.is-high { background: #FFECE8; box-shadow: inset 0 0 0 1px #FDCDC5; color: #F53F3F; }
+/* 栏宽不足（右栏展开时内容列会被压到 600 上下）时，操作按钮换到第二行右对齐 */
+.cp-main { flex: 1 1 320px; min-width: 0; }
+.cp-title { margin: 0; font-size: 14px; line-height: 22px; color: var(--cds-text-primary); }
+.cp-meta { margin: 2px 0 0; font-size: 13px; line-height: 20px; color: var(--cds-text-tertiary); }
+.cp-link { color: var(--cds-color-link); }
+.cp-link:hover { text-decoration: underline; }
+.cp-dot { margin: 0 6px; color: var(--cds-text-disabled); }
+.cp-note { margin: 6px 0 0; font-size: 13px; line-height: 20px; }
+.cp[data-risk="low"] .cp-note { color: var(--cds-text-tertiary); }
+.cp[data-risk="mid"] .cp-note { color: #FF7D00; }
+.cp[data-risk="high"] .cp-note { color: #F53F3F; }
+.cp-acts { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.cp-btn {
+  height: 28px; padding: 0 10px; border-radius: 4px;
+  display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+  border: 1px solid #E5E5E5; background: #FFFFFF;
+  font-size: 13px; line-height: 20px; color: var(--cds-text-secondary);
+  transition: border-color .16s var(--cds-motion-ease), color .16s var(--cds-motion-ease),
+              background .16s var(--cds-motion-ease);
+}
+.cp-btn:hover { border-color: #C9C9C9; color: var(--cds-text-primary); }
+.cp-btn--pri { border-color: #DAE4FE; background: #F5F8FF; color: var(--cds-color-primary); }
+.cp-btn--pri:hover { border-color: #B7CBF8; background: #EEF3FF; color: var(--cds-color-primary); }
+.cp-caret { color: var(--cds-text-tertiary); transition: transform .18s var(--cds-motion-ease); }
+.cp.is-range-off .cp-caret { transform: rotate(180deg); }
+/* 已忽略：整卡转灰，只留「恢复」 */
+.cp.is-ignored { background: #FAFAFA; border-color: #F0F0F0; }
+.cp.is-ignored .cp-title, .cp.is-ignored .cp-meta, .cp.is-ignored .cp-note { color: var(--cds-text-disabled); }
+.cp.is-ignored .cp-risk { background: #F2F3F5; box-shadow: inset 0 0 0 1px #E9EAEC; color: var(--cds-text-tertiary); }
+.cp.is-ignored [data-cp-evidence],
+.cp.is-ignored [data-cp-ignore],
+.cp.is-ignored [data-cp-range] { display: none; }
+[data-cp-restore] { display: none; }
+.cp.is-ignored [data-cp-restore] { display: inline-flex; }
+.cp.is-range-off .cp-meta, .cp.is-range-off .cp-note { display: none; }
+
+/* ---- ③ 底部双按钮 ---- */
+.tp-foot { gap: 12px; }
+.tp-ghost {
+  height: 36px; padding: 0 14px; border-radius: 4px;
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid #B7CBF8; background: #FFFFFF;
+  font-size: 14px; line-height: 22px; color: var(--cds-color-primary);
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease),
+              border-color var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-ghost:hover { background: #F5F8FF; border-color: var(--cds-color-primary); }
+.tp-primary--wide { padding: 0 24px; }
+.tp-ghost[hidden], .tp-primary[hidden] { display: none; }
+
+/* 步骤卡：已完成（勾选）/ 当前的外圈 */
+.tp-step.is-done { background: #FFFFFF; box-shadow: inset 0 0 0 1px #EEEEEE; }
+.tp-step.is-done .tp-step-no { color: var(--cds-color-primary); background: #EAF0FE; box-shadow: none; }
+.tp-step.is-done:hover { background: #FFFFFF; box-shadow: inset 0 0 0 1px #EEEEEE; }
+
+/* ============================================================
    第 49 轮：文字说明弹窗（480 宽，多行文本框 + 保存关闭）
    ============================================================ */
 .tp-dlg {
