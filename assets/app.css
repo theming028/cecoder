@@ -2451,7 +2451,8 @@ body[data-page="task"] .stage > .version { display: none; }
 .ts-item.is-done .ts-name { font-weight: 500; }
 /* 第 77 轮：工序链末步「任务总结」改成链接（点进任务总结工序页），补 a 的默认样式与悬停 */
 a.ts-item { text-decoration: none; color: inherit; }
-a.ts-item:hover .ts-name, a.ts-item:focus-visible .ts-name { color: var(--cds-color-primary); }
+/* 待开始项的 #6B6B6B 规则是 0,4,0，这里补到 0,4,1 才盖得住 */
+a.ts-item.ts-go:hover .ts-name, a.ts-item.ts-go:focus-visible .ts-name { color: var(--cds-color-primary); }
 a.ts-item:focus-visible { outline: none; }
 /* 第 46 轮：状态色按稿 —— 当前主色、进行中橙、其余灰；未开始的工序名降一级到 #6B6B6B */
 .ts-item.is-now .ts-state { color: var(--cds-color-primary); }
