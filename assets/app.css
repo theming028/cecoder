@@ -822,6 +822,8 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 }
 .qf-step:hover { color: var(--cds-text-primary); }
 .qf-step.is-active { color: var(--cds-text-primary); }
+/* 第 77 轮：末步「任务总结」可点，直接进任务总结工序页 */
+.qf-step[data-go="summary"] { cursor: pointer; }
 /* 序号与工序名之间不再有竖线分隔（第 13 轮去掉 qf-sep），靠 3px 外边距留气口 */
 .qf-no { font-variant-numeric: tabular-nums; margin-right: 3px; }
 /* 工序名一律用正文色（序号仍是三级灰，激活态靠底色/阴影区分） */
@@ -2447,6 +2449,10 @@ body[data-page="task"] .stage > .version { display: none; }
 .ts-item.is-now .ts-name { font-weight: 500; }
 /* 第 59 轮：已完成阶段的工序名也按中粗 500（原来只有 is-now 加粗，is-done 掉回 400） */
 .ts-item.is-done .ts-name { font-weight: 500; }
+/* 第 77 轮：工序链末步「任务总结」改成链接（点进任务总结工序页），补 a 的默认样式与悬停 */
+a.ts-item { text-decoration: none; color: inherit; }
+a.ts-item:hover .ts-name, a.ts-item:focus-visible .ts-name { color: var(--cds-color-primary); }
+a.ts-item:focus-visible { outline: none; }
 /* 第 46 轮：状态色按稿 —— 当前主色、进行中橙、其余灰；未开始的工序名降一级到 #6B6B6B */
 .ts-item.is-now .ts-state { color: var(--cds-color-primary); }
 .ts-item.is-running .ts-state { color: #F77234; }

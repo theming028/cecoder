@@ -67,11 +67,12 @@
             <span class="ts-name">提交流水线</span>
             <span class="ts-state">待开始</span>
           </div>
-          <div class="ts-item" data-step="9">
+          <!-- 第 77 轮：工序链最后一步改成「任务总结」，点它进任务总结工序页 -->
+          <a class="ts-item ts-go" href="cecoder-summary.html?id=0" data-step="9">
             <span class="ts-icon">9</span>
-            <span class="ts-name">交付确认</span>
+            <span class="ts-name">任务总结</span>
             <span class="ts-state">待开始</span>
-          </div>
+          </a>
           <span class="ts-link is-on"></span>
           <span class="ts-link is-on"></span>
           <span class="ts-link is-on"></span>
@@ -157,8 +158,10 @@
       <div class="tp-body is-open" id="tpBody">
         <div class="tp-body-head">
           <button class="tp-sect" type="button" aria-expanded="true" data-tp-toggle="body">
-            <span class="ico ico14 tp-sect-caret" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.2 5.2 7 9l3.8-3.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>变更分析
+            <span class="ico ico14 tp-sect-caret" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.2 5.2 7 9l3.8-3.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span id="tpBodyT">变更分析</span>
           </button>
+          <!-- 第 76 轮：分析完成后这一条收起来，右侧挂一条状态摘要（稿 3376:53726） -->
+          <span class="tp-body-status" id="tpBodyStatus" hidden>建议补充 1 项 · 已就绪 1/2</span>
         </div>
 
         <div class="tp-body-in">
@@ -300,5 +303,102 @@
         </div>
       </div>
 
-      <div class="tp-foot"><button class="tp-primary" type="button">开始变更分析</button></div>
+      <!-- ============================================================
+           第 76 轮：变更分析完成态（稿 3376:53726）
+           点「开始变更分析」→ 上面的输入区收成「资料输入」一条，
+           下面列出变更点（风险级别 + 描述 + 写入范围 + 逐条操作）
+           ============================================================ -->
+      <section class="tp-chg" id="tpChg" hidden>
+        <h3 class="tp-chg-title">变更点<span class="tp-chg-count" id="tpChgCount">（4个）</span></h3>
+        <div class="tp-chg-bar">
+          <p class="tp-chg-sub">按仓库与文件夹查看变更文件。每个文件列出新增内容、修改位置与方式，或删除原因。</p>
+          <button class="tp-chg-sort" type="button" id="tpChgSort"><span id="tpChgSortT">按实现时间排序</span><span class="ico ico12" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.6 4.6 6 8l3.4-3.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+        </div>
+
+        <button class="tp-chg-add" type="button" id="tpChgAdd">
+          <span class="tp-chg-add-p" aria-hidden="true">+</span><b>添加变更点</b>
+          <span class="tp-chg-add-h">用提示词描述需要补充的变更，交给 AI 补全</span>
+        </button>
+
+        <div class="tp-chg-list" id="tpChgList">
+        <article class="cp" data-risk="low" data-cp-id="1">
+          <span class="cp-risk is-low">低风险</span>
+          <div class="cp-main">
+            <p class="cp-title">把登录失败提示从硬编码文案改为统一错误码映射，失败原因直接对用户可读。</p>
+            <p class="cp-meta">写入仓库：<span class="cp-link">paa-web</span><span class="cp-dot">·</span><span class="cp-link">feat/login-error</span><span class="cp-dot">·</span>1 个文件<span class="cp-dot">·</span>2 处变更</p>
+          </div>
+          <div class="cp-acts">
+            <button class="cp-btn cp-btn--pri" type="button" data-cp-evidence>变更点证据链</button>
+            <button class="cp-btn" type="button" data-cp-ignore>忽略</button>
+            <button class="cp-btn" type="button" data-cp-range><span class="cp-range-t">收起</span><span class="ico ico12 cp-caret" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.6 7.4 6 4l3.4 3.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+            <button class="cp-btn" type="button" data-cp-restore>恢复</button>
+          </div>
+        </article>
+
+        <article class="cp" data-risk="mid" data-cp-id="2">
+          <span class="cp-risk is-mid">中风险</span>
+          <div class="cp-main">
+            <p class="cp-title">补充凭证失效、账号锁定等错误码枚举，并建立错误码到提示文案的映射关系。</p>
+            <p class="cp-meta">写入仓库：<span class="cp-link">paa-web</span><span class="cp-dot">·</span><span class="cp-link">feat/login-error</span><span class="cp-dot">·</span>1 个文件<span class="cp-dot">·</span>2 处变更</p>
+            <p class="cp-note">风险说明：文案替换，影响局部。</p>
+          </div>
+          <div class="cp-acts">
+            <button class="cp-btn cp-btn--pri" type="button" data-cp-evidence>变更点证据链</button>
+            <button class="cp-btn" type="button" data-cp-ignore>忽略</button>
+            <button class="cp-btn" type="button" data-cp-range><span class="cp-range-t">收起</span><span class="ico ico12 cp-caret" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.6 7.4 6 4l3.4 3.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+            <button class="cp-btn" type="button" data-cp-restore>恢复</button>
+          </div>
+        </article>
+
+        <article class="cp" data-risk="high" data-cp-id="3">
+          <span class="cp-risk is-high">高风险</span>
+          <div class="cp-main">
+            <p class="cp-title">登录结果结构同步账号状态，前端状态展示与后端返回保持一致。</p>
+            <p class="cp-meta">写入仓库：<span class="cp-link">paa-web</span><span class="cp-dot">·</span><span class="cp-link">feat/login-error</span><span class="cp-dot">·</span>1 个文件<span class="cp-dot">·</span>2 处变更</p>
+            <p class="cp-note">风险说明：文案替换，影响局部。</p>
+          </div>
+          <div class="cp-acts">
+            <button class="cp-btn cp-btn--pri" type="button" data-cp-evidence>变更点证据链</button>
+            <button class="cp-btn" type="button" data-cp-ignore>忽略</button>
+            <button class="cp-btn" type="button" data-cp-range><span class="cp-range-t">收起</span><span class="ico ico12 cp-caret" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.6 7.4 6 4l3.4 3.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+            <button class="cp-btn" type="button" data-cp-restore>恢复</button>
+          </div>
+        </article>
+
+          <div class="tp-chg-sep" aria-hidden="true"></div>
+          <article class="cp is-ignored" data-risk="low" data-cp-id="4">
+            <span class="cp-risk is-low">低风险</span>
+            <div class="cp-main">
+              <p class="cp-title">后端错误统一归一，屏蔽内部堆栈与实现细节，只向调用方暴露业务错误码。</p>
+              <p class="cp-meta">写入仓库：<span class="cp-link">paa-web</span><span class="cp-dot">·</span><span class="cp-link">feat/login-error</span><span class="cp-dot">·</span>1 个文件<span class="cp-dot">·</span>2 处变更</p>
+            </div>
+            <div class="cp-acts">
+              <button class="cp-btn cp-btn--pri" type="button" data-cp-evidence>变更点证据链</button>
+              <button class="cp-btn" type="button" data-cp-ignore>忽略</button>
+              <button class="cp-btn" type="button" data-cp-range><span class="cp-range-t">收起</span><span class="ico ico12 cp-caret" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.6 7.4 6 4l3.4 3.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+              <button class="cp-btn" type="button" data-cp-restore>恢复</button>
+            </div>
+          </article>
+        <article class="cp" data-risk="low" data-cp-id="5">
+          <span class="cp-risk is-low">低风险</span>
+          <div class="cp-main">
+            <p class="cp-title">新增独立审计模块，登录失败时记录账号、错误码与时间，不改变现有登录提示链路。</p>
+            <p class="cp-meta">写入仓库：<span class="cp-link">paa-web</span><span class="cp-dot">·</span><span class="cp-link">feat/login-error</span><span class="cp-dot">·</span>1 个文件<span class="cp-dot">·</span>2 处变更</p>
+            <p class="cp-note">风险说明：文案替换，影响局部。</p>
+          </div>
+          <div class="cp-acts">
+            <button class="cp-btn cp-btn--pri" type="button" data-cp-evidence>变更点证据链</button>
+            <button class="cp-btn" type="button" data-cp-ignore>忽略</button>
+            <button class="cp-btn" type="button" data-cp-range><span class="cp-range-t">收起</span><span class="ico ico12 cp-caret" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.6 7.4 6 4l3.4 3.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+            <button class="cp-btn" type="button" data-cp-restore>恢复</button>
+          </div>
+        </article>
+        </div>
+      </section>
+
+      <div class="tp-foot">
+        <button class="tp-ghost" type="button" id="tpReanalyze" hidden><span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M11.4 5.4A4.6 4.6 0 1 0 11.6 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M11.6 2.6v2.9H8.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>全部重新分析</button>
+        <button class="tp-primary" type="button" id="tpStart">开始变更分析</button>
+        <button class="tp-primary tp-primary--wide" type="button" id="tpConfirm" hidden>确认变更范围，开始生成代码</button>
+      </div>
     </div>

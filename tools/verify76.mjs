@@ -42,14 +42,15 @@ async function mk(url, w = 1920, h = 1200) {
     };
   });
   ok('A1 工序条 43 高、贴 44', a.steps.h === 43 && a.steps.y === 44, JSON.stringify(a.steps));
-  ok('A2 六道工序：概要设计 / 详细设计 / 任务总结 / 代码变更分析 / 开发实现 / 代码审查',
-    a.names.join('/') === '概要设计/详细设计/任务总结/代码变更分析/开发实现/代码审查', a.names.join('/'));
+  /* 第 77 轮：任务总结从第 3 位挪到末位（工序链最后一步） */
+  ok('A2 六道工序：概要设计 / 详细设计 / 代码变更分析 / 开发实现 / 代码审查 / 任务总结',
+    a.names.join('/') === '概要设计/详细设计/代码变更分析/开发实现/代码审查/任务总结', a.names.join('/'));
   ok('A3 当前 = 任务总结（绿底 #3BB346 + 状态主色）',
     a.now === '任务总结' && a.nowIcon === 'rgb(59, 179, 70)' && a.nowState === 'rgb(55, 112, 247)', a.nowIcon + ' ' + a.nowState);
   ok('A4 已完成蓝底 #F5F8FF；待开始名称常规字重',
     a.doneIcon === 'rgb(245, 248, 255)' && a.todoWeight === '400', a.doneIcon + ' ' + a.todoWeight);
-  ok('A5 六块宽 88/152/152/180/152/152、含间距总长 916（稿 3495:55201）',
-    a.itemW.join(',') === '88,152,152,180,152,152' && a.itemW.reduce((x, y) => x + y, 0) + 5 * 8 === 916, a.itemW.join(','));
+  ok('A5 六块宽 88/152/180/152/152/152、含间距总长 916（同稿面口径）',
+    a.itemW.join(',') === '88,152,180,152,152,152' && a.itemW.reduce((x, y) => x + y, 0) + 5 * 8 === 916, a.itemW.join(','));
   ok('A6 内容列 1024 且与工序轨道同左缘', a.col.w === 1024 && a.col.x === a.track.x, JSON.stringify([a.col, a.track]));
   ok('A7 内容区从 87 起（44 顶栏 + 43 工序条）', a.wrapTop === 87, a.wrapTop);
   ok('A8 无脚本报错', p.__e.length === 0, p.__e.slice(0, 3).join(' / '));

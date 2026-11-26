@@ -62,7 +62,7 @@
 
   /* 工序真值：技术任务 8 道取自 layers/quick-flow.json（2960:44863） */
   var QF_STEPS = {
-    '技术任务': ['概要设计', '详细设计', '程序设计', '代码开发', '代码审查', '白盒测试', '提交流水线', '交付确认'],
+    '技术任务': ['概要设计', '详细设计', '程序设计', '代码开发', '代码审查', '白盒测试', '提交流水线', '任务总结'],
     '缺陷修复': ['问题复现', '根因定位', '修复实现', '回归验证'],
     '需求编写': ['需求澄清', '需求分析', '需求文档', '评审确认'],
     '需求优化': ['现状梳理', '优化方案', '方案评审', '落地实施']
@@ -80,6 +80,7 @@
       step.setAttribute('role', 'button');
       step.tabIndex = 0;
       step.dataset.i = i;
+      if (name === '任务总结') step.dataset.go = 'summary';
       var no = document.createElement('span');
       no.className = 'qf-no';
       no.textContent = pad2(i + 1);
@@ -327,6 +328,8 @@
       if (!step) return;
       qfFlow.querySelectorAll('.qf-step').forEach(function (x) { x.classList.remove('is-active'); });
       step.classList.add('is-active');
+      /* 第 77 轮：工序链末步「任务总结」→ 直接进任务总结工序页 */
+      if (step.dataset.go === 'summary') location.href = 'cecoder-summary.html?id=0';
     });
   }
   window.addEventListener('resize', qfMeasure);
