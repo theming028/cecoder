@@ -2283,6 +2283,25 @@
       toast('已确认变更范围，开始生成代码');
     });
 
+    /* 忽略 / 恢复：整卡转灰的同时把仓库、分支链接一起停用（键盘也进不去） */
+    function setIgnored(card, on) {
+      card.classList.toggle('is-ignored', on);
+      var links = card.querySelectorAll('.cp-link');
+      for (var i = 0; i < links.length; i++) {
+        if (on) {
+          links[i].setAttribute('aria-disabled', 'true');
+          links[i].setAttribute('tabindex', '-1');
+        } else {
+          links[i].removeAttribute('aria-disabled');
+          links[i].removeAttribute('tabindex');
+        }
+      }
+    }
+    if (list) {
+      var pre = list.querySelectorAll('.cp.is-ignored');
+      for (var pi = 0; pi < pre.length; pi++) setIgnored(pre[pi], true);
+    }
+
     /* 卡片上的三个操作 + 恢复 */
     if (list) list.addEventListener('click', function (e) {
       var btn = e.target.closest('button');
@@ -2290,11 +2309,11 @@
       var card = btn.closest('.cp');
       if (!card) return;
       if (btn.hasAttribute('data-cp-ignore')) {
-        card.classList.add('is-ignored');
+        setIgnored(card, true);
         recount();
         toast('已忽略该变更点');
       } else if (btn.hasAttribute('data-cp-restore')) {
-        card.classList.remove('is-ignored');
+        setIgnored(card, false);
         recount();
       } else if (btn.hasAttribute('data-cp-range')) {
         var off = card.classList.toggle('is-range-off');
