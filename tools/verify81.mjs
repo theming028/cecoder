@@ -31,7 +31,7 @@ async function mk(url, w = 1440, h = 900) {
   const a = await grab(task), s = await grab(summary), u = await grab(ui);
   ok('A1 总结页顶栏与任务页逐字节一致', a.html === s.html, 'diff');
   ok('A2 UI设计页顶栏与任务页一致', a.html === u.html, 'diff');
-  ok('A3 顶栏同高 44、同起于面板顶（任务页右侧被 AI 栏挤压，只比 y/h）', [a, s, u].every(x => x.rect[1] === 48 && x.rect[3] === 44) && s.rect.join() === u.rect.join(), [a.rect, s.rect, u.rect].join(' / '));
+  ok('A3 顶栏同高 44、同起于面板顶；UI页也带 AI 栏，宽度与任务页一致', [a, s, u].every(x => x.rect[1] === 48 && x.rect[3] === 44) && a.rect.join() === u.rect.join(), [a.rect, s.rect, u.rect].join(' / '));
   ok('A4 不再有「任务执行」返链，右侧仍是 自动执行/证据链/工序进度/AI协作',
     !s.hasBack && a.ids.join('|') === s.ids.join('|') && s.ids.join('|') === 'tkRun|tt-vsep|tkEvidence|tt-now|tkAiOpen', s.ids.join('|'));
   ok('A5 三页无脚本报错', [task, summary, ui].every(p => p.__e.length === 0), [task.__e, summary.__e, ui.__e].flat().slice(0, 3).join(' / '));

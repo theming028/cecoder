@@ -2291,6 +2291,8 @@
       markStep(step1, 'done');
       markStep(step2, 'on');
       toast('已确认变更范围，开始生成代码');
+      /* 第 82 轮：确认变更范围 → 进入「代码生成与确认」页（稿 3561:55208） */
+      setTimeout(function () { location.href = 'cecoder-codegen.html?id=0'; }, 420);
     });
 
     function setIgnored(card, on) { card.classList.toggle('is-ignored', on); }
@@ -2878,6 +2880,16 @@
     }
     if (aiFoldBtn) aiFoldBtn.addEventListener('click', function () { setAiPanel(false); toast('AI 协作已收起'); });
     if (aiOpenBtn) aiOpenBtn.addEventListener('click', function () { setAiPanel(true); });
+
+    /* 第 82 轮：UI设计工序页默认带出 AI 对话栏 —— 栏内标题 / 上下文分割线换成 UI设计口径 */
+    if (PAGE === 'ui') {
+      var aiHt = document.querySelector('.ai-h-title');
+      if (aiHt && aiHt.firstChild && aiHt.firstChild.nodeType === 3) aiHt.firstChild.nodeValue = '生成 UI 设计稿';
+      var aiDivT = document.querySelector('.ai-divider span');
+      if (aiDivT) aiDivT.textContent = '已加载 UI设计资产与组件规范';
+      var aiBubble = document.querySelector('.ai-msg.is-user .ai-bubble');
+      if (aiBubble) aiBubble.textContent = '根据当前任务的 UI设计资产，生成页面的高保真设计稿。';
+    }
 
     /* 第 69 轮：附件两张图各自可删；删空就整条收掉 */
     var aiAtts = document.getElementById('aiAtts');
@@ -3531,6 +3543,55 @@
         closeDp();
         tip('已派发 ' + n + ' 项任务');
       }, 1400);
+    });
+  }
+})();
+
+/* ============================================================
+   第 82 轮：代码生成与确认页（cecoder-codegen.html）
+   ① 生成设置有折叠 ② 全部重新生成走一遍进度条动画 ③ 忽略摘掉卡片
+   ============================================================ */
+(function () {
+  if (document.body.getAttribute('data-page') !== 'codegen') return;
+
+  function tip(msg) {
+    var wrap = document.getElementById('toastWrap');
+    if (!wrap) return;
+    var el = document.createElement('div');
+    el.className = 'semi-toast';
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(function () { el.remove(); }, 1800);
+  }
+
+  var setBox = document.getElementById('cgSet');
+  var setBtn = document.getElementById('cgSetToggle');
+  if (setBox && setBtn) {
+    setBtn.addEventListener('click', function () {
+      var closed = setBox.classList.toggle('is-closed');
+      setBtn.setAttribute('aria-expanded', closed ? 'false' : 'true');
+    });
+  }
+
+  var bar = document.getElementById('cgBar');
+  var regen = document.getElementById('cgRegen');
+  if (regen) {
+    regen.addEventListener('click', function () {
+      if (!bar) return;
+      bar.style.width = '0%';
+      setTimeout(function () { bar.style.width = '41.1%'; }, 120);
+      tip('已重新开始生成');
+    });
+  }
+
+  var list = document.getElementById('cgList');
+  if (list) {
+    list.addEventListener('click', function (e) {
+      var ig = e.target.closest ? e.target.closest('[data-cg-ignore]') : null;
+      if (!ig) return;
+      var card = ig.closest('.cg-card');
+      if (card) card.remove();
+      tip('已忽略该变更点');
     });
   }
 })();

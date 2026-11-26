@@ -165,14 +165,15 @@ async function mk(url, w = 1920, h = 1200) {
     const box = s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height) }; };
     return {
       open: document.getElementById('dpModal').classList.contains('is-open'),
+      panelH: Math.round(document.querySelector('.panel').getBoundingClientRect().height),
       dlg: box('.dp-dlg'), head: box('.dp-head'), left: box('.dp-left'), foot: box('.dp-foot'), lfoot: box('.dp-left-foot'),
       empty: !!document.querySelector('.dp-empty'), grps: document.querySelectorAll('.dp-grp').length,
       count: document.getElementById('dpCount').textContent, cards: document.querySelectorAll('.dp-card').length,
     };
   });
-  ok('D1 派发卡按钮 → 弹窗打开，1200×804', d.open && d.dlg.w === 1200 && d.dlg.h === 804, JSON.stringify(d.dlg));
-  ok('D2 头 48 / 左列 400×700 / 左列底 48 / 底部 56',
-    d.head.h === 48 && d.left.w === 400 && d.left.h === 700 && d.lfoot.h === 48 && d.foot.h === 56, JSON.stringify([d.head, d.left]));
+  ok('D1 派发卡按钮 → 弹窗打开，1200 宽、上下各 40 撑满面板（与云端同步同方案）', d.open && d.dlg.w === 1200 && d.dlg.h === d.panelH - 80, JSON.stringify([d.dlg, d.panelH]));
+  ok('D2 头 48 / 左列 400×自适应 / 左列底 48 / 底部 56',
+    d.head.h === 48 && d.left.w === 400 && d.left.h === d.dlg.h - 104 && d.lfoot.h === 48 && d.foot.h === 56, JSON.stringify([d.head, d.left, d.dlg]));
   ok('D3 拆分前：空态 + 4 个工序组 + 计数 0 项（与稿一致，缺陷修复不再单列）', d.empty && d.grps === 4 && d.cards === 0 && /已选 0 项/.test(d.count), d.count);
 
   await p.evaluate(() => document.getElementById('dpSelectAll').click()); await wait(220);

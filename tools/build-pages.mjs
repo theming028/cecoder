@@ -31,6 +31,8 @@ const P = {
   dispatch: R('src/dispatch.html'),
   /* 第 80 轮：UI设计工序专属页（中栏空） */
   uiview: R('src/uiview.html'),
+  /* 第 82 轮：代码生成与确认页（稿 3561:55208） */
+  codegenview: R('src/codegenview.html'),
 };
 
 /* 会话页 / 任务页沿用 is-chat 那套「单卡输入区」样式，但不需要 hero 等首页块 */
@@ -96,11 +98,11 @@ const task = wrap({
   body: chrome(pmChat, P.tasktop + P.taskview, stageChat, '', P.aiside),
 });
 
-/* ---------- 3.5 UI设计工序页：顶栏 + 工序条，中栏留空 ---------- */
+/* ---------- 3.5 UI设计工序页：顶栏 + 工序条 + 中栏空 + 右栏 AI 协作（第 82 轮：默认带出对话栏） ---------- */
 const ui = wrap({
   title: 'Cecoder · UI设计',
   page: 'ui',
-  body: chrome(pmChat, P.tasktop + P.uiview, stageChat, '', '', ''),
+  body: chrome(pmChat, P.tasktop + P.uiview, stageChat, '', P.aiside, ''),
 });
 
 /* ---------- 4 任务总结工序页：工序条 6 步 + 内容 1024 列 + 派发弹窗 ---------- */
@@ -113,12 +115,20 @@ const summary = wrap({
   body: chrome(pmChat, P.tasktop + P.summaryview, stageChat, '', P.dispatch, ''),
 });
 
+/* ---------- 5 代码生成与确认页：第 5 道「代码开发」确认变更范围之后 ---------- */
+const codegen = wrap({
+  title: 'Cecoder · 代码生成与确认',
+  page: 'codegen',
+  body: chrome(pmChat, P.tasktop + P.codegenview, stageChat, '', '', ''),
+});
+
 for (const [name, html] of [
   ['cecoder-home.html', home],
   ['cecoder-session.html', session],
   ['cecoder-task.html', task],
   ['cecoder-ui.html', ui],
   ['cecoder-summary.html', summary],
+  ['cecoder-codegen.html', codegen],
 ]) {
   fs.writeFileSync(path.join(ROOT, name), html, 'utf8');
   console.log(name.padEnd(22), (Buffer.byteLength(html) / 1024).toFixed(1) + ' KB');

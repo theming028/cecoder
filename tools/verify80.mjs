@@ -167,6 +167,7 @@ async function mk(url, w = 1920, h = 1200) {
     const grpBox = grp.getBoundingClientRect();
     return {
       dlg: [Math.round(dlg.width), Math.round(dlg.height)],
+      panelH: Math.round(document.querySelector('.panel').getBoundingClientRect().height),
       dlgBg: getComputedStyle(document.querySelector('.dp-dlg')).backgroundColor,
       leftBg: cs('.dp-left', 'backgroundColor'),
       headBg: cs('.dp-head', 'backgroundColor'),
@@ -184,8 +185,8 @@ async function mk(url, w = 1920, h = 1200) {
       stateRight: (() => { const st = document.querySelector('.dp-grp.is-empty'); return Math.round(st.getBoundingClientRect().right - st.querySelector('.dp-grp-state').getBoundingClientRect().right); })(),
     };
   });
-  ok('F1 弹窗 1200×804、底 #F2F2F2、头/底白、左列 #F7F7F7',
-    f.dlg.join('x') === '1200x804' && f.dlgBg === 'rgb(242, 242, 242)' && f.headBg === 'rgb(255, 255, 255)' &&
+  ok('F1 弹窗 1200 宽 / 上下各 40 撑满面板、底 #F2F2F2、头/底白、左列 #F7F7F7',
+    f.dlg[0] === 1200 && f.dlg[1] === f.panelH - 80 && f.dlgBg === 'rgb(242, 242, 242)' && f.headBg === 'rgb(255, 255, 255)' &&
     f.footBg === 'rgb(255, 255, 255)' && f.leftBg === 'rgb(247, 247, 247)', JSON.stringify([f.dlg, f.dlgBg, f.leftBg]));
   ok('F2 左列工序卡：白底 + 仅 0 1 2 阴影（无描边）、工序勾缩进 17、描述 12px',
     f.grpBg === 'rgb(255, 255, 255)' && /rgba\(0, 0, 0, 0\.08\) 0px 1px 2px/.test(f.grpShadow) && f.grpCkX === 17 && f.descFont === '12px',
