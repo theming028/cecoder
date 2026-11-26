@@ -474,12 +474,13 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
 
     <!-- 第 22 轮：会话详情标题栏 —— 通栏，横跨整个 panel-main（左侧让开 28px 的展开按钮） -->
     <!-- ============================================================
-         第 76 轮：任务总结工序页（稿 3495:55201 步骤条 / 3495:55203 内容）
-         ① 顶部 44：首页 / 标题 / 任务执行（回任务页）/ 自动执行
-         ② 工序条 43：6 道工序横排（24 圆点 + 名称 / 状态），当前 = 任务总结（绿勾）
-         ③ 内容 1024 列居中：任务总结标题（两侧横线）→ 任务智能派发卡 96
-            → 工序资产（可一键展开 / 折叠）
-         ④ 底部 56：主键「智能派发任务」→ 弹出任务智能派发弹窗
+         第 79 轮：任务总结工序页（按 MasterGo 稿完全重铺）
+         稿面：内容列 3495:55203（1024×802）= 标题 28 + 24 + 派发卡 96 + 20 + 工序资产 634
+               工序条容器 3495:55202（1133×87，与「代码开发」任务页同款）
+         ① 顶栏 44：首页 / 标题 / 任务执行（回任务页）/ 自动执行
+         ② 工序条 87：同 .task-steps 容器，9 道工序（名称与任务页一致，末位当前 = 任务总结）
+         ③ 内容 1024 居中：标题（456 线 + 80 文字 + 456 线）→ 派发卡 → 工序资产
+         ④ 派发入口收进派发卡右侧「打开任务派发」，不再单独做底栏
          ============================================================ -->
     <div class="task-top">
       <a class="tt-home" href="cecoder-home.html">
@@ -496,210 +497,198 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
       </div>
     </div>
 
-    <!-- 工序条：稿 3495:55201 —— 6 步 · 块间距 8 · 每块前 56 连线（首块无） -->
-    <div class="sum-steps" id="sumSteps">
-      <div class="ss-track">
-        <a class="ss-item is-done" href="cecoder-task.html?id=0">
-          <span class="ss-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-          <span class="ss-txt"><b>概要设计</b><i>已完成</i></span>
-        </a>
-        <a class="ss-item is-done" href="cecoder-task.html?id=0">
-          <span class="ss-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-          <span class="ss-txt"><b>详细设计</b><i>已完成</i></span>
-        </a>
-        <a class="ss-item is-todo" href="cecoder-task.html?id=0">
-          <span class="ss-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-          <span class="ss-txt"><b>代码变更分析</b><i>待开始</i></span>
-        </a>
-        <a class="ss-item is-todo" href="cecoder-task.html?id=0">
-          <span class="ss-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-          <span class="ss-txt"><b>开发实现</b><i>待开始</i></span>
-        </a>
-        <a class="ss-item is-todo" href="cecoder-task.html?id=0">
-          <span class="ss-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-          <span class="ss-txt"><b>代码审查</b><i>待开始</i></span>
-        </a>
-        <span class="ss-item is-now" aria-current="step">
-          <span class="ss-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-          <span class="ss-txt"><b>任务总结</b><i>当前</i></span>
-        </span>
+    <!-- 工序条：稿 3495:55202 —— 1133×87 容器（与任务页同款）· 9 道工序 · 末位当前 -->
+    <div class="task-steps" id="tkStepBar">
+      <div class="ts-scroll" id="tkStepScroll">
+        <div class="ts-track" id="tkStepTrack">
+          <a class="ts-item is-done" href="cecoder-task.html?id=0" data-step="1">
+            <span class="ts-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <span class="ts-name">概要设计</span>
+            <span class="ts-state">已完成</span>
+          </a>
+          <a class="ts-item is-done" href="cecoder-task.html?id=0" data-step="2">
+            <span class="ts-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <span class="ts-name">详细设计</span>
+            <span class="ts-state">已完成</span>
+          </a>
+          <a class="ts-item is-done" href="cecoder-task.html?id=0" data-step="3">
+            <span class="ts-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <span class="ts-name">程序设计</span>
+            <span class="ts-state">已完成</span>
+          </a>
+          <a class="ts-item is-done" href="cecoder-task.html?id=0" data-step="4">
+            <span class="ts-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <span class="ts-name">代码变更分析</span>
+            <span class="ts-state">已完成</span>
+          </a>
+          <a class="ts-item is-done" href="cecoder-task.html?id=0" data-step="5">
+            <span class="ts-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <span class="ts-name">代码开发</span>
+            <span class="ts-state">已完成</span>
+          </a>
+          <a class="ts-item is-done" href="cecoder-task.html?id=0" data-step="6">
+            <span class="ts-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <span class="ts-name">代码审查</span>
+            <span class="ts-state">已完成</span>
+          </a>
+          <a class="ts-item is-done" href="cecoder-task.html?id=0" data-step="7">
+            <span class="ts-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <span class="ts-name">白盒测试</span>
+            <span class="ts-state">已完成</span>
+          </a>
+          <a class="ts-item is-done" href="cecoder-task.html?id=0" data-step="8">
+            <span class="ts-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <span class="ts-name">提交流水线</span>
+            <span class="ts-state">已完成</span>
+          </a>
+          <span class="ts-item is-now" data-step="9" aria-current="step">
+            <span class="ts-icon">9</span>
+            <span class="ts-name">任务总结</span>
+            <span class="ts-state">当前</span>
+          </span>
+          <span class="ts-link is-on"></span>
+          <span class="ts-link is-on"></span>
+          <span class="ts-link is-on"></span>
+          <span class="ts-link is-on"></span>
+          <span class="ts-link is-on"></span>
+          <span class="ts-link is-on"></span>
+          <span class="ts-link is-on"></span>
+          <span class="ts-link is-on"></span>
+        </div>
       </div>
+      <div class="ts-prog" id="tkStepProg" aria-hidden="true"><span class="ts-prog-thumb"></span></div>
     </div>
 
-    <!-- 内容：1024 列居中（与任务页 .tp-wrap 同几何） -->
+    <!-- 内容：稿 3495:55203 —— 1024×802 -->
     <div class="sum-wrap" id="sumWrap">
       <div class="sum-col">
-        <div class="sum-h"><span class="sum-h-line" aria-hidden="true"></span><span class="sum-h-txt">任务总结</span><span class="sum-h-line" aria-hidden="true"></span></div>
+        <div class="sum-h">
+          <span class="sum-h-line" aria-hidden="true"></span>
+          <span class="sum-h-txt">任务总结</span>
+          <span class="sum-h-line" aria-hidden="true"></span>
+        </div>
 
+        <!-- 派发卡：稿 3337:53274 —— 1024×96 · #F7F7F7 + 1px #EEEEEE · r4（卡身无投影） -->
         <section class="sum-dp">
-          <span class="sum-dp-ico" aria-hidden="true"><span class="ico ico24"><svg viewBox="0 0 24 24" fill="none"><path d="M4.6 9.2h9.6M4.6 14.8h6.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16.2 6.4h3.2v3.2M19.4 6.4l-5.2 5.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.8 17.6H4.6v-3.2M4.6 17.6l5.2-5.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+          <span class="sum-dp-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M16.151512,14.7575731L16.151512,12.2121201L21.242422,15.604928L16.151512,18.999999000000003L16.151512,16.454544L14.666664,16.454544C12.8859777,16.454544,11.3493156,15.409778,10.6363621,13.8997002C9.923408,15.409778,8.3867464,16.454544,6.6060590999999995,16.454544L3,16.454544L3,14.757575L6.606059999999999,14.757575C8.1290336,14.757575,9.3636351,13.522974,9.3636351,12C9.3636351,10.477026,8.1290336,9.242423500000001,6.606059999999999,9.242423500000001L3,9.242423500000001L3,7.545453800000001L6.606059999999999,7.545453800000001C8.3867464,7.545453800000001,9.923409,8.5902212,10.636363,10.1002989C11.3493166,8.5902216,12.8859787,7.545454299999999,14.666665,7.545454299999999L16.151514,7.545454299999999L16.151514,5L21.242422,8.392808L16.151512,11.7878785L16.151512,9.242423500000001L14.666664,9.242423500000001C13.143693,9.242423500000001,11.90909,10.477025000000001,11.90909,12C11.90909,13.522974,13.143693,14.757575,14.666665,14.757575L16.151512,14.7575731Z" fill="currentColor"/></svg>
+          </span>
           <div class="sum-dp-main">
             <h3 class="sum-dp-t">任务智能派发</h3>
             <p class="sum-dp-d">基于「数字构建实验室」的工作空间配置，把完成情况拆分为需求拆分、架构设计、UI 设计、代码开发、缺陷修复等任务，并按岗位角色预分配受理人。</p>
           </div>
           <button class="sum-dp-btn" type="button" id="sumOpenDispatch">
-            <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5.6 2.6h3M2.6 5.2v6.2h8.8V5.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 8.6V2.2M4.9 4.3 7 2.2l2.1 2.1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>打开任务派发
+            <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M4.300128636678467,22.946199999999997C9.828880826678468,14.0276299,16.360280626678467,9,23.999980626678468,9C31.639680626678466,9,38.17108062667847,14.0276299,43.69988162667847,22.946199999999997C43.69988162667847,22.946199999999997,44.35308062667847,24,44.35308062667847,24C44.35308062667847,24,43.69988162667847,25.053801,43.69988162667847,25.053801C38.17108062667847,33.972401000000005,31.639680626678466,39,23.999980626678468,39C16.360280626678467,39,9.828880826678468,33.972401000000005,4.300128636678467,25.053801C4.300128636678467,25.053801,3.646880626678467,24,3.646880626678467,24C3.646880626678467,24,4.300128636678467,22.946199999999997,4.300128636678467,22.946199999999997ZM8.370690826678466,24C13.384420826678467,31.665701,18.625080626678468,35,23.999980626678468,35C29.374881626678466,35,34.615580626678465,31.665701,39.62927962667847,24C34.615580626678465,16.3343501,29.374881626678466,13,23.999980626678468,13C18.625080626678468,13,13.384420826678467,16.3343501,8.370690826678466,24ZM23.999980626678468,21C22.343181626678465,21,20.999980626678468,22.3431,20.999980626678468,24C20.999980626678468,25.6569,22.343181626678465,27,23.999980626678468,27C25.65688062667847,27,26.999980626678468,25.6569,26.999980626678468,24C26.999980626678468,22.3431,25.65688062667847,21,23.999980626678468,21ZM16.999980626678465,24C16.999980626678465,20.134,20.133981626678466,17,23.999980626678468,17C27.865981626678465,17,30.999980626678468,20.134,30.999980626678468,24C30.999980626678468,27.865999,27.865981626678465,31,23.999980626678468,31C20.133981626678466,31,16.999980626678465,27.865999,16.999980626678465,24Z" fill="currentColor"/></svg>
+            打开任务派发
           </button>
         </section>
 
-        <!-- 工序资产：头 42 + 可折叠清单（稿 3495:55203 · 168 起 634 高） -->
+        <!-- 工序资产：稿 3495:55203 的 容器 2190（1024×634 = 头 42 + 16 + 展开卡 288 + 8 + 6×40 + 5×8） -->
         <section class="sum-assets" id="sumAssets">
           <div class="sa-head">
-            <span class="sa-head-l">
+            <div class="sa-head-l">
               <a class="sa-head-t" href="#assets">工序资产</a>
               <span class="sa-head-s">8 项已记录 · 12 项待产出 · 资产按工序汇总</span>
-            </span>
+            </div>
             <button class="sa-all" type="button" id="saAll" aria-expanded="true" aria-label="全部展开 / 折叠">
-              <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.4 5.4 7 9l3.6-3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1.5 6.1 7 2.2l5.5 3.9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.5 7.9 7 11.8l5.5-3.9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
           </div>
 
           <div class="sa-list" id="saList">
-            <!-- 展开行：稿 1024×288 = 头 40 + 16 + 标签 24 + 16 + 表 176 + 16 -->
-            <div class="sa-row is-open">
+<div class="sa-row is-open">
               <button class="sa-row-h" type="button" aria-expanded="true">
-                <span class="ico ico14 sa-caret"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.4 5.4 7 9l3.6-3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="sa-caret" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.6 5.4 7 8.8l3.4-3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 <span class="sa-name">概要设计</span>
                 <span class="sa-cnt">2 项资产</span>
                 <span class="sa-state is-warn">2 项待产出</span>
               </button>
               <div class="sa-body">
-                <div class="sa-tags">
-                  <span class="sa-tag"><b>代码仓库</b><i>paa-web、paa-auth</i></span>
-                  <span class="sa-tag is-wide"><b>影响文件</b><i>LoginForm.tsx、errorMessage.ts、AuthService.ts、LoginAudit.ts、LegacyLoginHint.ts</i></span>
-                </div>
-                <div class="sa-table">
-                  <div class="sa-tr is-th">
-                    <span>序号</span><span>资产名称</span>
-                    <span class="sa-sort">类型<span class="ico ico14 sa-sort-ico"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5.4 5.2 7 3.4l1.6 1.8M8.6 8.8 7 10.6 5.4 8.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-                    <span class="sa-sort">大小<span class="ico ico14 sa-sort-ico"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5.4 5.2 7 3.4l1.6 1.8M8.6 8.8 7 10.6 5.4 8.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-                    <span>状态</span>
-                  </div>
-                  <div class="sa-tr"><span>#1</span><span>代码变更分析.md</span><span>MD</span><span>18 KB</span><span>已产出</span></div>
-                  <div class="sa-tr"><span>#2</span><span>影响脑图.json</span><span>JSON</span><span>32 KB</span><span>已产出</span></div>
-                  <div class="sa-tr"><span>#3</span><span>login-fix.patch</span><span>PATCH</span><span>182 KB</span><span>待产出</span></div>
-                  <div class="sa-tr"><span>#4</span><span>概要设计资产清单.yaml</span><span>YAML</span><span>36 KB</span><span>待产出</span></div>
-                </div>
+                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web、paa-auth</i></span><span class="sa-tag"><b>影响文件</b><i class="is-muted">LoginForm.tsx、errorMessage.ts、AuthService.ts、LoginAudit.ts、LegacyLoginHint.ts</i></span></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>代码变更分析.md</span><span>MD</span><span>18 KB</span><span>已产出</span></div><div class="sa-tr"><span>#2</span><span>影响脑图.json</span><span>JSON</span><span>32 KB</span><span>已产出</span></div><div class="sa-tr"><span>#3</span><span>login-fix.patch</span><span>PATCH</span><span>182 KB</span><span>待产出</span></div><div class="sa-tr"><span>#4</span><span>概要设计资产清单.yaml</span><span>YAML</span><span>36 KB</span><span>待产出</span></div></div>
               </div>
             </div>
 
-            <div class="sa-row">
+<div class="sa-row">
               <button class="sa-row-h" type="button" aria-expanded="false">
-                <span class="ico ico14 sa-caret"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.4 5.4 7 9l3.6-3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="sa-caret" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.6 5.4 7 8.8l3.4-3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 <span class="sa-name">详细设计</span>
                 <span class="sa-cnt">2 项资产</span>
-                <span class="sa-state is-ok"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.4 6.2 4.7 8.5 9.6 3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>已就绪</span>
+                <span class="sa-state is-ok"><span class="sa-state-ico" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.3 4.8 8.6 9.5 3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>已就绪</span>
               </button>
               <div class="sa-body">
-                <div class="sa-tags">
-                  <span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span>
-                  <span class="sa-tag is-wide"><b>影响文件</b><i>LoginFailHint.tsx、i18n/login.ts</i></span>
-                </div>
-                <div class="sa-table">
-                  <div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型</span><span class="sa-sort">大小</span><span>状态</span></div>
-                  <div class="sa-tr"><span>#1</span><span>登录失败提示_详细设计.md</span><span>MD</span><span>24 KB</span><span>已产出</span></div>
-                  <div class="sa-tr"><span>#2</span><span>登录失败提示_接口清单.yaml</span><span>YAML</span><span>12 KB</span><span>已产出</span></div>
-                </div>
+                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span><span class="sa-tag"><b>影响文件</b><i class="is-muted">LoginFailHint.tsx、i18n/login.ts</i></span></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>登录失败提示_详细设计.md</span><span>MD</span><span>24 KB</span><span>已产出</span></div><div class="sa-tr"><span>#2</span><span>登录失败提示_接口清单.yaml</span><span>YAML</span><span>12 KB</span><span>已产出</span></div></div>
               </div>
             </div>
 
-            <div class="sa-row">
+<div class="sa-row">
               <button class="sa-row-h" type="button" aria-expanded="false">
-                <span class="ico ico14 sa-caret"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.4 5.4 7 9l3.6-3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="sa-caret" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.6 5.4 7 8.8l3.4-3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 <span class="sa-name">程序设计</span>
                 <span class="sa-cnt">11 项资产</span>
-                <span class="sa-state is-ok"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.4 6.2 4.7 8.5 9.6 3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>已就绪</span>
+                <span class="sa-state is-ok"><span class="sa-state-ico" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.3 4.8 8.6 9.5 3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>已就绪</span>
               </button>
               <div class="sa-body">
-                <div class="sa-tags">
-                  <span class="sa-tag"><b>代码仓库</b><i>paa-web、paa-auth</i></span>
-                  <span class="sa-tag is-wide"><b>影响文件</b><i>AuthService.ts、LoginForm.tsx、errorMessage.ts</i></span>
-                </div>
-                <div class="sa-table">
-                  <div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型</span><span class="sa-sort">大小</span><span>状态</span></div>
-                  <div class="sa-tr"><span>#1</span><span>程序设计文档.md</span><span>MD</span><span>48 KB</span><span>已产出</span></div>
-                  <div class="sa-tr"><span>#2</span><span>程序设计资产清单.yaml</span><span>YAML</span><span>36 KB</span><span>已产出</span></div>
-                </div>
+                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web、paa-auth</i></span><span class="sa-tag"><b>影响文件</b><i class="is-muted">AuthService.ts、LoginForm.tsx、errorMessage.ts</i></span></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>程序设计文档.md</span><span>MD</span><span>48 KB</span><span>已产出</span></div><div class="sa-tr"><span>#2</span><span>程序设计资产清单.yaml</span><span>YAML</span><span>36 KB</span><span>已产出</span></div></div>
               </div>
             </div>
 
-            <div class="sa-row">
+<div class="sa-row">
               <button class="sa-row-h" type="button" aria-expanded="false">
-                <span class="ico ico14 sa-caret"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.4 5.4 7 9l3.6-3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="sa-caret" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.6 5.4 7 8.8l3.4-3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 <span class="sa-name">代码开发</span>
                 <span class="sa-cnt">7 项资产</span>
-                <span class="sa-state is-ok"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.4 6.2 4.7 8.5 9.6 3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>已就绪</span>
+                <span class="sa-state is-ok"><span class="sa-state-ico" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.3 4.8 8.6 9.5 3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>已就绪</span>
               </button>
               <div class="sa-body">
-                <div class="sa-tags">
-                  <span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span>
-                  <span class="sa-tag is-wide"><b>影响文件</b><i>LoginForm.tsx、errorMessage.ts</i></span>
-                </div>
-                <div class="sa-table">
-                  <div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型</span><span class="sa-sort">大小</span><span>状态</span></div>
-                  <div class="sa-tr"><span>#1</span><span>login-fix.patch</span><span>PATCH</span><span>182 KB</span><span>已产出</span></div>
-                  <div class="sa-tr"><span>#2</span><span>变更说明.md</span><span>MD</span><span>9 KB</span><span>已产出</span></div>
-                </div>
+                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span><span class="sa-tag"><b>影响文件</b><i class="is-muted">LoginForm.tsx、errorMessage.ts</i></span></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>login-fix.patch</span><span>PATCH</span><span>182 KB</span><span>已产出</span></div><div class="sa-tr"><span>#2</span><span>变更说明.md</span><span>MD</span><span>9 KB</span><span>已产出</span></div></div>
               </div>
             </div>
 
-            <div class="sa-row">
+<div class="sa-row">
               <button class="sa-row-h" type="button" aria-expanded="false">
-                <span class="ico ico14 sa-caret"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.4 5.4 7 9l3.6-3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="sa-caret" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.6 5.4 7 8.8l3.4-3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 <span class="sa-name">代码审查</span>
-                <span class="sa-state is-ok">4 项待产出</span>
-              </button>
-              <div class="sa-body">
-                <div class="sa-tags">
-                  <span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span>
-                  <span class="sa-tag is-wide"><b>影响文件</b><i>LoginForm.tsx</i></span>
-                </div>
-                <div class="sa-table">
-                  <div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型</span><span class="sa-sort">大小</span><span>状态</span></div>
-                  <div class="sa-tr"><span>#1</span><span>代码审查报告.md</span><span>MD</span><span>—</span><span>待产出</span></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="sa-row">
-              <button class="sa-row-h" type="button" aria-expanded="false">
-                <span class="ico ico14 sa-caret"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.4 5.4 7 9l3.6-3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                <span class="sa-name">黑盒测试</span>
+                <span class="sa-cnt"></span>
                 <span class="sa-state is-warn">4 项待产出</span>
               </button>
               <div class="sa-body">
-                <div class="sa-tags">
-                  <span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span>
-                  <span class="sa-tag is-wide"><b>影响文件</b><i>LoginForm.tsx</i></span>
-                </div>
-                <div class="sa-table">
-                  <div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型</span><span class="sa-sort">大小</span><span>状态</span></div>
-                  <div class="sa-tr"><span>#1</span><span>黑盒测试用例.md</span><span>MD</span><span>—</span><span>待产出</span></div>
-                </div>
+                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span><span class="sa-tag"><b>影响文件</b><i class="is-muted">LoginForm.tsx</i></span></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>代码审查报告.md</span><span>MD</span><span>—</span><span>待产出</span></div></div>
               </div>
             </div>
 
-            <div class="sa-row">
+<div class="sa-row">
               <button class="sa-row-h" type="button" aria-expanded="false">
-                <span class="ico ico14 sa-caret"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.4 5.4 7 9l3.6-3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                <span class="sa-name">完成确认</span>
-                <span class="sa-state is-ok">无产出记录</span>
+                <span class="sa-caret" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.6 5.4 7 8.8l3.4-3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="sa-name">黑盒测试</span>
+                <span class="sa-cnt"></span>
+                <span class="sa-state is-warn">4 项待产出</span>
               </button>
               <div class="sa-body">
-                <div class="sa-tags">
-                  <span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span>
-                </div>
-                <div class="sa-table">
-                  <div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型</span><span class="sa-sort">大小</span><span>状态</span></div>
-                  <div class="sa-tr"><span>#1</span><span>完成确认单.md</span><span>MD</span><span>—</span><span>待产出</span></div>
-                </div>
+                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span><span class="sa-tag"><b>影响文件</b><i class="is-muted">LoginForm.tsx</i></span></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>黑盒测试用例.md</span><span>MD</span><span>—</span><span>待产出</span></div></div>
+              </div>
+            </div>
+
+<div class="sa-row">
+              <button class="sa-row-h" type="button" aria-expanded="false">
+                <span class="sa-caret" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.6 5.4 7 8.8l3.4-3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="sa-name">完成确认</span>
+                <span class="sa-cnt"></span>
+                <span class="sa-state is-ok is-quiet">无产出记录</span>
+              </button>
+              <div class="sa-body">
+                <div class="sa-tags"><span class="sa-tag"><b>代码仓库</b><i>paa-web</i></span></div>
+                <div class="sa-table"><div class="sa-tr is-th"><span>序号</span><span>资产名称</span><span class="sa-sort">类型<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span class="sa-sort">大小<span class="sa-sort-ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M7 3.2 9.2 6.1H4.8z" fill="currentColor"/><path d="M7 10.8 4.8 7.9h4.4z" fill="currentColor"/></svg></span></span><span>状态</span></div><div class="sa-tr"><span>#1</span><span>完成确认单.md</span><span>MD</span><span>—</span><span>待产出</span></div></div>
               </div>
             </div>
           </div>
         </section>
       </div>
-
-      <div class="sum-foot"><button class="sum-primary" type="button" id="sumDispatch">智能派发任务</button></div>
     </div>
 
   <div class="stage is-chat">

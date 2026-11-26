@@ -3196,6 +3196,10 @@
     setTimeout(function () { el.remove(); }, 1800);
   }
 
+  /* 第 79 轮：顶栏「自动执行」——总结页没有 AI 栏，只回一颗提示 */
+  var runBtn = document.getElementById('sumRun');
+  if (runBtn) runBtn.addEventListener('click', function () { tip('已开始自动执行'); });
+
   /* ---------- ① 工序资产 ---------- */
   var list = document.getElementById('saList');
   var allBtn = document.getElementById('saAll');
@@ -3254,7 +3258,7 @@
     if (t) t.hidden = true;
   }
 
-  ['sumDispatch', 'sumOpenDispatch'].forEach(function (id) {
+  ['sumOpenDispatch'].forEach(function (id) {
     var b = document.getElementById(id);
     if (b) b.addEventListener('click', openDp);
   });

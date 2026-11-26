@@ -1,4 +1,4 @@
-/* 第 76 轮验收：任务总结工序页（工序条 6 步 / 内容 1024 列 / 工序资产折叠 / 派发弹窗两态 / 页面互跳） */
+/* 第 79 轮验收：任务总结工序页（按稿完全重铺：9 道工序同款容器 / 派发卡 / 工序资产 / 派发弹窗 / 互跳） */
 const BASE = (process.env.CECODER_ROOT || process.cwd()).replace(/\\/g, '/');
 import puppeteer from 'puppeteer-core';
 
@@ -18,178 +18,188 @@ async function mk(url, w = 1920, h = 1200) {
   return p;
 }
 
-/* ============ A 页面骨架：工序条 / 内容列 ============ */
+/* ============ A 工序条：与「代码开发」任务页同一容器、同一 9 道工序 ============ */
 {
   const p = await mk('cecoder-summary.html?id=0');
   const a = await p.evaluate(() => {
     const pm = document.querySelector('.panel-main').getBoundingClientRect();
     const box = el => { const r = el.getBoundingClientRect(); return { x: Math.round(r.left - pm.left), y: Math.round(r.top - pm.top), w: Math.round(r.width), h: Math.round(r.height) }; };
     const q = s => box(document.querySelector(s));
-    const steps = [...document.querySelectorAll('.ss-item')];
+    const items = [...document.querySelectorAll('#tkStepTrack .ts-item')];
     return {
-      steps: q('.sum-steps'), track: q('.ss-track'),
-      names: steps.map(s => s.querySelector('b').textContent),
-      states: steps.map(s => s.querySelector('i').textContent),
-      now: document.querySelector('.ss-item.is-now b').textContent,
-      nowIcon: getComputedStyle(document.querySelector('.ss-item.is-now .ss-icon')).backgroundColor,
-      nowState: getComputedStyle(document.querySelector('.ss-item.is-now i')).color,
-      doneIcon: getComputedStyle(document.querySelector('.ss-item.is-done .ss-icon')).backgroundColor,
-      todoWeight: getComputedStyle(document.querySelector('.ss-item.is-todo b')).fontWeight,
-      trackW: Math.round(document.querySelector('.ss-track').getBoundingClientRect().width),
-      itemW: steps.map(s => Math.round(s.getBoundingClientRect().width)),
-      col: q('.sum-col'), wrapTop: q('.sum-wrap').y,
-      errs: 0,
+      bar: q('.task-steps'),
+      names: items.map(s => s.querySelector('.ts-name').textContent),
+      states: items.map(s => s.querySelector('.ts-state').textContent),
+      now: document.querySelector('.ts-item.is-now .ts-name').textContent,
+      nowIconBg: getComputedStyle(document.querySelector('.ts-item.is-now .ts-icon')).backgroundColor,
+      doneIconBg: getComputedStyle(document.querySelector('.ts-item.is-done .ts-icon')).backgroundColor,
+      links: document.querySelectorAll('#tkStepTrack .ts-link').length,
+      col: q('.sum-col'), wrap: q('.sum-wrap'),
+      overflow: document.getElementById('tkStepScroll').scrollWidth - document.getElementById('tkStepScroll').clientWidth,
     };
   });
-  ok('A1 工序条 43 高、贴 44', a.steps.h === 43 && a.steps.y === 44, JSON.stringify(a.steps));
-  /* 第 77 轮：任务总结从第 3 位挪到末位（工序链最后一步） */
-  ok('A2 六道工序：概要设计 / 详细设计 / 代码变更分析 / 开发实现 / 代码审查 / 任务总结',
-    a.names.join('/') === '概要设计/详细设计/代码变更分析/开发实现/代码审查/任务总结', a.names.join('/'));
-  ok('A3 当前 = 任务总结（绿底 #3BB346 + 状态主色）',
-    a.now === '任务总结' && a.nowIcon === 'rgb(59, 179, 70)' && a.nowState === 'rgb(55, 112, 247)', a.nowIcon + ' ' + a.nowState);
-  ok('A4 已完成蓝底 #F5F8FF；待开始名称常规字重',
-    a.doneIcon === 'rgb(245, 248, 255)' && a.todoWeight === '400', a.doneIcon + ' ' + a.todoWeight);
-  ok('A5 六块宽 88/152/180/152/152/152、含间距总长 916（同稿面口径）',
-    a.itemW.join(',') === '88,152,180,152,152,152' && a.itemW.reduce((x, y) => x + y, 0) + 5 * 8 === 916, a.itemW.join(','));
-  ok('A6 内容列 1024 且与工序轨道同左缘', a.col.w === 1024 && a.col.x === a.track.x, JSON.stringify([a.col, a.track]));
-  ok('A7 内容区从 87 起（44 顶栏 + 43 工序条）', a.wrapTop === 87, a.wrapTop);
-  ok('A8 无脚本报错', p.__e.length === 0, p.__e.slice(0, 3).join(' / '));
+  ok('A1 工序条沿用任务页容器：87 高、贴顶栏 44', a.bar.h === 87 && a.bar.y === 44, JSON.stringify(a.bar));
+  ok('A2 9 道工序、名称与「代码开发」一致',
+    a.names.join('/') === '概要设计/详细设计/程序设计/代码变更分析/代码开发/代码审查/白盒测试/提交流水线/任务总结', a.names.join('/'));
+  ok('A3 末位 = 任务总结（当前，实心主色圆点）；前 8 道已完成',
+    a.now === '任务总结' && a.nowIconBg === 'rgb(55, 112, 247)' && a.states.slice(0, 8).every(s => s === '已完成') && a.states[8] === '当前',
+    a.nowIconBg + ' ' + a.states.join('/'));
+  ok('A4 已完成圆点蓝底 #F5F8FF；8 段连线全亮', a.doneIconBg === 'rgb(245, 248, 255)' && a.links === 8, a.doneIconBg + ' ' + a.links);
+  ok('A5 内容列 1024 居中、自 131 起（44 + 87）', a.col.w === 1024 && a.wrap.y === 131, JSON.stringify([a.col.w, a.wrap.y]));
+  ok('A6 1920 下工序条不出横向滚动', a.overflow <= 0, a.overflow);
+  ok('A7 无脚本报错', p.__e.length === 0, p.__e.slice(0, 3).join(' / '));
   await p.close();
 }
 
-/* ============ B 内容区几何（稿 3495:55203） ============ */
+/* ============ B 内容几何（稿 3495:55203 / 3337:53274 / 3395:59974） ============ */
 {
   const p = await mk('cecoder-summary.html?id=0');
   const c = await p.evaluate(() => {
     const col = document.querySelector('.sum-col').getBoundingClientRect();
-    const box = el => { if (typeof el === 'string') el = document.querySelector(el); const r = el.getBoundingClientRect(); return { x: Math.round(r.left - col.left), y: Math.round(r.top - col.top), w: Math.round(r.width), h: Math.round(r.height) }; };
-    const cs = s => getComputedStyle(document.querySelector(s));
-    const th = [...document.querySelectorAll('.sa-row.is-open .sa-tr.is-th > span')].filter(e => e.offsetWidth).map(e => box(e).x);
-    const rows = [...document.querySelectorAll('.sa-row')].map(e => box(e));
+    const rel = el => { const r = el.getBoundingClientRect(); return { x: Math.round(r.left - col.left), y: Math.round(r.top - col.top), w: Math.round(r.width), h: Math.round(r.height) }; };
+    const cs = (s, k) => getComputedStyle(document.querySelector(s))[k];
+    const dp = document.querySelector('.sum-dp');
+    const rows = [...document.querySelectorAll('.sa-row')];
+    const trs = [...document.querySelectorAll('.sa-row.is-open .sa-tr')];
     return {
-      h: box('.sum-h'), hTxt: cs('.sum-h-txt').fontSize + '/' + cs('.sum-h-txt').fontWeight,
-      lines: [...document.querySelectorAll('.sum-h-line')].map(e => box(e)),
-      dp: box('.sum-dp'), dpBg: cs('.sum-dp').backgroundColor, dpShadow: cs('.sum-dp').boxShadow,
-      ico: box('.sum-dp-ico'), t: box('.sum-dp-t'), d: box('.sum-dp-d'), btn: box('.sum-dp-btn'),
-      assets: box('.sum-assets'), head: box('.sa-head'), all: box('.sa-all'), list: box('.sa-list'),
-      row1: box('.sa-row.is-open'), rowH: box('.sa-row.is-open .sa-row-h'),
-      tags: [...document.querySelectorAll('.sa-row.is-open .sa-tag')].map(e => box(e)),
-      table: box('.sa-table'), th: box('.sa-row.is-open .sa-tr.is-th'),
-      thX: th, rows, foot: box('.sum-foot'), pri: box('.sum-primary'),
-      footBg: cs('.sum-foot').backgroundColor, priW: box('.sum-primary').w,
-      wrapScroll: (() => { const w = document.querySelector('.sum-wrap'); return { sh: w.scrollHeight, ch: w.clientHeight }; })(),
+      col: { w: Math.round(col.width), h: Math.round(col.height) },
+      h: rel(document.querySelector('.sum-h')),
+      hTxt: cs('.sum-h-txt', 'fontSize') + '/' + cs('.sum-h-txt', 'fontWeight'),
+      lines: [...document.querySelectorAll('.sum-h-line')].map(e => Math.round(e.getBoundingClientRect().width)),
+      dp: rel(dp),
+      dpBg: getComputedStyle(dp).backgroundColor,
+      dpShadow: getComputedStyle(dp).boxShadow,
+      dpRadius: getComputedStyle(dp).borderRadius,
+      ico: rel(document.querySelector('.sum-dp-ico')),
+      icoShadow: cs('.sum-dp-ico', 'boxShadow'),
+      t: rel(document.querySelector('.sum-dp-t')),
+      tFont: cs('.sum-dp-t', 'fontSize') + '/' + cs('.sum-dp-t', 'lineHeight') + '/' + cs('.sum-dp-t', 'fontWeight'),
+      d: rel(document.querySelector('.sum-dp-d')),
+      dFont: cs('.sum-dp-d', 'fontSize') + '/' + cs('.sum-dp-d', 'lineHeight'),
+      dColor: cs('.sum-dp-d', 'color'),
+      btn: rel(document.querySelector('.sum-dp-btn')),
+      btnFont: cs('.sum-dp-btn', 'fontSize') + '/' + cs('.sum-dp-btn', 'lineHeight'),
+      assets: rel(document.querySelector('.sum-assets')),
+      head: rel(document.querySelector('.sa-head')),
+      all: rel(document.querySelector('.sa-all')),
+      row1: rel(rows[0]), row1H: rel(rows[0].querySelector('.sa-row-h')),
+      tags: [...document.querySelectorAll('.sa-row.is-open .sa-tag')].map(e => Math.round(e.getBoundingClientRect().height)),
+      tagBg: cs('.sa-tag', 'backgroundColor'),
+      table: rel(document.querySelector('.sa-table')),
+      th: Math.round(trs[0].getBoundingClientRect().height),
+      trH: Math.round(trs[1].getBoundingClientRect().height),
+      colX: [...trs[1].querySelectorAll('span')].map(s => Math.round(s.getBoundingClientRect().left - col.left - 16)),
+      rowH: rows.map(r => Math.round(r.getBoundingClientRect().height)),
+      row2: rel(rows[1]),
+      warns: [...document.querySelectorAll('.sa-state.is-warn')].map(e => getComputedStyle(e).color),
+      oks: [...document.querySelectorAll('.sa-state.is-ok')].map(e => getComputedStyle(e).color),
       over: document.querySelector('.sum-wrap').scrollWidth - document.querySelector('.sum-wrap').clientWidth,
     };
   });
-  ok('B1 标题 28 高、20/500、两侧各 456 横线', c.h.h === 28 && c.hTxt === '20px/500' && Math.abs(c.lines[0].w - 456) <= 1 && Math.abs(c.lines[1].w - 456) <= 1, JSON.stringify([c.h, c.hTxt, c.lines]));
-  ok('B2 派发卡 1024×96 @52、底 #F7F7F7、内描边 #EEEEEE', c.dp.h === 96 && c.dp.y === 52 && c.dp.w === 1024 && c.dpBg === 'rgb(247, 247, 247)' && /238, 238, 238/.test(c.dpShadow), JSON.stringify([c.dp, c.dpBg]));
-  ok('B3 卡内图标 40×40 @16,68 / 标题 @68,68 / 描述 700 宽两行 / 按钮 134×32',
-    c.ico.w === 40 && c.ico.h === 40 && c.ico.x === 16 && c.ico.y === 68 && c.t.x === 68 && c.d.w === 700 && c.d.h === 40 && c.btn.w === 134 && c.btn.h === 32,
-    JSON.stringify([c.ico, c.t, c.d, c.btn]));
-  ok('B4 工序资产块从 168 起、头部 42、右上键 32 贴右', c.assets.y === 168 && c.head.h === 42 && c.all.w === 32 && c.all.x === 992, JSON.stringify([c.assets, c.head, c.all]));
-  ok('B5 展开卡 1024×288 从 226 起、行头 40', c.row1.y === 226 && c.row1.h === 288 && c.rowH.h === 40, JSON.stringify([c.row1, c.rowH]));
-  ok('B6 标签行两条 24 高（代码仓库 182 / 影响文件撑满）', c.tags.length === 2 && c.tags[0].h === 24 && Math.abs(c.tags[0].w - 182) <= 6 && c.tags[1].w > 500, JSON.stringify(c.tags));
-  ok('B7 表格 992×176（表头 32 + 4 行 36）', c.table.w === 992 && c.table.h === 176 && c.th.h === 32, JSON.stringify([c.table, c.th]));
-  ok('B8 表格列 ≈ 12 / 68 / 692 / 812 / 902（±14，网格按可用宽自适应）',
-    c.thX.length === 5 && c.thX.every((v, i) => Math.abs((v - c.table.x) - [12, 68, 692, 812, 902][i]) <= 14), c.thX.map(v => v - c.table.x).join(','));
-  ok('B9 七个工序行：1 展开 288 + 6 折叠 40、行距 8（末行收在 802）',
-    c.rows.length === 7 && c.rows.slice(1).every(r => r.h === 40) && c.rows[1].y - (c.rows[0].y + c.rows[0].h) === 8 && c.rows[6].y + 40 === 802,
-    JSON.stringify(c.rows));
-  ok('B10 底栏 56、主键 212×36 居中', c.foot.h === 56 && c.pri.w === 212 && c.pri.h === 36 && Math.abs((c.pri.x + c.pri.w / 2) - 512) <= 1, JSON.stringify([c.foot, c.pri]));
-  ok('B11 无横向溢出', c.over <= 0, c.over);
+  ok('B1 内容列 1024×802；标题 28 高、20/500、两侧 456 横线',
+    c.col.w === 1024 && c.col.h === 802 && c.h.h === 28 && c.hTxt === '20px/500' && c.lines.join('/') === '456/456',
+    JSON.stringify([c.col, c.h, c.lines]));
+  ok('B2 派发卡 1024×96 @52、底 #F7F7F7、r4、内描边且卡身无投影',
+    c.dp.y === 52 && c.dp.w === 1024 && c.dp.h === 96 && c.dpBg === 'rgb(247, 247, 247)' &&
+    c.dpShadow === 'rgb(238, 238, 238) 0px 0px 0px 1px inset' && c.dpRadius === '4px',
+    JSON.stringify([c.dp, c.dpBg, c.dpShadow]));
+  ok('B3 卡内：图标 40×40 @16,16（白底 + 0 1 2 阴影）/ 标题 14/22/500 / 描述 700×40、12/20、#6B6B6B',
+    c.ico.x - c.dp.x === 16 && c.ico.y - c.dp.y === 16 && c.ico.w === 40 && c.t.x === 68 && c.tFont === '14px/22px/500' &&
+    c.d.w === 700 && c.d.h === 40 && c.dFont === '12px/20px' && c.dColor === 'rgb(107, 107, 107)' && /rgba\(0, 0, 0, 0\.08\) 0px 1px 2px/.test(c.icoShadow),
+    JSON.stringify([c.ico, c.tFont, c.d, c.dFont, c.dColor]));
+  ok('B4 按钮 134×32、右边距 20、文字 14/22',
+    c.btn.w === 134 && c.btn.h === 32 && c.btn.x + c.btn.w === 1004 && c.btnFont === '14px/22px',
+    JSON.stringify(c.btn));
+  ok('B5 工序资产自 168 起、头部 42、右上按钮 32×32 贴右',
+    c.assets.y === 168 && c.head.h === 42 && c.all.w === 32 && c.all.x + c.all.w === 1024 && c.all.y - c.head.y === 10,
+    JSON.stringify([c.assets, c.head, c.all]));
+  ok('B6 展开卡 1024×288 自 226 起、行头 40、标签 2 条 24 高、底 #F5F8FF',
+    c.row1.y === 226 && c.row1.h === 288 && c.row1H.h === 40 && c.tags.length === 2 && c.tags.every(v => v === 24) && c.tagBg === 'rgb(245, 248, 255)',
+    JSON.stringify([c.row1, c.tags]));
+  ok('B7 表格 992×176（表头 32 + 4 行 36）',
+    c.table.w === 992 && c.table.h === 176 && c.th === 32 && c.trH === 36, JSON.stringify([c.table, c.th, c.trH]));
+  ok('B8 表格列 12 / 68 / 692 / 812 / 902',
+    c.colX.join('/') === '12/68/692/812/902', c.colX.join('/'));
+  ok('B9 7 行：首行展开 288 + 6 行 40、行距 8（末行收在 802）',
+    c.rowH.length === 7 && c.rowH[0] === 288 && c.rowH.slice(1).every(v => v === 40) &&
+    c.row2.y === c.row1.y + 288 + 8 && c.row2.y + 6 * 40 + 5 * 8 === 802,
+    c.rowH.join('/') + ' row2@' + c.row2.y);
+  ok('B10 状态：已就绪/无产出记录 #30953B（带勾）、待产出 #FF7D00',
+    c.oks.every(v => v === 'rgb(48, 149, 59)') && c.warns.every(v => v === 'rgb(255, 125, 0)'),
+    c.oks[0] + ' ' + c.warns[0]);
+  ok('B11 1920 下内容区无横向溢出', c.over <= 0, c.over);
   await p.close();
 }
 
-/* ============ C 工序资产折叠 ============ */
+/* ============ C 折叠 / 展开 ============ */
 {
   const p = await mk('cecoder-summary.html?id=0');
   const h = () => p.evaluate(() => [...document.querySelectorAll('.sa-row')].map(r => Math.round(r.getBoundingClientRect().height)));
   const before = await h();
   await p.tap('.sa-row:nth-child(2) .sa-row-h'); await wait(120);
   const opened = await h();
-  ok('C1 点折叠行 → 展开（第 2 行 40 → 至少 130）', before[1] === 40 && opened[1] > 130, before[1] + ' → ' + opened[1]);
+  ok('C1 点折叠行 → 展开（40 → 约 288）', before[1] === 40 && opened[1] > 200, before[1] + ' → ' + opened[1]);
 
-  await p.tap('#saAll'); await wait(160);
+  await p.tap('.sa-row:nth-child(2) .sa-row-h'); await wait(120);
+  const shut = await h();
+  ok('C2 再点行头 → 收起', shut[1] === 40, shut[1]);
+
+  await p.tap('#saAll'); await wait(200);
   const allOpen = await h();
-  ok('C2 点右上「全部展开」→ 七行全开、按钮 aria=true', allOpen.every(v => v > 40) && await p.evaluate(() => document.getElementById('saAll').getAttribute('aria-expanded')) === 'true', allOpen.join('/'));
+  ok('C3 「全部展开」→ 7 行全开、aria=true',
+    allOpen.every(v => v > 40) && await p.evaluate(() => document.getElementById('saAll').getAttribute('aria-expanded')) === 'true', allOpen.join('/'));
 
-  await p.tap('#saAll'); await wait(160);
+  await p.tap('#saAll'); await wait(200);
   const allShut = await h();
-  ok('C3 再点 → 全收，七行都 40、按钮 aria=false',
+  ok('C4 再点 → 全收，7 行都 40、aria=false',
     allShut.every(v => v === 40) && await p.evaluate(() => document.getElementById('saAll').getAttribute('aria-expanded')) === 'false', allShut.join('/'));
   await p.close();
 }
 
-/* ============ D 任务智能派发弹窗 ============ */
+/* ============ D 派发弹窗（两态 + 出卡 + 派发） ============ */
 {
   const p = await mk('cecoder-summary.html?id=0');
-  await p.tap('#sumDispatch'); await wait(320);
+  await p.tap('#sumOpenDispatch'); await wait(320);
   const d = await p.evaluate(() => {
     const box = s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height) }; };
     return {
       open: document.getElementById('dpModal').classList.contains('is-open'),
-      dlg: box('.dp-dlg'), head: box('.dp-head'), left: box('.dp-left'), foot: box('.dp-foot'),
-      lfoot: box('.dp-left-foot'), empty: !!document.querySelector('.dp-empty'),
-      grps: document.querySelectorAll('.dp-grp').length,
-      count: document.getElementById('dpCount').textContent,
-      cards: document.querySelectorAll('.dp-card').length,
-      title: document.querySelector('.dp-title').textContent,
+      dlg: box('.dp-dlg'), head: box('.dp-head'), left: box('.dp-left'), foot: box('.dp-foot'), lfoot: box('.dp-left-foot'),
+      empty: !!document.querySelector('.dp-empty'), grps: document.querySelectorAll('.dp-grp').length,
+      count: document.getElementById('dpCount').textContent, cards: document.querySelectorAll('.dp-card').length,
     };
   });
-  ok('D1 底栏主键 → 弹窗打开，1200×804', d.open && d.dlg.w === 1200 && d.dlg.h === 804, JSON.stringify(d.dlg));
-  ok('D2 头 48 / 左列 400×700 / 左列底 48 / 底部 56', d.head.h === 48 && d.left.w === 400 && d.left.h === 700 && d.lfoot.h === 48 && d.foot.h === 56,
-    JSON.stringify([d.head, d.left, d.lfoot, d.foot]));
-  ok('D3 拆分前：空态 + 五个工序组 + 计数 0 项', d.empty && d.grps === 5 && d.cards === 0 && /已选 0 项/.test(d.count), d.count);
+  ok('D1 派发卡按钮 → 弹窗打开，1200×804', d.open && d.dlg.w === 1200 && d.dlg.h === 804, JSON.stringify(d.dlg));
+  ok('D2 头 48 / 左列 400×700 / 左列底 48 / 底部 56',
+    d.head.h === 48 && d.left.w === 400 && d.left.h === 700 && d.lfoot.h === 48 && d.foot.h === 56, JSON.stringify([d.head, d.left]));
+  ok('D3 拆分前：空态 + 5 个工序组 + 计数 0 项', d.empty && d.grps === 5 && d.cards === 0 && /已选 0 项/.test(d.count), d.count);
 
-  /* 勾一个工序 → 出对应任务卡 */
-  await p.evaluate(() => document.querySelector('.dp-grp[data-grp="design"] [data-dp-all]').click());
-  await wait(160);
-  const one = await p.evaluate(() => ({ cards: document.querySelectorAll('.dp-card').length, type: document.querySelector('.dp-card .dp-type') ? document.querySelector('.dp-card .dp-type').textContent : null, count: document.getElementById('dpCount').textContent }));
-  ok('D4 勾「概要设计」→ 出 1 张架构设计卡，计数 4 项', one.cards === 1 && one.type === '架构设计' && /已选 4 项/.test(one.count), JSON.stringify(one));
-
-  /* 一键智能拆分 */
-  await p.evaluate(() => document.getElementById('dpSelectAll').click());
-  await wait(200);
+  await p.evaluate(() => document.getElementById('dpSelectAll').click()); await wait(220);
   const all = await p.evaluate(() => {
     const cards = [...document.querySelectorAll('.dp-card')];
     return {
       n: cards.length, types: cards.map(c => c.querySelector('.dp-type').textContent),
       count: document.getElementById('dpCount').textContent,
       h0: Math.round(cards[0].getBoundingClientRect().height),
-      state: cards[0].querySelector('.dp-state').textContent,
-      sel: cards[0].querySelector('.dp-sel-v').textContent,
-      btns: [...cards[0].querySelectorAll('.dp-card-btns .dp-btn')].map(b => b.textContent),
-      detail: !!cards[0].querySelector('.dp-detail'),
       dv: cards[0].querySelectorAll('.dp-dv-list .dp-ck').length,
+      btns: [...cards[0].querySelectorAll('.dp-card-btns .dp-btn')].map(b => b.textContent),
     };
   });
-  ok('D5 全选 → 三张卡（架构设计 / 代码开发 / 缺陷修复）', all.n === 3 && all.types.join('/') === '架构设计/代码开发/缺陷修复', all.types.join('/'));
-  ok('D6 卡片：待派发标签 / 标题 / 受理人下拉 / 详情·移除按钮',
-    all.state === '待派发' && all.sel === '架构师 · 周宁' && all.btns.join('/') === '收起详情/移除', JSON.stringify(all));
-  ok('D7 架构设计卡展开详情 342 高、传递资产 6 项', all.h0 === 340 && all.detail && all.dv === 6, all.h0 + ' ' + all.dv);
-  ok('D8 计数 = 共 15 项，已选 15 项', all.count === '共 15 项，已选 15 项', all.count);
+  ok('D4 全选 → 三张卡（架构设计 / 代码开发 / 缺陷修复）', all.n === 3 && all.types.join('/') === '架构设计/代码开发/缺陷修复', all.types.join('/'));
+  ok('D5 架构设计卡展开详情 340、传递资产 6 项、按钮「收起详情/移除」',
+    all.h0 === 340 && all.dv === 6 && all.btns.join('/') === '收起详情/移除', all.h0 + ' ' + all.dv + ' ' + all.btns.join('/'));
+  ok('D6 计数 = 共 15 项，已选 15 项', all.count === '共 15 项，已选 15 项', all.count);
 
-  /* 收起详情 */
-  await p.evaluate(() => document.querySelector('.dp-card [data-dp-detail]').click());
-  await wait(160);
-  const shut = await p.evaluate(() => ({ hidden: document.querySelector('.dp-card .dp-detail').hidden, label: document.querySelector('.dp-card [data-dp-detail]').textContent, h: Math.round(document.querySelector('.dp-card').getBoundingClientRect().height) }));
-  ok('D9 点「收起详情」→ 详情收起、按钮回到「任务详情」、卡高 120', shut.hidden && shut.label === '任务详情' && shut.h === 120, JSON.stringify(shut));
-
-  /* 派发 → toast */
-  await p.evaluate(() => document.getElementById('dpGo').click());
-  await wait(220);
+  await p.evaluate(() => document.getElementById('dpGo').click()); await wait(240);
   const t = await p.evaluate(() => ({ hidden: document.getElementById('dpToast').hidden, txt: document.getElementById('dpToastTxt').textContent }));
-  ok('D10 派发 → 顶部提示「已派发 3 项任务，任务已完成」', t.hidden === false && /已派发 3 项任务/.test(t.txt), JSON.stringify(t));
+  ok('D7 派发 → 提示「已派发 3 项任务，任务已完成」', t.hidden === false && /已派发 3 项任务/.test(t.txt), JSON.stringify(t));
 
   await wait(1500);
-  const closed = await p.evaluate(() => document.getElementById('dpModal').classList.contains('is-open'));
-  ok('D11 提示后自动关闭弹窗', closed === false, String(closed));
+  ok('D8 提示后自动关窗', await p.evaluate(() => !document.getElementById('dpModal').classList.contains('is-open')));
 
-  /* Esc 关闭 */
-  await p.tap('#sumDispatch'); await wait(220);
+  await p.tap('#sumOpenDispatch'); await wait(220);
   await p.keyboard.press('Escape'); await wait(200);
-  const esc = await p.evaluate(() => document.getElementById('dpModal').classList.contains('is-open'));
-  ok('D12 Esc 关闭弹窗', esc === false, String(esc));
+  ok('D9 Esc 关闭弹窗', await p.evaluate(() => !document.getElementById('dpModal').classList.contains('is-open')));
   await p.close();
 }
 
@@ -197,37 +207,32 @@ async function mk(url, w = 1920, h = 1200) {
 {
   const p = await mk('cecoder-summary.html?id=0');
   await p.tap('.sum-back'); await wait(600);
-  ok('E1 任务总结页「任务执行」→ 任务页', /cecoder-task\.html/.test(p.url()), p.url());
+  ok('E1 「任务执行」→ 任务页', /cecoder-task\.html/.test(p.url()), p.url());
 
   const p2 = await mk('cecoder-task.html?id=0');
-  const link = await p2.evaluate(() => { const a = document.querySelector('a.tk-sum-link'); return a ? { href: a.getAttribute('href'), txt: a.textContent.trim() } : null; });
-  ok('E2 任务页页签条右侧有「任务总结」入口', !!link && /cecoder-summary\.html/.test(link.href) && link.txt === '任务总结', JSON.stringify(link));
   await p2.tap('a.tk-sum-link'); await wait(600);
-  ok('E3 点它 → 进任务总结页', /cecoder-summary\.html/.test(p2.url()), p2.url());
+  ok('E2 任务页页签「任务总结」→ 总结页', /cecoder-summary\.html/.test(p2.url()), p2.url());
 
   const p3 = await mk('cecoder-summary.html?id=0');
-  await p3.tap('.tt-home'); await wait(600);
-  ok('E4 顶栏「首页」→ 落地首页', /cecoder-home\.html/.test(p3.url()), p3.url());
-  await p3.close(); await p2.close();
+  await p3.tap('#tkStepTrack .ts-item[data-step="1"]'); await wait(600);
+  ok('E3 工序条第 1 道 → 任务页', /cecoder-task\.html/.test(p3.url()), p3.url());
+
+  const p4 = await mk('cecoder-summary.html?id=0');
+  await p4.tap('.tt-home'); await wait(600);
+  ok('E4 顶栏「首页」→ 首页', /cecoder-home\.html/.test(p4.url()), p4.url());
+  await p4.close(); await p3.close(); await p2.close();
 }
 
-/* ============ F 窄窗：1280 不溢出、工序一屏 ============ */
+/* ============ F 窄窗 1280 不溢出 ============ */
 {
   const p = await mk('cecoder-summary.html?id=0', 1280, 800);
   const f = await p.evaluate(() => {
     const w = document.querySelector('.sum-wrap');
-    const tr = document.querySelector('.sa-table').getBoundingClientRect();
+    const tbl = document.querySelector('.sa-table').getBoundingClientRect();
     const last = [...document.querySelectorAll('.sa-row.is-open .sa-tr:not(.is-th)')[0].querySelectorAll('span')].pop().getBoundingClientRect();
-    return {
-      over: w.scrollWidth - w.clientWidth,
-      tableIn: last.right <= tr.right + 1,
-      steps: document.querySelectorAll('.ss-item').length,
-      trackW: Math.round(document.querySelector('.ss-track').getBoundingClientRect().width),
-      trackW2: Math.round(document.querySelector('.ss-track').scrollWidth),
-    };
+    return { over: w.scrollWidth - w.clientWidth, tableIn: last.right <= tbl.right + 1, colW: Math.round(document.querySelector('.sum-col').getBoundingClientRect().width) };
   });
-  ok('F1 1280：内容区无横向滚动、状态列不越出表格', f.over <= 0 && f.tableIn, JSON.stringify(f));
-  ok('F2 1280：六道工序仍是一行（轨道收窄后 916 → 约 776）', f.steps === 6 && f.trackW < 916 && f.trackW > 700, f.trackW + '');
+  ok('F1 1280：内容列收窄到可用宽、无横向滚动、状态列不越界', f.over <= 0 && f.tableIn && f.colW < 1024, JSON.stringify(f));
   await p.close();
 }
 

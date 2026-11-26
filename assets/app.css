@@ -3542,11 +3542,11 @@ body.is-ai-resizing .float { transition: none !important; }
 }
 
 /* ============================================================
-   第 76 轮：任务总结工序页（稿 3495:55201 步骤条 / 3495:55203 内容）
-   ① 顶栏 44：首页 / 标题 / 任务执行（回任务页）/ 自动执行
-   ② 工序条 43：6 步 · 块间距 8 · 每块前 56 连线（首块无）
-   ③ 内容 1024 列居中：任务总结标题 28 → 派发卡 96 → 工序资产
-   ④ 底栏 56：sticky 贴底，主键「智能派发任务」
+   第 79 轮：任务总结工序页（按 MasterGo 稿完全重铺）
+   稿面：3495:55203 内容列 1024×802 / 3495:55202 工序条容器 1133×87
+   ① 顶栏 44（同任务页）
+   ② 工序条 = 任务页 .task-steps（87 高），9 道工序、名称一致
+   ③ 内容 1024 居中：标题 28 → 派发卡 96 → 工序资产 634
    ============================================================ */
 body[data-page="summary"] { --sum-col: 1024px; }
 /* 任务总结页的交互全在 panel-main 里，不需要底部输入区 */
@@ -3560,59 +3560,13 @@ body[data-page="summary"] .stage.is-chat { display: none; }
 }
 .sum-back .ico { color: var(--cds-text-secondary); }
 .sum-back:hover, .sum-back:focus-visible { background: var(--cds-surface-subtle); }
-.sum-back:hover .ico, .sum-back:focus-visible .ico { color: var(--cds-color-primary); }
+.sum-back:focus-visible { outline: none; }
 
-/* ---- ② 工序条 ---- */
-.sum-steps {
-  position: absolute; left: 0; right: 0; top: 44px; height: 43px; z-index: 8;
-  display: flex; align-items: flex-start; padding: 1px 20px 0;
-  container-type: inline-size;
-  background: var(--cds-bg-container);
-  box-shadow: inset 1px 0 0 0 #EBECED, inset 0 -1px 0 0 var(--cds-line-strong);
-  overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
-}
-.sum-steps::-webkit-scrollbar { height: 0; }
-.ss-track { display: flex; align-items: flex-start; gap: 8px; width: 100%; max-width: var(--sum-col); margin: 0 auto; }
-.ss-item {
-  position: relative; flex: 0 0 auto; height: 42px; padding-left: 64px;
-  display: flex; align-items: flex-start; gap: 8px; text-decoration: none;
-}
-.ss-item:first-child { padding-left: 0; }
-.ss-item::before {
-  content: ''; position: absolute; left: 0; top: 11.2px; width: 56px; height: 1.6px;
-  background: var(--cds-line-strong);
-}
-.ss-item:first-child::before { content: none; }
-.ss-item.is-done::before, .ss-item.is-now::before { background: var(--cds-color-primary); }
-.ss-icon {
-  flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%;
-  display: inline-flex; align-items: center; justify-content: center;
-  color: var(--cds-color-primary);
-  background: var(--cds-blue-1); box-shadow: inset 0 0 0 1px var(--cds-blue-2);
-  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
-}
-.ss-txt { display: flex; flex-direction: column; min-width: 0; }
-.ss-txt b { font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); white-space: nowrap; }
-.ss-txt i { font-size: 12px; line-height: 20px; font-style: normal; color: #868686; white-space: nowrap; }
-/* 待开始：名称降一级到次要灰、常规字重（稿 3183:92940 / 3183:92976 / 3183:92960） */
-.ss-item.is-todo .ss-txt b { font-weight: 400; color: var(--cds-text-secondary); }
-/* 当前：绿色实心 + 白勾（稿 3395:60041 = #3BB346），状态字主色 */
-.ss-item.is-now .ss-icon { color: #FFFFFF; background: #3BB346; box-shadow: none; }
-.ss-item.is-now .ss-txt i { color: var(--cds-color-primary); }
-a.ss-item:hover .ss-txt b, a.ss-item:focus-visible .ss-txt b { color: var(--cds-color-primary); }
-a.ss-item:focus-visible { outline: none; }
-/* 面板 < 980 时收紧连线与间距，6 道工序仍能一屏放下（1280 视口） */
-@container (max-width: 980px) {
-  .ss-item { padding-left: 44px; }
-  .ss-item::before { width: 36px; }
-  .ss-track { gap: 4px; }
-}
-
-/* ---- ③ 内容区（同 .tp-wrap 几何：绝对值撑满 + 1024 列居中 + 8px 细滚动条） ---- */
+/* ---- 内容区：顶栏 44 + 工序条 87 = 131 起，1024 列居中 ---- */
 .sum-wrap {
-  position: absolute; left: 0; right: 0; top: 87px; bottom: 0; z-index: 8;
+  position: absolute; left: 0; right: 0; top: 131px; bottom: 0; z-index: 8;
   display: flex; flex-direction: column; align-items: center;
-  padding: 20px 20px 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin;
+  padding: 20px 20px 24px; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin;
 }
 .sum-wrap::-webkit-scrollbar { width: 8px; }
 .sum-wrap::-webkit-scrollbar-track { background: transparent; }
@@ -3620,114 +3574,128 @@ a.ss-item:focus-visible { outline: none; }
 .sum-wrap::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, .28); }
 .sum-col { width: 100%; max-width: var(--sum-col); flex: 0 0 auto; }
 
-/* 标题：28 高，两侧各 456 横线（稿 3337:55158 / 53191 / 53194） */
+/* 标题：28 高，两侧各 456 线、间距 16（稿 3337:55158 / 53191 / 53194） */
 .sum-h { height: 28px; display: flex; align-items: center; gap: 16px; }
-.sum-h-line { flex: 1 1 0; height: 1px; background: var(--cds-line-strong); }
-.sum-h-txt { font-size: 20px; line-height: 28px; font-weight: 500; color: var(--cds-text-primary); white-space: nowrap; }
+.sum-h-line { flex: 1 1 0; height: 1px; background: #E5E5E5; }
+.sum-h-txt { font-size: 20px; line-height: 28px; font-weight: 500; color: #1F1F1F; white-space: nowrap; }
 
-/* 派发卡：96 高 · 底 #F7F7F7 + 1px #EEEEEE + r4 + 0 1 2 阴影（稿 3253:53185） */
+/* 派发卡：稿 3337:53274 —— 1024×96 · #F7F7F7 + 1px #EEEEEE · r4 · 卡身无投影 */
 .sum-dp {
-  margin-top: 24px; height: 96px; padding: 16px; border-radius: 4px;
+  margin-top: 24px; height: 96px; padding: 16px 20px 16px 16px; border-radius: 4px;
   display: flex; align-items: flex-start; gap: 12px;
   background: #F7F7F7;
-  box-shadow: inset 0 0 0 1px #EEEEEE, 0 1px 2px rgba(0, 0, 0, .08);
+  box-shadow: inset 0 0 0 1px #EEEEEE;
 }
+/* 图标底：40×40 白底 r4 + 0 1 2 0 rgba(0,0,0,.08)（稿 3337:53245 容器 2012） */
 .sum-dp-ico {
   flex: 0 0 auto; width: 40px; height: 40px; border-radius: 4px;
   display: inline-flex; align-items: center; justify-content: center;
-  color: var(--cds-color-primary); background: #FFFFFF;
+  color: #1F1F1F; background: #FFFFFF;
   box-shadow: 0 1px 2px rgba(0, 0, 0, .08);
 }
+.sum-dp-ico svg { width: 24px; height: 24px; display: block; }
 .sum-dp-main { flex: 1 1 auto; min-width: 0; }
-.sum-dp-t { margin: 0; font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); }
-.sum-dp-d { margin: 2px 0 0; max-width: 700px; font-size: 12px; line-height: 20px; color: var(--cds-text-primary); }
+.sum-dp-t { margin: 0; font-size: 14px; line-height: 22px; font-weight: 500; color: #1F1F1F; }
+.sum-dp-d {
+  margin: 2px 0 0; max-width: 700px;
+  font-size: 12px; line-height: 20px; color: #6B6B6B;
+}
+/* 按钮：134×32 · 白底 + 1px #E5E5E5 · 图标 14 + 4 + 文字 14/22（稿 Button 3253:53297） */
 .sum-dp-btn {
   align-self: center; flex: 0 0 auto; height: 32px; padding: 0 16px; border-radius: 4px;
   display: inline-flex; align-items: center; gap: 4px;
-  font-size: 14px; line-height: 22px; color: var(--cds-text-primary); background: #FFFFFF;
+  font-size: 14px; line-height: 22px; font-weight: 400; color: #1F1F1F; background: #FFFFFF;
   box-shadow: inset 0 0 0 1px #E5E5E5;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.sum-dp-btn .ico { color: var(--cds-text-secondary); }
+.sum-dp-btn svg { width: 14px; height: 14px; display: block; flex: 0 0 auto; }
 .sum-dp-btn:hover, .sum-dp-btn:focus-visible { background: #FAFAFA; }
-.sum-dp-btn:hover .ico { color: var(--cds-color-primary); }
+.sum-dp-btn:focus-visible { outline: none; }
 
 /* ---- 工序资产 ---- */
 .sum-assets { margin-top: 20px; }
+/* 头 42：标题 14/22 + 副标题 12/20；右侧 32×32 收起/展开按钮，距顶 10 */
 .sa-head { height: 42px; display: flex; align-items: flex-start; }
 .sa-head-l { display: flex; flex-direction: column; min-width: 0; }
-.sa-head-t { font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); text-decoration: none; }
+.sa-head-t { font-size: 14px; line-height: 22px; font-weight: 500; color: #1F1F1F; text-decoration: none; }
 .sa-head-t:hover, .sa-head-t:focus-visible { color: var(--cds-color-primary); }
-.sa-head-s { font-size: 12px; line-height: 20px; color: var(--cds-text-primary); }
+.sa-head-t:focus-visible { outline: none; }
+.sa-head-s { font-size: 12px; line-height: 20px; color: #1F1F1F; }
 .sa-all {
-  margin-left: auto; align-self: flex-end; flex: 0 0 auto; width: 32px; height: 32px; border-radius: 4px;
+  margin: 10px 0 0 auto; flex: 0 0 auto; width: 32px; height: 32px; border-radius: 4px;
   display: inline-flex; align-items: center; justify-content: center;
-  color: var(--cds-text-primary); background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  color: #1F1F1F; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.sa-all .ico { transition: transform .2s var(--cds-motion-ease); }
-.sa-all:hover { background: #FAFAFA; }
-.sa-all[aria-expanded="false"] .ico { transform: rotate(-90deg); }
+.sa-all svg { width: 14px; height: 14px; display: block; }
+.sa-all:hover, .sa-all:focus-visible { background: #FAFAFA; }
+.sa-all:focus-visible { outline: none; }
 
+/* 列表：头 42 与首行间 16，行间距 8 */
 .sa-list { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
-.sa-row { border-radius: 4px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #EEEEEE; }
+.sa-row { border-radius: 4px; }
+/* 行头 40：白底 + 1px #EEEEEE · r4；左 16 → 箭头 14 → 4 → 名称 → 8 → 资产数 */
 .sa-row-h {
-  display: flex; align-items: center; gap: 8px; width: 100%; height: 40px; padding: 0 16px;
-  text-align: left; border-radius: 4px;
+  display: flex; align-items: center; width: 100%; height: 40px; padding: 0 16px;
+  text-align: left; border-radius: 4px; background: #FFFFFF;
+  box-shadow: inset 0 0 0 1px #EEEEEE;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.sa-row-h:hover { background: #FAFAFA; }
-.sa-caret { flex: 0 0 auto; color: var(--cds-text-secondary); transition: transform .2s var(--cds-motion-ease); transform: rotate(-90deg); }
-.sa-name { font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); white-space: nowrap; }
-.sa-cnt { font-size: 12px; line-height: 16px; color: var(--cds-text-primary); }
-.sa-cnt[hidden] { display: none; }
-.sa-state { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 14px; line-height: 22px; white-space: nowrap; }
+.sa-caret { flex: 0 0 auto; width: 14px; height: 14px; display: inline-flex; color: #1F1F1F; }
+.sa-caret svg { width: 14px; height: 14px; display: block; transform: rotate(-90deg); transition: transform .2s var(--cds-motion-ease); }
+.sa-name { margin-left: 4px; font-size: 14px; line-height: 22px; font-weight: 500; color: #1F1F1F; white-space: nowrap; }
+.sa-cnt { margin-left: 8px; font-size: 12px; line-height: 16px; color: #868686; white-space: nowrap; }
+.sa-cnt:empty { display: none; }
+/* 状态：12/22，右侧贴 16；已就绪带 12 勾、间距 4 */
+.sa-state {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; line-height: 22px; white-space: nowrap;
+}
+.sa-state-ico { width: 12px; height: 12px; display: inline-flex; }
+.sa-state-ico svg { width: 12px; height: 12px; display: block; }
 .sa-state.is-ok { color: #30953B; }
 .sa-state.is-warn { color: #FF7D00; }
+.sa-state.is-quiet { color: #30953B; }
+
+/* 展开态：卡身白底 + 1px #EEEEEE + 0 8 8 rgba(0,0,0,.06)，行头换 #F7F7F7 + #E5E5E5（上圆角） */
+.sa-row.is-open { background: #FFFFFF; box-shadow: 0 8px 8px rgba(0, 0, 0, .06), inset 0 0 0 1px #EEEEEE; }
+.sa-row.is-open .sa-row-h {
+  background: #F7F7F7; box-shadow: inset 0 0 0 1px #E5E5E5; border-radius: 4px 4px 0 0;
+}
+.sa-row.is-open .sa-caret svg { transform: rotate(0deg); }
+.sa-row.is-open .sa-cnt { color: #1F1F1F; }
+.sa-row:not(.is-open) .sa-row-h:hover { background: #F7F7F7; box-shadow: inset 0 0 0 1px #E5E5E5; }
+.sa-row-h:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--cds-color-primary); }
+
 .sa-body { display: none; padding: 0 16px 16px; }
 .sa-row.is-open .sa-body { display: block; }
-.sa-row.is-open .sa-row-h { height: 40px; }
-.sa-row.is-open .sa-caret { transform: rotate(0deg); }
 
-.sa-tags { display: flex; align-items: flex-start; gap: 8px; padding-top: 16px; }
+/* 标签行：24 高 · #F5F8FF + 1px #DAE4FE · r4 · 内距 8 · 标签间 8 */
+.sa-tags { display: flex; gap: 8px; margin-top: 16px; min-width: 0; }
 .sa-tag {
-  height: 24px; padding: 0 8px; border-radius: 4px;
-  display: inline-flex; align-items: center; gap: 8px; max-width: 100%;
-  font-size: 12px; line-height: 24px; color: var(--cds-text-primary);
-  background: var(--cds-blue-1); box-shadow: inset 0 0 0 1px var(--cds-blue-2);
+  flex: 0 0 auto; height: 24px; max-width: 100%; padding: 0 8px; border-radius: 4px;
+  display: inline-flex; align-items: center; gap: 8px; overflow: hidden;
+  background: #F5F8FF; box-shadow: inset 0 0 0 1px #DAE4FE;
+  font-size: 12px; line-height: 24px;
 }
-.sa-tag b { font-weight: 400; }
-.sa-tag i { font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sa-tag.is-wide { flex: 1 1 auto; min-width: 0; }
-.sa-tag.is-wide i { color: var(--cds-text-tertiary); }
+.sa-tag b { font-weight: 500; color: #1F1F1F; white-space: nowrap; }
+.sa-tag i { font-style: normal; color: #1F1F1F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sa-tag i.is-muted { color: #868686; }
 
-.sa-table { margin-top: 16px; border-radius: 4px; overflow: hidden; box-shadow: inset 0 0 0 1px #EEEEEE; }
+/* 表：992 宽（左右 16），表头 32 + 4 行 36；列 12 / 68 / 692 / 812 / 902 */
+.sa-table { margin-top: 16px; }
 .sa-tr {
   display: grid; grid-template-columns: 56px minmax(0, 1fr) 120px 90px 90px;
-  align-items: center; height: 36px; padding: 0 12px;
-  font-size: 14px; line-height: 22px; color: var(--cds-text-primary); background: #FFFFFF;
-  box-shadow: inset 0 -1px 0 0 #EBECED;
+  align-items: center; height: 36px; padding-left: 12px;
+  font-size: 14px; line-height: 22px; color: #1F1F1F;
+  box-shadow: inset 0 -1px 0 #EBECED;
 }
-.sa-tr:last-child { box-shadow: none; }
-.sa-tr.is-th { height: 32px; background: #F7F7F7; font-size: 12px; line-height: 20px; color: var(--cds-text-secondary); }
+.sa-tr > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sa-tr.is-th { height: 32px; font-size: 12px; line-height: 20px; font-weight: 500; color: #6B6B6B; }
+.sa-tr.is-th > span:first-child { color: #1F1F1F; }
 .sa-sort { display: inline-flex; align-items: center; gap: 2px; }
-.sa-sort-ico { color: var(--cds-text-disabled); }
-
-/* ---- ④ 底栏 ---- */
-.sum-foot {
-  position: sticky; bottom: 0; z-index: 2;
-  flex: 0 0 56px; width: 100%; max-width: var(--sum-col); margin-top: auto;
-  display: flex; align-items: center; justify-content: center;
-  background: #FFFFFF; box-shadow: inset 0 1px 0 0 #EBECED;
-}
-.sum-primary {
-  width: 212px; height: 36px; border-radius: 4px;
-  font-size: 14px; line-height: 22px; font-weight: 500; color: #FFFFFF;
-  background: var(--cds-color-primary);
-  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
-}
-.sum-primary:hover, .sum-primary:focus-visible { background: #2E63DB; }
-.sum-primary:active { background: #0A57D0; }
+.sa-sort-ico { width: 14px; height: 14px; display: inline-flex; }
+.sa-sort-ico svg { width: 14px; height: 14px; display: block; }
 
 /* ============================================================
    第 76 轮：任务智能派发弹窗（稿 3495:55225 / 3495:55277 · 1200×804）

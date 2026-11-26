@@ -74,19 +74,21 @@ const file = u => 'file:///' + BASE + '/cecoder-' + u + '.html';
 /* ============ C 任务总结页：工序条末步 + 回跳 ============ */
 {
   const p = await mk('cecoder-summary.html?id=0');
+  /* 第 79 轮：工序条改成与任务页同款容器（9 道），末步当前态不是链接 */
   const c = await p.evaluate(() => {
-    const items = [...document.querySelectorAll('.ss-item')];
+    const items = [...document.querySelectorAll('#tkStepTrack .ts-item')];
     const last = items[items.length - 1];
     return {
-      names: items.map(i => i.querySelector('b').textContent),
+      names: items.map(i => i.querySelector('.ts-name').textContent),
       lastTag: last.tagName, lastNow: last.classList.contains('is-now'),
-      links: items.slice(0, 5).map(i => i.getAttribute('href')),
+      links: items.slice(0, 8).map(i => i.getAttribute('href')),
       home: (document.querySelector('.tt-home') || {}).getAttribute ? document.querySelector('.tt-home').getAttribute('href') : '',
       back: (document.querySelector('.sum-back') || {}).href ? document.querySelector('.sum-back').getAttribute('href') : '',
     };
   });
-  ok('C1 末步 = 任务总结（当前态，非链接）', c.names[5] === '任务总结' && c.lastTag === 'SPAN' && c.lastNow, c.names.join('/'));
-  ok('C2 前 5 道工序都能回任务页', c.links.every(h => h === 'cecoder-task.html?id=0'), c.links.join(','));
+  ok('C1 9 道工序、末步 = 任务总结（当前态，非链接）',
+    c.names.length === 9 && c.names[8] === '任务总结' && c.lastTag === 'SPAN' && c.lastNow, c.names.join('/'));
+  ok('C2 前 8 道工序都能回任务页', c.links.length === 8 && c.links.every(h => h === 'cecoder-task.html?id=0'), c.links.join(','));
   ok('C3 顶部「首页 / 任务执行」双入口', c.home === 'cecoder-home.html' && c.back === 'cecoder-task.html?id=0', c.home + ' ' + c.back);
   await p.close();
 }
