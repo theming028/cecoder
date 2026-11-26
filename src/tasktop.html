@@ -1,0 +1,28 @@
+    <!-- ============================================================
+         第 81 轮：任务执行页 / 任务总结页 / UI设计页 共用顶栏（44 高）
+         用户：任务总结的 task-top 与代码开发的一致，那块是公共的
+         左：任务标题 · 右：自动执行 | 任务证据链 | 工序进度 收起⌃ | AI协作
+         ============================================================ -->
+    <div class="task-top">
+      <span class="tt-title">登录成功时未提示信息</span>
+      <div class="tt-right">
+        <button class="tt-run" type="button" id="tkRun"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.6 2.4 9.2 6l-5.6 3.6z" fill="currentColor"/></svg></span>自动执行</button>
+        <span class="tt-vsep" aria-hidden="true"></span>
+        <!-- 第 62 轮：原「任务信息 / 工序资产」两条链接收成一条「任务证据链」，
+             外观与左上「首页」那颗迷你次要按钮同一套（白底 + 1px 描边 + r4 + 图标），
+             点击弹出证据链弹窗（壳子同「云端任务同步」） -->
+        <button class="tt-ev" type="button" id="tkEvidence" aria-haspopup="dialog" aria-controls="evModal">
+          <span class="ico ico12"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" aria-hidden="true"><circle cx="12" cy="5.25" r="3.25" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="5.25" cy="17.75" r="3.25" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="18.75" cy="17.75" r="3.25" stroke="currentColor" stroke-width="3" fill="none"/><path d="M9.93 9.08Q6.76 10.34 7.32 13.92" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M14.07 9.08Q17.24 10.34 16.68 13.92" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M9.6 17.75Q12 19.95 14.4 17.75" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg></span>任务证据链
+        </button>
+
+        <div class="tt-now">
+          <span class="tt-now-label">工序进度</span>
+          <span class="tt-now-sep" aria-hidden="true"></span>
+          <button class="tt-fold" type="button" id="tkStepsToggle" aria-expanded="true" aria-controls="tkStepBar">收起<span class="ico ico12 tt-caret"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.9 7.5 6 4.5 9.1 7.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+        </div>
+        <!-- 第 68 轮：AI 协作栏收起后，这里长出一颗入口（外观同「任务证据链」，hover 蓝底白字） -->
+        <button class="tt-ai" type="button" id="tkAiOpen" aria-controls="aiSide" aria-expanded="false">
+          <span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1.7l1.55 3.9 3.9 1.55-3.9 1.55L8 12.6 6.45 8.7l-3.9-1.55 3.9-1.55z" stroke="currentColor" stroke-width="1.15" stroke-linejoin="round"/><path d="M12.6 11.4l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z" fill="currentColor"/></svg></span>AI协作
+        </button>
+      </div>
+    </div>

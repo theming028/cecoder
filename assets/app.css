@@ -2454,6 +2454,11 @@ body[data-page="task"] .stage > .version { display: none; }
 @keyframes tsOrbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .ts-item.is-now .ts-icon::after { animation: none; } }
 .ts-item.is-now .ts-name { font-weight: 500; }
+/* 第 81 轮：末道「任务总结」= 已完成态 —— 绿底 #3BB346 + 白色对勾（稿 3395:60041 / 60040），
+   去掉蓝色实心的 32 点阵环；状态文字同稿取成功绿 */
+.ts-item.is-now.is-final .ts-icon { color: #FFFFFF; background: #3BB346; box-shadow: none; }
+.ts-item.is-now.is-final .ts-icon::after { display: none; }
+.ts-item.is-now.is-final .ts-state { color: #3BB346; }
 /* 第 59 轮：已完成阶段的工序名也按中粗 500（原来只有 is-now 加粗，is-done 掉回 400） */
 .ts-item.is-done .ts-name { font-weight: 500; }
 /* 第 77 轮：工序链末步「任务总结」改成链接（点进任务总结工序页），补 a 的默认样式与悬停 */
@@ -3082,6 +3087,8 @@ body.is-focus[data-page="task"] .tp-wrap { top: 40px; }
 /* 已忽略：整卡转灰，只留「恢复」 */
 .cp.is-ignored { background: #FAFAFA; border-color: #F0F0F0; }
 .cp.is-ignored .cp-title, .cp.is-ignored .cp-meta, .cp.is-ignored .cp-note { color: var(--cds-text-disabled); }
+/* 第 81 轮：忽略后的标题回常规字重（500 → 400），整卡才真的「退下去」 */
+.cp.is-ignored .cp-title { font-weight: 400; }
 /* 忽略后仓库／分支文本随 .cp-meta 一起转灰 */
 .cp.is-ignored .cp-link, .cp.is-ignored .cp-dot { color: inherit; }
 .cp.is-ignored .cp-risk { background: #F2F3F5; box-shadow: inset 0 0 0 1px #E9EAEC; color: var(--cds-text-tertiary); }
@@ -3563,7 +3570,8 @@ body[data-page="summary"] { --sum-col: 1024px; }
 body[data-page="summary"] .stage.is-chat { display: none; }
 /* 第 80 轮：UI设计工序页 —— 顶栏 44 + 工序条 87，中栏留空 */
 body[data-page="ui"] .stage.is-chat { display: none; }
-.ui-blank { position: absolute; left: 0; right: 0; top: 131px; bottom: 0; z-index: 3; background: var(--cds-bg-container); }
+.ui-blank { position: absolute; left: 0; right: 0; top: 131px; bottom: 0; z-index: 3; background: var(--cds-bg-container); transition: top .26s cubic-bezier(.2, .8, .2, 1); }
+body[data-page="ui"] .panel-main.is-steps-off .ui-blank { top: 44px; }
 
 .sum-back {
   height: 28px; padding: 0 10px; border-radius: 4px;
@@ -3580,7 +3588,10 @@ body[data-page="ui"] .stage.is-chat { display: none; }
   position: absolute; left: 0; right: 0; top: 131px; bottom: 0; z-index: 8;
   display: flex; flex-direction: column; align-items: center;
   padding: 20px 20px 24px; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin;
+  transition: top .26s cubic-bezier(.2, .8, .2, 1);
 }
+/* 第 81 轮：顶栏接了公共的「工序进度 收起」—— 工序条收平后内容一起上移 */
+body[data-page="summary"] .panel-main.is-steps-off .sum-wrap { top: 44px; }
 .sum-wrap::-webkit-scrollbar { width: 8px; }
 .sum-wrap::-webkit-scrollbar-track { background: transparent; }
 .sum-wrap::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, .16); border-radius: 8px; }
@@ -3633,7 +3644,8 @@ body[data-page="ui"] .stage.is-chat { display: none; }
 .sa-head-t { font-size: 14px; line-height: 22px; font-weight: 500; color: #1F1F1F; text-decoration: none; }
 .sa-head-t:hover, .sa-head-t:focus-visible { color: var(--cds-color-primary); }
 .sa-head-t:focus-visible { outline: none; }
-.sa-head-s { font-size: 12px; line-height: 20px; color: #1F1F1F; }
+/* 第 81 轮：副标题取稿 3337 的文字色 文本/@color-text-3（#868686），不再与标题同黑 */
+.sa-head-s { font-size: 12px; line-height: 20px; color: #868686; }
 .sa-all {
   margin: 10px 0 0 auto; flex: 0 0 auto; width: 32px; height: 32px; border-radius: 4px;
   display: inline-flex; align-items: center; justify-content: center;
@@ -3705,7 +3717,7 @@ body[data-page="ui"] .stage.is-chat { display: none; }
 }
 .sa-tr > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sa-tr.is-th { height: 32px; font-size: 12px; line-height: 20px; font-weight: 500; color: #6B6B6B; }
-.sa-tr.is-th > span:first-child { color: #1F1F1F; }
+/* 第 81 轮：表头「序号」与其余表头同色（稿 textColor #6B6B6B），不再单独压深 */
 /* 第 80 轮：表格序号一律偏灰；状态列「待产出」走橙 */
 .sa-tr:not(.is-th) > span:first-child { color: #868686; }
 .sa-st.is-warn { color: #FF7D00; }
@@ -3809,21 +3821,27 @@ body[data-page="ui"] .stage.is-chat { display: none; }
 .dp-count { font-size: 14px; line-height: 22px; color: #868686; }
 
 /* ---- 右列：智能拆分的任务 ---- */
-.dp-right { flex: 1 1 auto; min-width: 0; min-height: 0; display: flex; flex-direction: column; padding: 20px 20px 0; }
+/* 第 81 轮：滚动条从 .dp-list 上移到整列 .dp-right（标题 / 说明 / 任务卡一起滚） */
+.dp-right {
+  flex: 1 1 auto; min-width: 0; min-height: 0;
+  display: flex; flex-direction: column; padding: 20px;
+  overflow-y: auto; scrollbar-width: thin;
+}
+.dp-right::-webkit-scrollbar { width: 6px; }
+.dp-right::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, .16); border-radius: 6px; }
 .dp-r-t { margin: 0; font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); }
 .dp-r-d { margin: 4px 0 0; font-size: 12px; line-height: 18px; color: #6B6B6B; }
 .dp-list {
-  margin-top: 16px; flex: 1 1 auto; min-height: 0; overflow-y: auto;
-  display: flex; flex-direction: column; gap: 8px; padding-bottom: 20px; scrollbar-width: thin;
+  margin-top: 16px; flex: 0 0 auto;
+  display: flex; flex-direction: column; gap: 8px;
 }
-.dp-list::-webkit-scrollbar { width: 6px; }
-.dp-list::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, .16); border-radius: 6px; }
 
+/* 空态：稿 2171 —— 760×600 · #FAFAFA + 1px 虚线 #C9C9C9（2×2 点划） */
 .dp-empty {
-  flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
+  flex: 0 0 600px; min-height: 0; display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 12px;
   background: #FAFAFA; border-radius: 4px;
-  box-shadow: inset 0 0 0 1px #C9C9C9;
+  box-shadow: none; border: 1px dashed #C9C9C9;
 }
 .dp-empty-t { margin: 0; font-size: 14px; line-height: 22px; color: var(--cds-text-primary); }
 .dp-split {
@@ -3847,22 +3865,45 @@ body[data-page="ui"] .stage.is-chat { display: none; }
 }
 .dp-type { background: var(--cds-blue-1); box-shadow: inset 0 0 0 1px var(--cds-blue-2); color: var(--cds-color-primary); }
 .dp-type.is-muted { color: var(--cds-text-secondary); }
-.dp-type.is-warn { background: #FFF7E8; box-shadow: inset 0 0 0 1px #FFE4BA; }
+/* 第 81 轮：橙底标签的文字同稿取 #FF7D00（原来继承了蓝底那套主色，看着发蓝） */
+.dp-type.is-warn { background: #FFF7E8; box-shadow: inset 0 0 0 1px #FFE4BA; color: #FF7D00; }
 .dp-state { background: #FFF7E8; box-shadow: inset 0 0 0 1px #FFE4BA; color: #FF7D00; }
 .dp-state.is-right { position: absolute; right: 16px; top: 17px; }
 .dp-card-main { padding-left: 68px; }
 .dp-card-t { margin: 0; font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); }
 .dp-card-s { margin: 4px 0 0; font-size: 12px; line-height: 18px; color: var(--cds-text-secondary); }
 .dp-card-row { margin-top: 12px; display: flex; align-items: center; gap: 8px; }
+/* 第 81 轮：「选择受理岗位/人员」改成可展开的岗位列表（下拉） */
+.dp-sel-wrap { position: relative; min-width: 0; display: flex; }
 .dp-sel {
   height: 32px; padding: 0 12px; border-radius: 4px; min-width: 0;
   display: inline-flex; align-items: center; gap: 8px;
   background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
-  font-size: 14px; line-height: 22px;
+  font-size: 14px; line-height: 22px; font-family: inherit; color: inherit; text-align: left;
+  transition: box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
 }
+.dp-sel:hover, .dp-sel[aria-expanded="true"] { box-shadow: inset 0 0 0 1px #C9C9C9; }
+.dp-sel:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--cds-color-primary); }
 .dp-sel-k { color: var(--cds-text-secondary); white-space: nowrap; }
 .dp-sel-v { color: var(--cds-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dp-sel .ico { color: var(--cds-text-disabled); flex: 0 0 auto; }
+.dp-sel .ico { color: var(--cds-text-disabled); flex: 0 0 auto; transition: transform .18s var(--cds-motion-ease); }
+.dp-sel[aria-expanded="true"] .ico { transform: rotate(180deg); }
+.dp-sel-menu {
+  position: absolute; left: 0; top: calc(100% + 4px); z-index: 6;
+  min-width: 100%; padding: 4px; border-radius: 4px;
+  background: #FFFFFF; border: 1px solid #E5E5E5;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .12);
+  display: flex; flex-direction: column;
+}
+.dp-sel-menu[hidden] { display: none; }
+.dp-sel-opt {
+  height: 32px; padding: 0 8px; border-radius: 2px; white-space: nowrap;
+  font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  background: transparent; text-align: left;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.dp-sel-opt:hover, .dp-sel-opt:focus-visible { background: #F7F7F7; outline: none; }
+.dp-sel-opt.is-on { background: #F5F8FF; color: var(--cds-color-primary); }
 .dp-card-btns { margin-left: auto; flex: 0 0 auto; display: flex; gap: 8px; }
 .dp-btn {
   height: 32px; padding: 0 16px; border-radius: 4px;

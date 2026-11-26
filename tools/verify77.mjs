@@ -83,14 +83,15 @@ const file = u => 'file:///' + BASE + '/cecoder-' + u + '.html';
       lastTag: last.tagName, lastNow: last.classList.contains('is-now'),
       links: items.slice(0, 8).map(i => i.getAttribute('href')),
       home: !!document.querySelector('.task-top .tt-home'),
-      back: (document.querySelector('.sum-back') || {}).href ? document.querySelector('.sum-back').getAttribute('href') : '',
+      back: !!document.querySelector('.sum-back'),
+      run: !!document.getElementById('tkRun'), ev: !!document.getElementById('tkEvidence'), fold: !!document.getElementById('tkStepsToggle'),
     };
   });
   ok('C1 9 道工序、末步 = 任务总结（当前态，非链接）',
     c.names.length === 9 && c.names[8] === '任务总结' && c.lastTag === 'SPAN' && c.lastNow, c.names.join('/'));
   ok('C2 第 3 道 UI设计 → 独立页，其余前 8 道回任务页',
     c.links.length === 8 && c.links[2] === 'cecoder-ui.html?id=0' && c.links.filter((h, i) => i !== 2).every(h => h === 'cecoder-task.html?id=0'), c.links.join(','));
-  ok('C3 中栏 task-top 不再放「首页」，右侧仍留「任务执行」', c.home === false && c.back === 'cecoder-task.html?id=0', c.home + ' ' + c.back);
+  ok('C3 顶栏与任务页同款（无「首页」/「任务执行」，有自动执行·证据链·收起）', c.home === false && c.back === false && c.run && c.ev && c.fold, JSON.stringify(c));
   await p.close();
 }
 

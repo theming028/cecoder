@@ -13,6 +13,8 @@ const P = {
   chathead: R('src/chathead.html'),
   rightpanel: R('src/rightpanel.html'),
   taskview: R('src/taskview.html'),
+  /* 第 81 轮：任务页 / 总结页 / UI设计页 共用顶栏（用户：task-top 那块是公共的） */
+  tasktop: R('src/tasktop.html'),
   /* 第 77 轮修：任务页右栏「AI 协作」（第 68 轮稿 3347:52836）—— 之前只存在于产物 html 里，
      src 缺失导致重建时整栏丢失，现单独成片段、按 side 槽位插在 panel-main 之后 */
   aiside: R('src/aiside.html'),
@@ -91,21 +93,24 @@ const session = wrap({
 const task = wrap({
   title: 'Cecoder · 任务执行',
   page: 'task',
-  body: chrome(pmChat, P.taskview, stageChat, '', P.aiside),
+  body: chrome(pmChat, P.tasktop + P.taskview, stageChat, '', P.aiside),
 });
 
 /* ---------- 3.5 UI设计工序页：顶栏 + 工序条，中栏留空 ---------- */
 const ui = wrap({
   title: 'Cecoder · UI设计',
   page: 'ui',
-  body: chrome(pmChat, P.uiview, stageChat, '', '', ''),
+  body: chrome(pmChat, P.tasktop + P.uiview, stageChat, '', '', ''),
 });
 
 /* ---------- 4 任务总结工序页：工序条 6 步 + 内容 1024 列 + 派发弹窗 ---------- */
+/* 第 81 轮：派发弹窗作为 side 槽位插在 panel-main 之后、floats 之前 ——
+   弹窗蒙层是 .panel 的绝对定位子层（panel 有 overflow:hidden），
+   之前放在 extra（floats 的游离 </div> 之后）会跑到 .cds-frame 下，蒙层溢出到顶栏外 */
 const summary = wrap({
   title: 'Cecoder · 任务总结',
   page: 'summary',
-  body: chrome(pmChat, P.summaryview, stageChat, '', '', P.dispatch),
+  body: chrome(pmChat, P.tasktop + P.summaryview, stageChat, '', P.dispatch, ''),
 });
 
 for (const [name, html] of [

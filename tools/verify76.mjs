@@ -41,8 +41,8 @@ async function mk(url, w = 1920, h = 1200) {
   ok('A1 工序条沿用任务页容器：87 高、贴顶栏 44', a.bar.h === 87 && a.bar.y === 44, JSON.stringify(a.bar));
   ok('A2 9 道工序、名称与「代码开发」一致',
     a.names.join('/') === '概要设计/详细设计/UI设计/代码变更分析/代码开发/代码审查/白盒测试/提交流水线/任务总结', a.names.join('/'));
-  ok('A3 末位 = 任务总结（当前，实心主色圆点）；前 8 道已完成',
-    a.now === '任务总结' && a.nowIconBg === 'rgb(55, 112, 247)' && a.states.slice(0, 8).every(s => s === '已完成') && a.states[8] === '当前',
+  ok('A3 末位 = 任务总结（当前，绿底 #3BB346 白勾）；前 8 道已完成',
+    a.now === '任务总结' && a.nowIconBg === 'rgb(59, 179, 70)' && a.states.slice(0, 8).every(s => s === '已完成') && a.states[8] === '当前',
     a.nowIconBg + ' ' + a.states.join('/'));
   ok('A4 已完成圆点蓝底 #F5F8FF；8 段连线全亮', a.doneIconBg === 'rgb(245, 248, 255)' && a.links === 8, a.doneIconBg + ' ' + a.links);
   ok('A5 内容列 1024 居中、自 131 起（44 + 87）', a.col.w === 1024 && a.wrap.y === 131, JSON.stringify([a.col.w, a.wrap.y]));
@@ -207,8 +207,7 @@ async function mk(url, w = 1920, h = 1200) {
 /* ============ E 页面互跳 ============ */
 {
   const p = await mk('cecoder-summary.html?id=0');
-  await p.tap('.sum-back'); await wait(600);
-  ok('E1 「任务执行」→ 任务页', /cecoder-task\.html/.test(p.url()), p.url());
+  ok('E1 顶栏改为任务页同款（不再有「任务执行」返链）', await p.evaluate(() => !document.querySelector('.sum-back') && !!document.getElementById('tkRun')));
 
   const p2 = await mk('cecoder-task.html?id=0');
   await p2.tap('#tkStepTrack .ts-item[data-step="9"]'); await wait(600);

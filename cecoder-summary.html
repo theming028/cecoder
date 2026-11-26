@@ -474,27 +474,42 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
 
     <!-- 第 22 轮：会话详情标题栏 —— 通栏，横跨整个 panel-main（左侧让开 28px 的展开按钮） -->
     <!-- ============================================================
+         第 81 轮：任务执行页 / 任务总结页 / UI设计页 共用顶栏（44 高）
+         用户：任务总结的 task-top 与代码开发的一致，那块是公共的
+         左：任务标题 · 右：自动执行 | 任务证据链 | 工序进度 收起⌃ | AI协作
+         ============================================================ -->
+    <div class="task-top">
+      <span class="tt-title">登录成功时未提示信息</span>
+      <div class="tt-right">
+        <button class="tt-run" type="button" id="tkRun"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.6 2.4 9.2 6l-5.6 3.6z" fill="currentColor"/></svg></span>自动执行</button>
+        <span class="tt-vsep" aria-hidden="true"></span>
+        <!-- 第 62 轮：原「任务信息 / 工序资产」两条链接收成一条「任务证据链」，
+             外观与左上「首页」那颗迷你次要按钮同一套（白底 + 1px 描边 + r4 + 图标），
+             点击弹出证据链弹窗（壳子同「云端任务同步」） -->
+        <button class="tt-ev" type="button" id="tkEvidence" aria-haspopup="dialog" aria-controls="evModal">
+          <span class="ico ico12"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" aria-hidden="true"><circle cx="12" cy="5.25" r="3.25" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="5.25" cy="17.75" r="3.25" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="18.75" cy="17.75" r="3.25" stroke="currentColor" stroke-width="3" fill="none"/><path d="M9.93 9.08Q6.76 10.34 7.32 13.92" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M14.07 9.08Q17.24 10.34 16.68 13.92" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M9.6 17.75Q12 19.95 14.4 17.75" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg></span>任务证据链
+        </button>
+
+        <div class="tt-now">
+          <span class="tt-now-label">工序进度</span>
+          <span class="tt-now-sep" aria-hidden="true"></span>
+          <button class="tt-fold" type="button" id="tkStepsToggle" aria-expanded="true" aria-controls="tkStepBar">收起<span class="ico ico12 tt-caret"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.9 7.5 6 4.5 9.1 7.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+        </div>
+        <!-- 第 68 轮：AI 协作栏收起后，这里长出一颗入口（外观同「任务证据链」，hover 蓝底白字） -->
+        <button class="tt-ai" type="button" id="tkAiOpen" aria-controls="aiSide" aria-expanded="false">
+          <span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1.7l1.55 3.9 3.9 1.55-3.9 1.55L8 12.6 6.45 8.7l-3.9-1.55 3.9-1.55z" stroke="currentColor" stroke-width="1.15" stroke-linejoin="round"/><path d="M12.6 11.4l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z" fill="currentColor"/></svg></span>AI协作
+        </button>
+      </div>
+    </div>
+    <!-- ============================================================
          第 79 轮：任务总结工序页（按 MasterGo 稿完全重铺）
          稿面：内容列 3495:55203（1024×802）= 标题 28 + 24 + 派发卡 96 + 20 + 工序资产 634
                工序条容器 3495:55202（1133×87，与「代码开发」任务页同款）
-         ① 顶栏 44：首页 / 标题 / 任务执行（回任务页）/ 自动执行
+         ① 顶栏 44：与任务页共用（src/tasktop.html，第 81 轮抽公共）
          ② 工序条 87：同 .task-steps 容器，9 道工序（名称与任务页一致，末位当前 = 任务总结）
          ③ 内容 1024 居中：标题（456 线 + 80 文字 + 456 线）→ 派发卡 → 工序资产
          ④ 派发入口收进派发卡右侧「打开任务派发」，不再单独做底栏
          ============================================================ -->
-    <div class="task-top">
-      <!-- 第 80 轮：顶栏左上角已有「首页」，中栏这枚去掉 -->
-      <span class="tt-title">登录成功时未提示信息</span>
-      <div class="tt-right">
-        <a class="sum-back" href="cecoder-task.html?id=0">
-          <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M8.6 3.4 5 7l3.6 3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>任务执行
-        </a>
-        <span class="tt-vsep" aria-hidden="true"></span>
-        <button class="tt-run" type="button" id="sumRun"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.6 2.4 9.2 6l-5.6 3.6z" fill="currentColor"/></svg></span>自动执行</button>
-      </div>
-    </div>
-
-    <!-- 工序条：稿 3495:55202 —— 1133×87 容器（与任务页同款）· 9 道工序 · 末位当前 -->
     <div class="task-steps" id="tkStepBar">
       <div class="ts-scroll" id="tkStepScroll">
         <div class="ts-track" id="tkStepTrack">
@@ -538,8 +553,10 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
             <span class="ts-name">提交流水线</span>
             <span class="ts-state">已完成</span>
           </a>
-          <span class="ts-item is-now" data-step="9" aria-current="step">
-            <span class="ts-icon">9</span>
+          <!-- 第 81 轮：末道「任务总结」已完成 —— 绿底 #3BB346 + 白色对勾（稿 3395:60041 / 60040），
+               不再用蓝色实心数字；状态文字同稿取成功绿 -->
+          <span class="ts-item is-now is-final" data-step="9" aria-current="step">
+            <span class="ts-icon"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
             <span class="ts-name">任务总结</span>
             <span class="ts-state">当前</span>
           </span>
@@ -588,7 +605,8 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
               <span class="sa-head-s">8 项已记录 · 12 项待产出 · 资产按工序汇总</span>
             </div>
             <button class="sa-all" type="button" id="saAll" aria-expanded="true" aria-label="全部展开 / 折叠">
-              <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1.5 6.1 7 2.2l5.5 3.9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.5 7.9 7 11.8l5.5-3.9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <!-- 第 81 轮：按稿 3337:56062 换成「折叠全部」图标（左侧上下双折 + 右侧三横线） -->
+              <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><g transform="translate(0.8906 2.2148)"><path d="M4.067777364843749,2.21484375L1.34630858484375,2.21484375C1.16197747484375,2.2148358225822,0.99579480484375,2.32587475,0.92526060384375,2.49617696C0.85472640384375,2.66647917,0.89373315874375,2.8625015,1.02408984484375,2.99282801L2.38476966484375,4.35350755C2.5627443648437502,4.531523249999999,2.85134146484375,4.531523249999999,3.02931666484375,4.35350755L4.38999606484375,2.99282777C4.52035236484375,2.86250103,4.5593590648437505,2.66647875,4.48882506484375,2.49617675C4.4182906648437505,2.32587454,4.25210836484375,2.2148358225822,4.067777364843749,2.21484375ZM4.067777364843749,9.54296875L1.34630858484375,9.54296875C1.16197717484375,9.542960149999999,0.99579396484375,9.65399835,0.92525976884375,9.824301250000001C0.85472551684375,9.99460365,0.89373263714375,10.19062615,1.02408984484375,10.32095335L2.38476966484375,11.68163295C2.5627441648437497,11.85964775,2.85134196484375,11.85964775,3.02931666484375,11.68163295L4.38999606484375,10.32095335C4.52035336484375,10.19062615,4.55936076484375,9.99460365,4.48882626484375,9.824301250000001C4.41829206484375,9.65399835,4.25210856484375,9.54295965,4.067777364843749,9.54296875ZM6.83594896484375,2.2421875L12.57813696484375,2.2421875C12.88017596484375,2.2421875,13.12501196484375,2.4870235,13.12501196484375,2.7890625C13.12501196484375,3.09110153,12.88017596484375,3.3359375499999997,12.57813696484375,3.3359375499999997L6.83594896484375,3.3359375499999997C6.53390976484375,3.3359375499999997,6.28907396484375,3.09110153,6.28907396484375,2.7890625C6.28907396484375,2.4870235,6.53390976484375,2.2421875,6.83594896484375,2.2421875ZM6.83594896484375,6.45312495L12.57813696484375,6.45312495C12.88017596484375,6.45312495,13.12501196484375,6.69796085,13.12501196484375,6.99999995C13.12501196484375,7.30203965,12.88017596484375,7.54687495,12.57813696484375,7.54687495L6.83594896484375,7.54687495C6.53390976484375,7.54687495,6.28907396484375,7.30203865,6.28907396484375,6.99999995C6.28907396484375,6.69796135,6.53390976484375,6.45312495,6.83594896484375,6.45312495ZM6.83594896484375,10.71874995L12.57813696484375,10.71874995C12.88017596484375,10.71874995,13.12501196484375,10.96358585,13.12501196484375,11.26562495C13.12501196484375,11.56766415,12.88017596484375,11.81249995,12.57813696484375,11.81249995L6.83594896484375,11.81249995C6.53390976484375,11.81249995,6.28907396484375,11.56766415,6.28907396484375,11.26562495C6.28907396484375,10.96358585,6.53390976484375,10.71874995,6.83594896484375,10.71874995Z" fill="currentColor"/></g></svg>
             </button>
           </div>
 
@@ -762,6 +780,94 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
     </footer>
   </div><!-- /stage -->
   </div><!-- /panel-main -->
+
+  <!-- ============================================================
+       第 76 轮：任务智能派发弹窗（稿 3495:55225 拆分前 / 3495:55277 拆分后）
+       ① 头 48：标题 + 关闭
+       ② 中 700：左列 360（选择派发来源 · 可滚动 + 底部全选 / 计数）
+                 右列 760（智能拆分的任务 · 空态 / 任务卡）
+       ③ 底 56：取消 / 派发任务
+       两态在同一弹窗里：左列勾选 → 右侧出现任务卡（拆分后）
+       ============================================================ -->
+  <div class="cds-modal dp-modal" id="dpModal" aria-hidden="true">
+    <div class="cm-mask" data-dp-close></div>
+    <div class="dp-dlg" role="dialog" aria-modal="true" aria-labelledby="dpTitle">
+      <header class="dp-head">
+        <h2 class="dp-title" id="dpTitle">任务智能派发</h2>
+        <button class="dp-x" type="button" data-dp-close aria-label="关闭"><span class="ico ico16"><svg viewBox="0.268 0.268 13.454 13.454" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M5.3932272999999995,6.3023109C4.5517561,5.4608417,3.1618684999999997,4.0709572000000005,2.45028523,3.3593756C2.19924629,3.1083372000000002,2.20691663,2.7021755,2.45795518,2.45113683C2.46136415,2.44772783,2.46477288,2.44431907,2.46818063,2.44091135C2.71921921,2.18987256,3.1083372000000002,2.19924587,3.3593755,2.45028484C4.0709569000000005,3.1618681,5.4608417,4.5517559,6.3023109,5.3932272999999995C6.6928339,5.7837512,7.3071384,5.7837493,7.6976633,5.3932272999999995C8.5391417,4.5517561,9.9290404,3.1618681,10.6406288,2.4502848999999998C10.8916683,2.19924775,11.2807875,2.18987206,11.5318241,2.44091129C11.5352325,2.44431907,11.538641,2.44772783,11.5420504,2.45113683C11.7930861,2.7021752599999997,11.8007526,3.1083385,11.549715,3.3593755C10.8381329,4.0709569000000005,9.448244599999999,5.4608417,8.6067734,6.3023109C8.2162495,6.6928339,8.2162514,7.3071384,8.6067734,7.6976633C9.4482446,8.5391417,10.8381329,9.9290404,11.549716,10.6406288C11.8007507,10.8916664,11.793087,11.2978315,11.5420504,11.5488682C11.2978315,11.793087,10.8916664,11.8007507,10.6406288,11.549715C9.9290404,10.8381329,8.5391417,9.448244599999999,7.6976638,8.6067734C7.3071384,8.2162514,6.6928339,8.2162495,6.3023109,8.6067734C5.4608417,9.448244599999999,4.0709572000000005,10.8381329,3.3593756,11.549716C3.1083385,11.8007526,2.7021755999999997,11.793086,2.45113683,11.5420504C2.44772783,11.538641,2.44431907,11.5352325,2.44091135,11.5318251C2.18987206,11.2807875,2.19924775,10.8916683,2.45028484,10.6406288C3.1618681,9.9290404,4.5517559,8.5391417,5.3932272999999995,7.6976638C5.7837493,7.3071384,5.7837514,6.6928339,5.3932272999999995,6.3023109" fill="currentColor" fill-rule="evenodd"/></svg></span></button>
+      </header>
+
+      <div class="dp-main">
+        <aside class="dp-left">
+          <div class="dp-left-scroll">
+            <h3 class="dp-l-t">选择派发来源</h3>
+            <p class="dp-l-d">勾选工序或资产后，系统按任务类型自动拆分，并按岗位角色预分配受理人。</p>
+
+            <div class="dp-grp" data-grp="design">
+              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>概要设计</label>
+              <div class="dp-subs">
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>变动范围分析报告.md</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>改动设计要点分析报告.md</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>【概要设计】-登录失败提示.md</label>
+              </div>
+            </div>
+
+            <div class="dp-grp" data-grp="detail">
+              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>详细设计</label>
+              <div class="dp-subs">
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>代码变更规划.md</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>登录失败提示_详细设计.md</label>
+              </div>
+            </div>
+
+            <div class="dp-grp" data-grp="program">
+              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>UI设计</label>
+              <div class="dp-subs">
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>UI设计文档.md</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>UI设计资产清单.yaml</label>
+                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>UI设计模板.md</label>
+              </div>
+            </div>
+
+
+            <div class="dp-grp is-empty" data-grp="code">
+              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>代码开发</label>
+              <div class="dp-subs">
+                <p class="dp-none">该工序暂无已记录资产</p>
+              </div>
+              <span class="dp-grp-state">4 项待产出</span>
+            </div>
+          </div>
+          <div class="dp-left-foot">
+            <button class="dp-all-btn" type="button" id="dpSelectAll">全选</button>
+            <span class="dp-count" id="dpCount">共 30 项，已选 0 项</span>
+          </div>
+        </aside>
+
+        <section class="dp-right">
+          <h3 class="dp-r-t">智能拆分的任务</h3>
+          <p class="dp-r-d">按任务类型拆分，受理人已按岗位角色预分配，可逐条调整或忽略。</p>
+          <div class="dp-list" id="dpList">
+            <div class="dp-empty" id="dpEmpty">
+              <p class="dp-empty-t">还没有派发的任务</p>
+              <button class="dp-split" type="button" id="dpSplitAll">一键智能拆分全部工序</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer class="dp-foot">
+        <button class="dp-btn" type="button" data-dp-close>取消</button>
+        <button class="dp-btn is-primary" type="button" id="dpGo">派发任务</button>
+      </footer>
+
+      <div class="dp-toast" id="dpToast" hidden>
+        <span class="ico ico20"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8.4" fill="#30953B"/><path d="M6.2 10.3 8.7 12.8 13.9 7.6" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="dp-toast-t" id="dpToastTxt">已派发 3 项任务，任务已完成</span>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== 模态层：panel 的绝对定位子层（蒙层只在窗口面板内，不溢出到顶栏） ===== -->
 
   <!-- 云端任务同步 · 模态（1080×804） -->
@@ -1168,94 +1274,6 @@ M41.99980306625366,43.999827879333495C41.99980306625366,43.999827879333495,5.999
         <button class="tp-dlg-btn" type="button" data-note-close>取消</button>
         <button class="tp-dlg-btn is-primary" type="button" id="tpNoteSave">保存</button>
       </footer>
-    </div>
-  </div>
-
-
-  <!-- ============================================================
-       第 76 轮：任务智能派发弹窗（稿 3495:55225 拆分前 / 3495:55277 拆分后）
-       ① 头 48：标题 + 关闭
-       ② 中 700：左列 360（选择派发来源 · 可滚动 + 底部全选 / 计数）
-                 右列 760（智能拆分的任务 · 空态 / 任务卡）
-       ③ 底 56：取消 / 派发任务
-       两态在同一弹窗里：左列勾选 → 右侧出现任务卡（拆分后）
-       ============================================================ -->
-  <div class="cds-modal dp-modal" id="dpModal" aria-hidden="true">
-    <div class="cm-mask" data-dp-close></div>
-    <div class="dp-dlg" role="dialog" aria-modal="true" aria-labelledby="dpTitle">
-      <header class="dp-head">
-        <h2 class="dp-title" id="dpTitle">任务智能派发</h2>
-        <button class="dp-x" type="button" data-dp-close aria-label="关闭"><span class="ico ico16"><svg viewBox="0.268 0.268 13.454 13.454" width="100%" height="100%" fill="currentColor" aria-hidden="true"><path d="M5.3932272999999995,6.3023109C4.5517561,5.4608417,3.1618684999999997,4.0709572000000005,2.45028523,3.3593756C2.19924629,3.1083372000000002,2.20691663,2.7021755,2.45795518,2.45113683C2.46136415,2.44772783,2.46477288,2.44431907,2.46818063,2.44091135C2.71921921,2.18987256,3.1083372000000002,2.19924587,3.3593755,2.45028484C4.0709569000000005,3.1618681,5.4608417,4.5517559,6.3023109,5.3932272999999995C6.6928339,5.7837512,7.3071384,5.7837493,7.6976633,5.3932272999999995C8.5391417,4.5517561,9.9290404,3.1618681,10.6406288,2.4502848999999998C10.8916683,2.19924775,11.2807875,2.18987206,11.5318241,2.44091129C11.5352325,2.44431907,11.538641,2.44772783,11.5420504,2.45113683C11.7930861,2.7021752599999997,11.8007526,3.1083385,11.549715,3.3593755C10.8381329,4.0709569000000005,9.448244599999999,5.4608417,8.6067734,6.3023109C8.2162495,6.6928339,8.2162514,7.3071384,8.6067734,7.6976633C9.4482446,8.5391417,10.8381329,9.9290404,11.549716,10.6406288C11.8007507,10.8916664,11.793087,11.2978315,11.5420504,11.5488682C11.2978315,11.793087,10.8916664,11.8007507,10.6406288,11.549715C9.9290404,10.8381329,8.5391417,9.448244599999999,7.6976638,8.6067734C7.3071384,8.2162514,6.6928339,8.2162495,6.3023109,8.6067734C5.4608417,9.448244599999999,4.0709572000000005,10.8381329,3.3593756,11.549716C3.1083385,11.8007526,2.7021755999999997,11.793086,2.45113683,11.5420504C2.44772783,11.538641,2.44431907,11.5352325,2.44091135,11.5318251C2.18987206,11.2807875,2.19924775,10.8916683,2.45028484,10.6406288C3.1618681,9.9290404,4.5517559,8.5391417,5.3932272999999995,7.6976638C5.7837493,7.3071384,5.7837514,6.6928339,5.3932272999999995,6.3023109" fill="currentColor" fill-rule="evenodd"/></svg></span></button>
-      </header>
-
-      <div class="dp-main">
-        <aside class="dp-left">
-          <div class="dp-left-scroll">
-            <h3 class="dp-l-t">选择派发来源</h3>
-            <p class="dp-l-d">勾选工序或资产后，系统按任务类型自动拆分，并按岗位角色预分配受理人。</p>
-
-            <div class="dp-grp" data-grp="design">
-              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>概要设计</label>
-              <div class="dp-subs">
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>变动范围分析报告.md</label>
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>改动设计要点分析报告.md</label>
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>【概要设计】-登录失败提示.md</label>
-              </div>
-            </div>
-
-            <div class="dp-grp" data-grp="detail">
-              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>详细设计</label>
-              <div class="dp-subs">
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>代码变更规划.md</label>
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>登录失败提示_详细设计.md</label>
-              </div>
-            </div>
-
-            <div class="dp-grp" data-grp="program">
-              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>UI设计</label>
-              <div class="dp-subs">
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>UI设计文档.md</label>
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>UI设计资产清单.yaml</label>
-                <label class="dp-ck"><input type="checkbox" data-dp-item><span class="dp-box"></span>UI设计模板.md</label>
-              </div>
-            </div>
-
-
-            <div class="dp-grp is-empty" data-grp="code">
-              <label class="dp-ck is-grp"><input type="checkbox" data-dp-all><span class="dp-box"></span>代码开发</label>
-              <div class="dp-subs">
-                <p class="dp-none">该工序暂无已记录资产</p>
-              </div>
-              <span class="dp-grp-state">4 项待产出</span>
-            </div>
-          </div>
-          <div class="dp-left-foot">
-            <button class="dp-all-btn" type="button" id="dpSelectAll">全选</button>
-            <span class="dp-count" id="dpCount">共 30 项，已选 0 项</span>
-          </div>
-        </aside>
-
-        <section class="dp-right">
-          <h3 class="dp-r-t">智能拆分的任务</h3>
-          <p class="dp-r-d">按任务类型拆分，受理人已按岗位角色预分配，可逐条调整或忽略。</p>
-          <div class="dp-list" id="dpList">
-            <div class="dp-empty" id="dpEmpty">
-              <p class="dp-empty-t">还没有派发的任务</p>
-              <button class="dp-split" type="button" id="dpSplitAll">一键智能拆分全部工序</button>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <footer class="dp-foot">
-        <button class="dp-btn" type="button" data-dp-close>取消</button>
-        <button class="dp-btn is-primary" type="button" id="dpGo">派发任务</button>
-      </footer>
-
-      <div class="dp-toast" id="dpToast" hidden>
-        <span class="ico ico20"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8.4" fill="#30953B"/><path d="M6.2 10.3 8.7 12.8 13.9 7.6" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="dp-toast-t" id="dpToastTxt">已派发 3 项任务，任务已完成</span>
-      </div>
     </div>
   </div>
 

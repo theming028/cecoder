@@ -178,6 +178,7 @@ async function mk(url, w = 1920, h = 1200) {
       empty: rel(document.querySelector('.dp-empty')),
       emptyBg: cs('.dp-empty', 'backgroundColor'),
       emptyShadow: cs('.dp-empty', 'boxShadow'),
+      emptyBorder: cs('.dp-empty', 'border'),
       lfoot: rel(document.querySelector('.dp-left-foot')),
       count: document.getElementById('dpCount').textContent,
       stateRight: (() => { const st = document.querySelector('.dp-grp.is-empty'); return Math.round(st.getBoundingClientRect().right - st.querySelector('.dp-grp-state').getBoundingClientRect().right); })(),
@@ -189,7 +190,7 @@ async function mk(url, w = 1920, h = 1200) {
   ok('F2 左列工序卡：白底 + 仅 0 1 2 阴影（无描边）、工序勾缩进 17、描述 12px',
     f.grpBg === 'rgb(255, 255, 255)' && /rgba\(0, 0, 0, 0\.08\) 0px 1px 2px/.test(f.grpShadow) && f.grpCkX === 17 && f.descFont === '12px',
     JSON.stringify([f.grpBg, f.grpShadow, f.grpCkX, f.descFont]));
-  ok('F3 右列空态 760×600、#FAFAFA + 1px #C9C9C9', f.empty[2] === 760 && f.empty[3] === 600 && f.emptyBg === 'rgb(250, 250, 250)' && /rgb\(201, 201, 201\)/.test(f.emptyShadow), JSON.stringify([f.empty, f.emptyBg]));
+  ok('F3 右列空态 760×600、#FAFAFA + 1px 虚线 #C9C9C9', f.empty[2] === 760 && f.empty[3] === 600 && f.emptyBg === 'rgb(250, 250, 250)' && /1px dashed rgb\(201, 201, 201\)/.test(f.emptyBorder), JSON.stringify([f.empty, f.emptyBg, f.emptyBorder]));
   ok('F4 左列底栏 48、计数与稿同构（共 N 项，已选 M 项）', f.lfoot[3] === 48 && /^共 \d+ 项，已选 \d+ 项$/.test(f.count), f.count);
   ok('F5 「4 项待产出」贴右 16', f.stateRight === 16, f.stateRight);
 

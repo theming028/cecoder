@@ -3215,9 +3215,8 @@
     setTimeout(function () { el.remove(); }, 1800);
   }
 
-  /* 第 79 轮：顶栏「自动执行」——总结页没有 AI 栏，只回一颗提示 */
-  var runBtn = document.getElementById('sumRun');
-  if (runBtn) runBtn.addEventListener('click', function () { tip('已开始自动执行'); });
+  /* 第 81 轮：顶栏换成公共片段后，「自动执行」由任务页那段统一绑（#tkRun → toast），
+     这里不再重复绑 */
 
   /* ---------- ① 工序资产 ---------- */
   var list = document.getElementById('saList');
@@ -3369,6 +3368,9 @@
     }
   ];
 
+  /* 第 81 轮：受理岗位/人员候选（点开 select 展开的列表） */
+  var OWNER_OPTS = ['架构师 · 张三', '产品经理 · 李四', 'UI设计师 · 王五', '前端工程师 · 孙六', '测试经理 · 赵七'];
+
   function cardHtml(rule, assetCount) {
     var tags = '<span class="dp-type' + (rule.muted ? ' is-muted' : '') + (rule.warn ? ' is-warn' : '') + '">' + rule.type + '</span>';
     var dv = rule.assets.length
@@ -3377,6 +3379,9 @@
           return '<label class="dp-ck"><input type="checkbox" checked><span class="dp-box"></span>' + a + '</label>';
         }).join('') + '</div>'
       : '';
+    var opts = OWNER_OPTS.map(function (o) {
+      return '<button class="dp-sel-opt' + (o === rule.owner ? ' is-on' : '') + '" type="button" role="option" data-dp-opt aria-selected="' + (o === rule.owner) + '">' + o + '</button>';
+    }).join('');
     return '' +
       '<article class="dp-card" data-key="' + rule.key + '">' +
         '<div class="dp-card-tags">' + tags + '</div>' +
@@ -3385,8 +3390,13 @@
           '<h4 class="dp-card-t">统一登录失败提示</h4>' +
           '<p class="dp-card-s">来源：' + rule.src + ' · ' + assetCount + ' 项资产</p>' +
           '<div class="dp-card-row">' +
-            '<span class="dp-sel"><span class="dp-sel-k">选择受理岗位/人员：</span><span class="dp-sel-v">' + rule.owner + '</span>' +
-              '<span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.8 5.6 7 8.8l3.2-3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>' +
+            '<span class="dp-sel-wrap">' +
+              '<button class="dp-sel" type="button" data-dp-sel aria-haspopup="listbox" aria-expanded="false">' +
+                '<span class="dp-sel-k">选择受理岗位/人员：</span><span class="dp-sel-v">' + rule.owner + '</span>' +
+                '<span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.8 5.6 7 8.8l3.2-3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+              '</button>' +
+              '<div class="dp-sel-menu" role="listbox" aria-label="受理岗位/人员" hidden>' + opts + '</div>' +
+            '</span>' +
             '<div class="dp-card-btns">' +
               '<button class="dp-btn" type="button" data-dp-detail>' + (rule.assets.length ? '收起详情' : '任务详情') +
                 '<span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.8 5.6 7 8.8l3.2-3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>' +
@@ -3445,16 +3455,49 @@
   bindSplit();
   refreshCount();
 
-  /* 卡内：任务详情 / 收起详情 / 移除 */
+  /* 卡内：选择受理人下拉 / 任务详情 / 收起详情 / 移除 */
+  function closeSelMenus(except) {
+    [].slice.call(modal.querySelectorAll('.dp-sel-menu')).forEach(function (m) {
+      if (m === except) return;
+      m.hidden = true;
+      var s = m.parentElement && m.parentElement.querySelector('.dp-sel');
+      if (s) s.setAttribute('aria-expanded', 'false');
+    });
+  }
   if (listEl) {
     listEl.addEventListener('click', function (e) {
+      /* 第 81 轮：点「选择受理岗位/人员」展开岗位列表 */
+      var s = e.target.closest ? e.target.closest('[data-dp-sel]') : null;
+      if (s) {
+        var menu = s.parentElement.querySelector('.dp-sel-menu');
+        var open = menu.hidden;
+        closeSelMenus(menu);
+        menu.hidden = !open;
+        s.setAttribute('aria-expanded', open ? 'true' : 'false');
+        return;
+      }
+      var opt = e.target.closest ? e.target.closest('[data-dp-opt]') : null;
+      if (opt) {
+        var wrap = opt.closest('.dp-sel-wrap');
+        var val = opt.textContent;
+        wrap.querySelector('.dp-sel-v').textContent = val;
+        [].slice.call(wrap.querySelectorAll('.dp-sel-opt')).forEach(function (o) {
+          var on = o === opt;
+          o.classList.toggle('is-on', on);
+          o.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        var btn = wrap.querySelector('.dp-sel');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+        opt.closest('.dp-sel-menu').hidden = true;
+        return;
+      }
       var d = e.target.closest ? e.target.closest('[data-dp-detail]') : null;
       if (d) {
         var card = d.closest('.dp-card');
         var det = card.querySelector('.dp-detail');
-        var open = det.hidden;
-        det.hidden = !open;
-        d.textContent = open ? '收起详情' : '任务详情';
+        var openDet = det.hidden;
+        det.hidden = !openDet;
+        d.textContent = openDet ? '收起详情' : '任务详情';
         return;
       }
       var r = e.target.closest ? e.target.closest('[data-dp-remove]') : null;
@@ -3465,6 +3508,14 @@
       }
     });
   }
+  /* 点空白处 / Esc 收起岗位列表 */
+  modal.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('.dp-sel-wrap')) return;
+    closeSelMenus(null);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeSelMenus(null);
+  });
 
   /* ---------- ⑤ 派发 ---------- */
   var goBtn = document.getElementById('dpGo');
