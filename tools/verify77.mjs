@@ -138,6 +138,38 @@ const file = u => 'file:///' + BASE + '/cecoder-' + u + '.html';
   await h.close();
 }
 
+/* ============ E 任务页顶栏 / AI 协作（第 68 轮功能，防再次被重建吃掉） ============ */
+{
+  const p = await mk('cecoder-task.html?id=0');
+  const e = await p.evaluate(() => {
+    const tr = document.querySelector('.tt-right');
+    const kids = [...tr.children].filter(x => x.tagName !== 'SPAN').map(x => ({ c: x.className, d: getComputedStyle(x).display }));
+    const ai = document.getElementById('aiSide');
+    return {
+      kids,
+      aiW: ai ? Math.round(ai.getBoundingClientRect().width) : 0,
+      ev: !!document.getElementById('evModal'),
+      shot: !!document.getElementById('shotViewer'),
+    };
+  });
+  ok('E1 顶栏右侧 = 自动执行 / 任务证据链 / 工序进度 / AI协作（收起后才显示）',
+    e.kids.map(k => k.c).join(',') === 'tt-run,tt-ev,tt-now,tt-ai' && e.kids[3].d === 'none', e.kids.map(k => k.c).join(','));
+  ok('E2 证据链弹窗 / 截图预览层都在', e.ev && e.shot, e.ev + ' ' + e.shot);
+  ok('E3 AI 协作栏默认展开 450 宽', e.aiW === 450, e.aiW);
+
+  await p.evaluate(() => document.getElementById('tkEvidence').click()); await wait(300);
+  ok('E4 点「任务证据链」→ 弹窗打开', await p.evaluate(() => document.getElementById('evModal').classList.contains('is-open')));
+  await p.evaluate(() => document.querySelector('#evModal [data-modal-close]').click()); await wait(200);
+
+  await p.evaluate(() => document.getElementById('aiFold').click()); await wait(350);
+  const off = await p.evaluate(() => ({ off: document.querySelector('.panel').classList.contains('is-ai-off'), d: getComputedStyle(document.getElementById('tkAiOpen')).display }));
+  ok('E5 收起 AI 协作 → 栏隐藏、顶栏长出「AI协作」入口', off.off && off.d === 'flex', JSON.stringify(off));
+  await p.evaluate(() => document.getElementById('tkAiOpen').click()); await wait(350);
+  ok('E6 点入口 → 栏恢复', await p.evaluate(() => !document.querySelector('.panel').classList.contains('is-ai-off')));
+  ok('E7 无脚本报错', p.__e.length === 0, p.__e.slice(0, 3).join(' / '));
+  await p.close();
+}
+
 console.log('\n' + pass + '/' + (pass + fail.length) + ' 通过');
 if (fail.length) { console.log('失败：'); fail.forEach(f => console.log('  ✗ ' + f)); }
 await b.close();

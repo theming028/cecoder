@@ -1,0 +1,114 @@
+  <!-- ============================================================
+       第 68 轮：任务执行页右栏「AI 协作」对话栏（稿 3347:52836 · 450×1201）
+       ① 头部 44：当前工序标题 + 新建对话 / 向右收起
+       ② 对话流：上下文分割线 → 用户气泡 → Cecoder「深度思考」卡 → 任务产物
+       ③ 底部输入卡：附件 / 艾迪 / 模型 / 发送
+       默认展开（工序一开始执行就有对话）；收起后由工具条 tt-now 右侧
+       的「AI 协作」入口重新呼出（见 .tt-ai 与 app.js 的 setAiPanel）
+       ============================================================ -->
+  <aside class="ai-side" id="aiSide" aria-label="AI 协作对话" aria-hidden="false">
+   <!-- 第 69 轮：左缘 8px 拖拽热区，可把整栏拉伸到 400~上限 -->
+   <div class="ai-resize" id="aiResize" role="separator" aria-orientation="vertical" aria-label="拖动调整 AI 协作栏宽度" tabindex="0"></div>
+   <div class="ai-side-in">
+
+    <header class="ai-head">
+      <button class="ai-h-title" type="button">
+        生成任务的业务代码
+        <span class="ico ico12 ai-h-caret" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.9 4.6 6 7.7 9.1 4.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </button>
+      <div class="ai-h-acts">
+        <button class="ai-hbtn" type="button" data-tip="新建对话" aria-label="新建对话"><span class="ico ico14"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.9a6.1 6.1 0 0 0-5 9.6l-.7 2.6 2.6-.7A6.1 6.1 0 1 0 8 1.9Z" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/><path d="M8 5.5v5M5.5 8h5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg></span></button>
+        <button class="ai-hbtn" type="button" id="aiFold" data-tip="收起 AI 协作" aria-label="收起 AI 协作"><span class="ico ico14"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5.4 3.6 9.8 8l-4.4 4.4" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.2 3.4v9.2" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/></svg></span></button>
+      </div>
+    </header>
+
+    <div class="ai-scroll" id="aiScroll">
+      <div class="ai-divider"><i></i><span>已加载代码变更与仓库上下文</span><i></i></div>
+
+      <!-- 用户消息 -->
+      <div class="ai-msg is-user">
+        <p class="ai-bubble">根据当前任务提交的资产内容，生成任务的业务代码。</p>
+        <div class="ai-meta">
+          <span class="ai-time">15:26</span>
+          <button class="ai-mbtn" type="button" data-tip="复制" aria-label="复制"><span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="4.6" y="1.9" width="7.1" height="7.1" rx="1.4" stroke="currentColor" stroke-width="1.1"/><path d="M9.4 11.2v.4c0 .8-.6 1.4-1.4 1.4H3.3c-.8 0-1.4-.6-1.4-1.4V6.9c0-.8.6-1.4 1.4-1.4h.4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span></button>
+          <button class="ai-mbtn" type="button" data-tip="重新生成" aria-label="重新生成"><span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M12 7a5 5 0 1 1-1.6-3.7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M12.2 2.2v2.9H9.3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+        </div>
+      </div>
+
+      <!-- AI 消息 -->
+      <div class="ai-msg is-ai">
+        <div class="ai-who"><span class="ai-avatar" aria-hidden="true">C</span>Cecoder</div>
+
+        <div class="ai-card">
+          <div class="ai-think">
+            <span class="ico ico12" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><rect x="1.4" y="1.4" width="9.2" height="9.2" rx="2.4" stroke="currentColor" stroke-width="1.1"/><circle cx="4.3" cy="6" r=".85" fill="currentColor"/><circle cx="7.7" cy="6" r=".85" fill="currentColor"/></svg></span>深度思考
+          </div>
+          <p class="ai-p">整体取向：以浅色为原生介质（冷灰画布 + 纯白卡面），靛蓝紫只保留给交互态、当前导航、主操作和主数据系列，其余全部走灰阶层级。</p>
+          <div class="ai-sub">
+            <span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><rect x="1.9" y="1.9" width="10.2" height="10.2" rx="2.3" stroke="currentColor" stroke-width="1.15"/><path d="M4.5 7.1 6.2 8.8 9.6 5.4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg></span>已查看 5 张图片
+          </div>
+          <!-- 第 70 轮：4 张独立截图（第 4 张是「还有 2 张」的叠图），点击开蒙层预览 -->
+          <div class="ai-shots" id="aiShots">
+            <button class="ai-shot" type="button" data-full="assets/images/ai/shot-1.png" data-cap="执行过程截图 1" aria-label="预览执行过程截图 1"><img src="assets/images/ai/shot-1.png" alt="执行过程截图 1" loading="lazy"></button>
+            <button class="ai-shot" type="button" data-full="assets/images/ai/shot-login.png" data-cap="执行过程截图 2" aria-label="预览执行过程截图 2"><img src="assets/images/ai/shot-login.png" alt="执行过程截图 2" loading="lazy"></button>
+            <button class="ai-shot" type="button" data-full="assets/images/ai/shot-3.png" data-cap="执行过程截图 3" aria-label="预览执行过程截图 3"><img src="assets/images/ai/shot-3.png" alt="执行过程截图 3" loading="lazy"></button>
+            <button class="ai-shot is-more" type="button" aria-label="还有 2 张截图，点击查看"><img src="assets/images/ai/shot-4.png" alt="还有 2 张截图" loading="lazy"></button>
+          </div>
+          <p class="ai-p is-tight">已完成截图操作并查看图片内容，现在继续。</p>
+
+          <div class="ai-divider is-in"><i></i><span>任务产物</span><i></i></div>
+
+          <!-- 第 69 轮：稿里这两行是带 1px #EEEEEE 边框的卡片，可点开文档详情 -->
+          <button class="ai-file" type="button" data-doc="md" data-name="任务执行报告.md" data-size="256KB">
+            <span class="ai-file-ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M3.6 2.1h5l3.3 3.3v8.5H3.6z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M8.4 2.3v3.3h3.3" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M5.6 8.2h4.4M5.6 10.6h3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>
+            <span class="ai-file-sep" aria-hidden="true"></span>
+            <span class="ai-file-txt"><b>任务执行报告.md</b><i>256KB</i></span>
+          </button>
+          <button class="ai-file" type="button" data-doc="html" data-name="index.html" data-size="128KB">
+            <span class="ai-file-ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M3.6 2.1h5l3.3 3.3v8.5H3.6z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M8.4 2.3v3.3h3.3" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M5.6 8.2h4.4M5.6 10.6h3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>
+            <span class="ai-file-sep" aria-hidden="true"></span>
+            <span class="ai-file-txt"><b>index.html</b><i>128KB</i></span>
+          </button>
+        </div>
+
+        <div class="ai-meta is-ai">
+          <span class="ai-done"><span class="ico ico12" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.9" stroke="currentColor" stroke-width="1.1"/><path d="M3.9 6.1 5.3 7.5 8.1 4.7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></span>输出完成</span>
+          <span class="ai-vsep" aria-hidden="true"></span>
+          <span class="ai-speed"><span class="ico ico12" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.6" stroke="currentColor" stroke-width="1.1"/><path d="M6 3.6V6l1.7 1.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Token 速率：256/s</span>
+          <span class="ai-vsep" aria-hidden="true"></span>
+          <button class="ai-mbtn" type="button" data-tip="更多" aria-label="更多"><span class="ico ico14"><svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><circle cx="3" cy="7" r="1.05"/><circle cx="7" cy="7" r="1.05"/><circle cx="11" cy="7" r="1.05"/></svg></span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部输入卡 -->
+    <div class="ai-foot">
+      <div class="ai-input">
+        <!-- 第 69 轮：两张参考图拆成独立节点，各自带 ×，可单独删除 -->
+        <div class="ai-atts" id="aiAtts">
+          <div class="ai-att">
+            <img src="assets/images/ai/att-a.png" width="88" height="50" alt="参考图 1" loading="lazy">
+            <button class="ai-att-x" type="button" aria-label="移除参考图 1"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.3 3.3 8.7 8.7M8.7 3.3 3.3 8.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span></button>
+          </div>
+          <div class="ai-att">
+            <img src="assets/images/ai/att-b.png" width="88" height="88" alt="参考图 2" loading="lazy">
+            <button class="ai-att-x" type="button" aria-label="移除参考图 2"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.3 3.3 8.7 8.7M8.7 3.3 3.3 8.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span></button>
+          </div>
+        </div>
+        <div class="ai-ta" contenteditable="true" role="textbox" aria-multiline="true" aria-label="向 AI 提问" data-ph="描述要解决的问题、目标或验收标准"></div>
+        <div class="ai-row">
+          <div class="ai-row-l">
+            <button class="ai-round" type="button" data-tip="添加附件" aria-label="添加附件"><span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2.4v9.2M2.4 7h9.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span></button>
+            <button class="ai-round" type="button" data-tip="选择技能" aria-label="选择技能"><span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M10.8 6.6 6.4 11a2.6 2.6 0 0 1-3.7-3.7l4.9-4.9a1.85 1.85 0 0 1 2.6 2.6l-4.6 4.6a1.05 1.05 0 0 1-1.5-1.5l4-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+            <button class="ai-pill" type="button" data-tip="切换协作角色"><span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><rect x="2.6" y="4.2" width="8.8" height="7" rx="2.2" stroke="currentColor" stroke-width="1.1"/><path d="M7 4.2V2.6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><circle cx="5.3" cy="7.7" r=".8" fill="currentColor"/><circle cx="8.7" cy="7.7" r=".8" fill="currentColor"/></svg></span>艾迪</button>
+          </div>
+          <div class="ai-row-r">
+            <button class="ai-model" type="button" aria-haspopup="listbox">DeepSeek-V4-Pro<span class="ico ico12 ai-model-caret" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.9 4.6 6 7.7 9.1 4.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+            <button class="ai-send" type="button" aria-label="发送"><span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 11.4V3.2M3.4 6.6 7 3l3.6 3.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+   </div><!-- /ai-side-in -->
+  </aside><!-- /ai-side -->

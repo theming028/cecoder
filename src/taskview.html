@@ -5,22 +5,30 @@
          ③ 底部 40：工序资产页签（概要设计 / 变更 / Git / 终端 / 浏览器 / + / ⌄）
          ============================================================ -->
     <div class="task-top">
+      <!-- 第 59 轮：稿 3332:52911 —— 标题左前加「首页」迷你次要按钮 + 16 竖线，间距各 12 -->
+      <a class="tt-home" href="cecoder-home.html" aria-label="回到首页"><span class="ico ico14"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.3861 2.21065C11.7472 1.92978 12.2528 1.92978 12.6139 2.21065L21.6139 9.21065C21.8575 9.4001 22 9.69141 22 10V21C22 21.5523 21.5523 22 21 22H15C14.4477 22 14 21.5523 14 21V14H10V21C10 21.5523 9.55228 22 9 22H3C2.44772 22 2 21.5523 2 21V10C2 9.69141 2.14247 9.4001 2.38606 9.21065L11.3861 2.21065ZM4 10.4891V20H8V13C8 12.4477 8.44772 12 9 12H15C15.5523 12 16 12.4477 16 13V20H20V10.4891L12 4.26686L4 10.4891Z"/></svg></span>首页</a>
+      <span class="tt-home-sep" aria-hidden="true"></span>
       <span class="tt-title">登录成功时未提示信息</span>
       <div class="tt-right">
         <button class="tt-run" type="button" id="tkRun"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.6 2.4 9.2 6l-5.6 3.6z" fill="currentColor"/></svg></span>自动执行</button>
         <span class="tt-vsep" aria-hidden="true"></span>
-        <!-- 第 47 轮：稿 3140:45042 —— 任务信息 / 工序资产是两条独立链接（不是 tab），
-             hover 只变文字色为主色，轨道仍是 160×28 #FAFAFA r4 -->
-        <div class="tt-links">
-          <a class="tt-link" href="#task-info" data-task-view="info">任务信息</a>
-          <span class="tt-links-sep" aria-hidden="true"></span>
-          <a class="tt-link" href="#task-assets" data-task-view="assets">工序资产</a>
-        </div>
-        <div class="tt-now">
+        <!-- 第 62 轮：原「任务信息 / 工序资产」两条链接收成一条「任务证据链」，
+             外观与左上「首页」那颗迷你次要按钮同一套（白底 + 1px 描边 + r4 + 图标），
+             点击弹出证据链弹窗（壳子同「云端任务同步」，内容先空着） -->
+        <button class="tt-ev" type="button" id="tkEvidence" aria-haspopup="dialog" aria-controls="evModal">
+          <span class="ico ico12"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" aria-hidden="true"><circle cx="12" cy="5.25" r="3.25" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="5.25" cy="17.75" r="3.25" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="18.75" cy="17.75" r="3.25" stroke="currentColor" stroke-width="3" fill="none"/><path d="M9.93 9.08Q6.76 10.34 7.32 13.92" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M14.07 9.08Q17.24 10.34 16.68 13.92" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M9.6 17.75Q12 19.95 14.4 17.75" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg></span>任务证据链
+        </button>
+
+        
+<div class="tt-now">
           <span class="tt-now-label">工序进度</span>
           <span class="tt-now-sep" aria-hidden="true"></span>
           <button class="tt-fold" type="button" id="tkStepsToggle" aria-expanded="true" aria-controls="tkStepBar">收起<span class="ico ico12 tt-caret"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.9 7.5 6 4.5 9.1 7.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
         </div>
+        <!-- 第 68 轮：AI 协作栏收起后，这里长出一颗入口（外观同「任务证据链」，hover 蓝底白字） -->
+        <button class="tt-ai" type="button" id="tkAiOpen" aria-controls="aiSide" aria-expanded="false">
+          <span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1.7l1.55 3.9 3.9 1.55-3.9 1.55L8 12.6 6.45 8.7l-3.9-1.55 3.9-1.55z" stroke="currentColor" stroke-width="1.15" stroke-linejoin="round"/><path d="M12.6 11.4l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z" fill="currentColor"/></svg></span>AI协作
+        </button>
       </div>
     </div>
 
@@ -81,8 +89,6 @@
           <span class="ts-link"></span>
           <span class="ts-link"></span>
           <span class="ts-link"></span>
-          <span class="ts-link"></span>
-          <span class="ts-link"></span>
         </div>
       </div>
       <!-- 第 36 轮：这条 6 高的是滚动条（ts-scroll 的真实滚动条），不是进度条 -->
@@ -92,16 +98,16 @@
     <div class="task-tabs">
       <div class="tk-tabs-l" role="tablist" aria-label="工序资产">
         <button class="tk-tab is-on" type="button" role="tab" aria-selected="true">概要设计</button>
-        <button class="tk-tab" type="button" role="tab" aria-selected="false">
+        <button class="tk-tab" type="button" role="tab" data-empty="1" aria-selected="false">
           <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.4 1.9h4.2l2.5 2.5v7.7H3.4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M7 2.1v2.6h2.6" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M5.2 7.2v3.4M3.5 8.9h3.4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>变更<span class="tk-x"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.4 3.4 8.6 8.6M8.6 3.4 3.4 8.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span></span>
         </button>
-        <button class="tk-tab" type="button" role="tab" aria-selected="false">
+        <button class="tk-tab" type="button" role="tab" data-empty="1" aria-selected="false">
           <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="3.3" cy="10.6" r="1.5" stroke="currentColor" stroke-width="1.1"/><circle cx="3.3" cy="3.4" r="1.5" stroke="currentColor" stroke-width="1.1"/><circle cx="10.7" cy="4.6" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3.3 4.9v4.2" stroke="currentColor" stroke-width="1.1"/><path d="M10.7 6.1c0 1.9-1.7 2.4-3.6 2.7-1.7.3-2.6.8-2.8 1.6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>Git<span class="tk-x"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.4 3.4 8.6 8.6M8.6 3.4 3.4 8.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span></span>
         </button>
-        <button class="tk-tab" type="button" role="tab" aria-selected="false">
+        <button class="tk-tab" type="button" role="tab" data-empty="1" aria-selected="false">
           <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1.6" y="2.6" width="10.8" height="8.8" rx="1.6" stroke="currentColor" stroke-width="1.1"/><path d="M4.1 5.6 6 7 4.1 8.4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.7 9.2h2.4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></span>终端<span class="tk-x"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.4 3.4 8.6 8.6M8.6 3.4 3.4 8.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span></span>
         </button>
-        <button class="tk-tab" type="button" role="tab" aria-selected="false">
+        <button class="tk-tab" type="button" role="tab" data-empty="1" aria-selected="false">
           <span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.4" stroke="currentColor" stroke-width="1.1"/><path d="M1.7 7h10.6" stroke="currentColor" stroke-width="1.1"/><ellipse cx="7" cy="7" rx="2.6" ry="5.4" stroke="currentColor" stroke-width="1.1"/></svg></span>浏览器<span class="tk-x"><span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.4 3.4 8.6 8.6M8.6 3.4 3.4 8.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span></span>
         </button>
         <span class="tk-vsep" aria-hidden="true"></span>
@@ -141,6 +147,66 @@
          ③ 底部：与主体固定 40 间距，56 高（内线 #EBECED + 居中主键 212×36）
          宽度：内容列 max-width 1024 且整体居中，窄于 1024 时按可用宽度收缩
          ============================================================ -->
+    <!-- ============================================================
+         第 72 轮：右栏「任务产物」的文件卡点开 → 在中栏 tk-tabs-l 新开一个以文件名命名的
+         页签，就地浏览正文（原来的 #docModal 弹窗方案下线）。
+         面板位置与 .tp-wrap 同锚（top 171 / 收工序 84 / 专注 40），两者互斥显示
+         ============================================================ -->
+    <!-- ============================================================
+         第 73 轮：正文不再套白卡、不再有「复制路径」底栏 —— 直接铺在中间，
+         面板与 .tp-wrap 同锚（top 171 / 收工序 84 / 专注 40）、同左右内距 20、
+         同内容列宽（--tp-col 1080）、同 8px 滚动条，宽度与位置完全同步
+         ============================================================ -->
+    <div class="tk-doc" id="tkDoc">
+      <div class="tk-doc-col">
+        <article class="dm-doc" data-doc-pane="md">
+          <h1>任务执行报告</h1>
+          <p class="dm-lead">任务「生成任务的业务代码」· 工序 9/9 完成确认 · 2026-11-25 15:26</p>
+          <h2>一、执行摘要</h2>
+          <p>依据当前任务提交的资产（概要设计、详细设计、接口契约）生成登录链路业务代码，覆盖登录成功提示、服务不可用与网络中断三条分支，全部通过语法校验与 12 条单测。</p>
+          <h2>二、产物清单</h2>
+          <ul>
+            <li><b>index.html</b> · 128KB · 登录页结构与提示容器</li>
+            <li><b>login.css</b> · 42KB · 提示条样式与响应式断点</li>
+            <li><b>login.js</b> · 86KB · 提交、校验与错误码映射</li>
+          </ul>
+          <h2>三、验证结果</h2>
+          <ul>
+            <li>单元测试 12/12 通过，覆盖超时、断网、服务 5xx</li>
+            <li>提示文案已与设计稿 3332:53051 逐条对齐</li>
+            <li>表单输入在失败后仍保留，可重复提交</li>
+          </ul>
+          <h2>四、遗留风险</h2>
+          <p>网络中断兜底依赖 <code>navigator.onLine</code>，在弱网环境下可能滞后 1~2 秒，建议后续接入心跳探测。</p>
+                </article>
+
+        <article class="dm-doc is-code" data-doc-pane="html" hidden>
+        <pre><code>&lt;section class="login" data-state="idle"&gt;
+          &lt;form class="login-form" novalidate&gt;
+            &lt;label class="field"&gt;
+              &lt;span class="field-label"&gt;账号&lt;/span&gt;
+              &lt;input name="account" autocomplete="username" /&gt;
+            &lt;/label&gt;
+            &lt;label class="field"&gt;
+              &lt;span class="field-label"&gt;密码&lt;/span&gt;
+              &lt;input name="password" type="password" autocomplete="current-password" /&gt;
+            &lt;/label&gt;
+
+            &lt;!-- 第 69 轮：提示容器常驻，靠 data-state 切换文案与配色 --&gt;
+            &lt;div class="login-tip" role="status" aria-live="polite"&gt;
+              &lt;span class="login-tip-ico" aria-hidden="true"&gt;&lt;/span&gt;
+              &lt;span class="login-tip-txt"&gt;&lt;/span&gt;
+            &lt;/div&gt;
+
+            &lt;button class="login-submit" type="submit"&gt;登录&lt;/button&gt;
+          &lt;/form&gt;
+        &lt;/section&gt;
+
+        &lt;script type="module" src="./login.js"&gt;&lt;/script&gt;</code></pre>
+                </article>
+      </div>
+    </div>
+
     <div class="tp-wrap">
       <div class="tp-head">
         <button class="tp-step is-on" type="button">
@@ -167,9 +233,12 @@
         <div class="tp-body-in">
           <div class="tp-goal">
             <h4 class="tp-goal-title">代码生成目标（Goal）与要求</h4>
-            <textarea class="tp-textarea" rows="4" aria-label="代码生成目标与要求">背景：登录失败提示只有一个「登录失败」，无法区分账号不存在、密码错误与网络超时。
-目标：补齐登录失败的错误码映射与提示文案，覆盖 5 类异常场景，并与设计稿文案逐条对齐。
-规则：不改动 /api/login 的请求与响应契约；错误码只能新增、不可修改既有含义；文案需走 i18n。</textarea>
+            <!-- 第 59 轮：原生 textarea 无法只给「背景／目标／规则」加粗，改为 contenteditable 富文本块（外观不变） -->
+            <div class="tp-textarea" role="textbox" aria-multiline="true" aria-label="代码生成目标与要求">
+          <div class="tp-ta-line"><b class="tp-ta-k">背景：</b><span class="tp-ta-in" contenteditable="true" role="textbox" aria-label="背景" data-ph="请输入"></span></div>
+          <div class="tp-ta-line"><b class="tp-ta-k">目标：</b><span class="tp-ta-in" contenteditable="true" role="textbox" aria-label="目标" data-ph="请输入"></span></div>
+          <div class="tp-ta-line"><b class="tp-ta-k">规则：</b><span class="tp-ta-in" contenteditable="true" role="textbox" aria-label="规则" data-ph="请输入"></span></div>
+        </div>
           </div>
 
           <section class="tp-files is-closed">
@@ -236,20 +305,28 @@
                     <span class="tp-sel-k">类型：</span><span class="tp-sel-v is-ph">请选择</span>
                     <span class="ico ico14 tp-sel-ic" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.2 5.2 7 9l3.8-3.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                   </button>
-                  <button class="tp-sel tp-sel-b" type="button">
-                    <span class="tp-sel-k">代码源：</span><span class="tp-sel-v is-ph">请选择</span>
-                    <span class="ico ico14 tp-sel-ic" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.2 5.2 7 9l3.8-3.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-                  </button>
+                  <!-- 第 66 轮：与「类型」同排的第二个选择改成下拉 —— 点开列出最近使用的本地目录，
+                       末项「选择其他目录」调起系统目录选择（上方加了分组间隔线，不再带省略号）；原来的「手动添加」和中间竖线已去掉 -->
+                  <div class="cds-dd tp-dd" data-dd="refsrc">
+                    <button class="tp-sel tp-sel-b" type="button" aria-haspopup="listbox">
+                      <span class="tp-sel-k">参考代码源：</span><span class="tp-sel-v is-ph">请选择</span>
+                      <span class="ico ico14 tp-sel-ic" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.2 5.2 7 9l3.8-3.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    </button>
+                    <ul class="semi-select-option-list-wrapper" role="listbox" aria-label="最近使用的本地目录">
+                      <li class="semi-select-option" role="option">~/cecoder/workspace/paa-web</li>
+                      <li class="semi-select-option" role="option">~/cecoder/workspace/paa-auth</li>
+                      <li class="semi-select-option" role="option">~/projects/demo/paa-console</li>
+                      <li class="semi-select-option semi-select-option-tail" role="option">选择其他目录</li>
+                    </ul>
+                  </div>
                   <button class="tp-pick-add" type="button">添加</button>
-                  <span class="tp-pick-sep" aria-hidden="true"></span>
-                  <a class="tp-pick-link" href="#manual">手动添加</a>
                 </div>
                 <div class="tp-pick-hint"><span>选择仓库的类型</span><span>选择该仓库下代码分支</span></div>
               </div>
 
               <section class="tp-repo is-open">
                 <div class="tp-repo-head">
-                  <button class="tp-sect" type="button" aria-expanded="true" data-tp-toggle="repo">
+                  <button class="tp-sect tp-tone-server" type="button" aria-expanded="true" data-tp-toggle="repo">
                     <span class="ico ico14 tp-sect-caret" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.2 5.2 7 9l3.8-3.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>服务端代码源
                   </button>
                   <span class="tp-chip-grp">
@@ -278,7 +355,7 @@
 
               <div class="tp-src">
                 <div class="tp-src-row is-on">
-                  <button class="tp-sect tp-src-t" type="button" aria-expanded="false">
+                  <button class="tp-sect tp-src-t tp-tone-backend" type="button" aria-expanded="false">
                     <span class="ico ico14 tp-sect-caret is-right" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.2 5.2 7 9l3.8-3.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>后端代码源
                   </button>
                   <span class="tp-chip-grp">
@@ -288,7 +365,7 @@
                   </span>
                 </div>
                 <div class="tp-src-row">
-                  <button class="tp-sect tp-src-t" type="button" aria-expanded="false">
+                  <button class="tp-sect tp-src-t tp-tone-frontend" type="button" aria-expanded="false">
                     <span class="ico ico14 tp-sect-caret is-right" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M3.2 5.2 7 9l3.8-3.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>前端代码源
                   </button>
                   <span class="tp-chip-grp">

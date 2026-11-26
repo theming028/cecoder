@@ -13,6 +13,9 @@ const P = {
   chathead: R('src/chathead.html'),
   rightpanel: R('src/rightpanel.html'),
   taskview: R('src/taskview.html'),
+  /* 第 77 轮修：任务页右栏「AI 协作」（第 68 轮稿 3347:52836）—— 之前只存在于产物 html 里，
+     src 缺失导致重建时整栏丢失，现单独成片段、按 side 槽位插在 panel-main 之后 */
+  aiside: R('src/aiside.html'),
   stageopen: R('src/stageopen.html'),
   homeA: R('src/homeA.html'),
   chat: R('src/chat.html'),
@@ -59,11 +62,20 @@ const chrome = (pm, pre, stage, main, side, extra) =>
    CLOSE_STAGE, CLOSE_PM, side || '', P.floats, extra || '', P.tail]
     .filter(Boolean).join('\n');
 
-/* ---------- 1 首页：hero + 场景卡 + 工具栏 + 工序条 + 输入区 ---------- */
+/* ---------- 1 首页：hero + 场景卡 + 工具栏 + 工序条 + 输入区 ----------
+   第 79 轮两处首页独有（远端只改在产物 html 上，重建会丢）：顶栏「首页」带 aria-current、
+   输入卡外圈彩色流光 .c-beam 挂在 c-card 与 c-foot 之间 */
+const homeBody = chrome(P.panelmain, '', P.stageopen, [P.homeA, P.homeB].join('\n'))
+  .replace('<a class="tb-home" href="cecoder-home.html" aria-label="回到首页">',
+           '<a class="tb-home" href="cecoder-home.html" aria-label="回到首页" aria-current="page">')
+  .replace('      <div class="c-foot">',
+           '      <!-- 第 79 轮：卡外圈的彩色流光（装饰层，纯 CSS 动画，不吃事件） -->\n'
+           + '      <span class="c-beam" aria-hidden="true"><span class="c-wave"></span><span class="c-wave c-wave--sharp"></span></span>\n\n'
+           + '      <div class="c-foot">');
 const home = wrap({
   title: 'Cecoder · 落地首页',
   page: 'home',
-  body: chrome(P.panelmain, '', P.stageopen, [P.homeA, P.homeB].join('\n')),
+  body: homeBody,
 });
 
 /* ---------- 2 会话页：对话/轨迹 + 对话流 + 输入区 +（可收起的）右栏 ---------- */
@@ -77,7 +89,7 @@ const session = wrap({
 const task = wrap({
   title: 'Cecoder · 任务执行',
   page: 'task',
-  body: chrome(pmChat, P.taskview, stageChat, ''),
+  body: chrome(pmChat, P.taskview, stageChat, '', P.aiside),
 });
 
 /* ---------- 4 任务总结工序页：工序条 6 步 + 内容 1024 列 + 派发弹窗 ---------- */
