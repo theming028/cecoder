@@ -3549,7 +3549,9 @@
 
 /* ============================================================
    第 82 轮：代码生成与确认页（cecoder-codegen.html）
-   ① 生成设置有折叠 ② 全部重新生成走一遍进度条动画 ③ 忽略摘掉卡片
+   ① 生成设置可折叠 ② 进度条入场 0 → 41.1%
+   ③ 变更卡自上而下逐张生成：卡内 cg-chip 逐个点亮→打勾，5 步走完转「待确认」，再轮到下一张
+   ④ 全部重新生成 / 忽略
    ============================================================ */
 (function () {
   if (document.body.getAttribute('data-page') !== 'codegen') return;
@@ -3564,6 +3566,7 @@
     setTimeout(function () { el.remove(); }, 1800);
   }
 
+  /* ---------- 生成设置折叠 ---------- */
   var setBox = document.getElementById('cgSet');
   var setBtn = document.getElementById('cgSetToggle');
   if (setBox && setBtn) {
@@ -3573,19 +3576,122 @@
     });
   }
 
+  /* ---------- 进度条 ---------- */
   var bar = document.getElementById('cgBar');
-  var regen = document.getElementById('cgRegen');
-  if (regen) {
-    regen.addEventListener('click', function () {
-      if (!bar) return;
-      bar.style.width = '0%';
-      setTimeout(function () { bar.style.width = '41.1%'; }, 120);
-      tip('已重新开始生成');
-    });
+  var numGen = document.getElementById('cgNumGen');
+  var numWait = document.getElementById('cgNumWait');
+  var STEP_PX = 150, BAR_PX = 1094, TOTAL = 6;
+  var pxBase = 450, genBase = 2, doneCards = 0;
+
+  function paintBar() {
+    if (bar) {
+      var px = Math.min(pxBase + STEP_PX * doneCards, BAR_PX);
+      bar.style.width = (px / BAR_PX * 100).toFixed(1) + '%';
+      if (bar.parentNode) bar.parentNode.setAttribute('aria-valuenow', Math.min(genBase + doneCards, TOTAL));
+    }
+    if (numGen) numGen.textContent = Math.min(genBase + doneCards, TOTAL) + '/' + TOTAL;
+    if (numWait) numWait.textContent = doneCards;
   }
 
+  /* ---------- 变更卡逐张生成 ---------- */
+  var CHIPS = ['读取Spec', '对比现有代码', '生成代码', '规则检查', '核对Spec'];
+  var SVG_CHECK = '<svg viewBox="0 0 12 12" fill="none"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var SVG_SPIN = '<svg viewBox="0 0 12 12" fill="none"><path d="M6 1.4a4.6 4.6 0 1 1-3.3 1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+  var SVG_CHEV = '<svg viewBox="0 0 12 12" fill="none"><path d="M4.4 2.4 7.6 6l-3.2 3.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var CHIP_MS = 700, CARD_GAP_MS = 420;
+  var timer = null;
+
   var list = document.getElementById('cgList');
+
+  function flowHtml() {
+    var out = '<div class="cg-flow"><span class="cg-flow-k">生成流程：</span><span class="cg-flow-in">';
+    for (var i = 0; i < CHIPS.length; i++) {
+      if (i) out += '<span class="cg-chev" aria-hidden="true">' + SVG_CHEV + '</span>';
+      out += '<span class="cg-chip" data-chip="' + i + '">' + CHIPS[i] + '</span>';
+    }
+    return out + '</span></div>';
+  }
+
+  function chipState(el, state) {
+    var name = CHIPS[+el.getAttribute('data-chip')];
+    el.className = 'cg-chip' + (state ? ' is-' + state : '');
+    if (state === 'done') {
+      el.innerHTML = '<span class="ico" aria-hidden="true">' + SVG_CHECK + '</span>' + name;
+    } else if (state === 'run') {
+      el.innerHTML = '<span class="ico cg-mini-spin" aria-hidden="true">' + SVG_SPIN + '</span>' + name;
+    } else {
+      el.textContent = name;
+    }
+  }
+
+  function tagOf(card, text, cls) {
+    var el = card.querySelector('.cg-st');
+    if (!el) return;
+    el.className = 'cg-st' + (cls ? ' ' + cls : '');
+    el.textContent = text;
+  }
+
+  function nextTodo() {
+    return list ? list.querySelector('.cg-card[data-state="todo"]') : null;
+  }
+
+  function finishCard(card) {
+    card.setAttribute('data-state', 'confirm');
+    tagOf(card, '待确认', 'is-warn');
+    var flow = card.querySelector('.cg-flow');
+    if (flow) flow.remove();
+    doneCards += 1;
+    paintBar();
+    var nx = nextTodo();
+    if (nx) timer = setTimeout(function () { startCard(nx, 0); }, CARD_GAP_MS);
+  }
+
+  function pump(card, i) {
+    var flow = card.querySelector('.cg-flow');
+    if (!flow) return;
+    var chips = flow.querySelectorAll('.cg-chip');
+    if (i >= chips.length) { finishCard(card); return; }
+    chipState(chips[i], 'run');
+    timer = setTimeout(function () {
+      chipState(chips[i], 'done');
+      pump(card, i + 1);
+    }, CHIP_MS);
+  }
+
+  function startCard(card, from) {
+    card.setAttribute('data-state', 'running');
+    tagOf(card, '生成中', 'is-run');
+    var flow = card.querySelector('.cg-flow');
+    if (!flow) {
+      var meta = card.querySelector('.cg-meta');
+      var host = document.createElement('div');
+      host.innerHTML = flowHtml();
+      flow = host.firstChild;
+      if (meta && meta.parentNode) meta.parentNode.insertBefore(flow, meta.nextSibling);
+    }
+    var chips = flow.querySelectorAll('.cg-chip');
+    for (var i = 0; i < chips.length; i++) chipState(chips[i], '');
+    pump(card, from || 0);
+  }
+
+  function resetCard(card) {
+    card.setAttribute('data-state', 'todo');
+    tagOf(card, '待生成', '');
+    var flow = card.querySelector('.cg-flow');
+    if (flow) flow.remove();
+  }
+
   if (list) {
+    /* 稿面快照：第 1 颗 chip 已打勾、第 2 颗在跑 → 从第 2 颗接着跑 */
+    var running = list.querySelector('.cg-card[data-state="running"]');
+    if (running) {
+      var rc = running.querySelectorAll('.cg-chip');
+      pump(running, rc.length > 1 ? 1 : 0);
+    }
+
+    /* 进度条入场：0 → 41.1% */
+    setTimeout(paintBar, 60);
+
     list.addEventListener('click', function (e) {
       var ig = e.target.closest ? e.target.closest('[data-cg-ignore]') : null;
       if (!ig) return;
@@ -3593,5 +3699,29 @@
       if (card) card.remove();
       tip('已忽略该变更点');
     });
+  }
+
+  /* ---------- 底栏 ---------- */
+  var regen = document.getElementById('cgRegen');
+  if (regen) {
+    regen.addEventListener('click', function () {
+      if (timer) clearTimeout(timer);
+      doneCards = 0; pxBase = 0; genBase = 0;
+      if (bar) bar.style.width = '0';
+      if (numGen) numGen.textContent = '0/' + TOTAL;
+      if (numWait) numWait.textContent = '0';
+      var cards = list ? [].slice.call(list.querySelectorAll('.cg-card')) : [];
+      cards.forEach(resetCard);
+      setTimeout(function () {
+        paintBar();
+        if (cards.length) startCard(cards[0], 0);
+      }, 120);
+      tip('已重新开始生成');
+    });
+  }
+
+  var confirmBtn = document.getElementById('cgConfirm');
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', function () { tip('已提交 4 处代码变更，进入代码审查'); });
   }
 })();

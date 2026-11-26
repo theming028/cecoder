@@ -3991,7 +3991,8 @@ body[data-page="codegen"] .stage.is-chat { display: none; }
 }
 a.cg-step { transition: background var(--cds-motion-duration) var(--cds-motion-ease); }
 a.cg-step:hover { background: #F5F8FF; }
-.cg-step.is-done { background: #F5F8FF; box-shadow: inset 0 0 0 1px #DAE4FE; }
+/* 稿：已完成卡仍是灰壳（3154:50594 #F7F7F7/#EEEEEE），当前卡才是浅蓝壳（3154:50576 #F5F8FF/#DAE4FE） */
+.cg-step.is-on { background: #F5F8FF; box-shadow: inset 0 0 0 1px #DAE4FE; }
 .cg-step-no {
   flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%;
   display: inline-flex; align-items: center; justify-content: center;
@@ -4014,9 +4015,10 @@ a.cg-step:hover { background: #F5F8FF; }
   flex: 0 0 auto; margin-left: auto; height: 20px; padding: 0 8px 0 4px; border-radius: 4px;
   display: inline-flex; align-items: center; gap: 4px;
   background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
-  font-size: 12px; line-height: 20px; color: #6B6B6B;
+  font-size: 12px; line-height: 20px; color: var(--cds-color-primary);
 }
-.cg-confirmed .ico { color: var(--cds-text-secondary); }
+.cg-confirmed .ico { color: currentColor; }
+.cg-head .tp-diff { flex: 0 0 96px; margin-left: 6px; }
 .cg-arrow { flex: 0 0 14px; height: 14px; color: #868686; display: inline-flex; }
 .cg-arrow svg { width: 14px; height: 14px; display: block; }
 
@@ -4066,25 +4068,28 @@ a.cg-step:hover { background: #F5F8FF; }
   background: #F7F7F7; box-shadow: inset 0 0 0 1px #EEEEEE;
 }
 .cg-repo-k { flex: 0 0 auto; font-size: 14px; line-height: 22px; color: #6B6B6B; white-space: nowrap; }
-.cg-repo-v { flex: 0 0 auto; font-size: 14px; line-height: 22px; color: var(--cds-text-primary); white-space: nowrap; }
-.cg-repo-v.is-link { color: var(--cds-color-primary); }
+.cg-repo-v { flex: 0 0 auto; font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); white-space: nowrap; }
+.cg-repo-v.is-mag { color: #B82EB8; }
+.cg-repo-v.is-link { color: #035EC5; }
 .cg-repo-tag {
   flex: 0 0 auto; margin-left: 8px; height: 20px; padding: 0 4px; border-radius: 3px;
   display: inline-flex; align-items: center;
   background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
-  font-size: 12px; line-height: 20px; color: var(--cds-color-primary); white-space: nowrap;
+  font-size: 12px; line-height: 20px; font-weight: 500; color: var(--cds-color-primary); white-space: nowrap;
 }
+.cg-repo-tag.is-mag { box-shadow: inset 0 0 0 1px #E2CFE2; color: #B82EB8; }
+.cg-repo-tag.is-blue { box-shadow: inset 0 0 0 1px #C7D3DF; color: var(--cds-color-primary); }
 .cg-pick {
   flex: 0 0 auto; margin-left: auto; height: 28px; padding: 0 12px; border-radius: 4px;
   display: inline-flex; align-items: center; gap: 4px;
   background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
-  font-size: 12px; line-height: 20px; color: #6B6B6B;
+  font-size: 14px; line-height: 20px; color: #6B6B6B;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease),
               box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
 }
 .cg-pick:hover { background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--cds-color-primary); color: var(--cds-color-primary); }
 .cg-ck {
-  flex: 0 0 auto; margin-left: 172px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  flex: 0 0 auto; margin-left: auto; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
   font-size: 14px; line-height: 22px; color: var(--cds-text-primary); white-space: nowrap; user-select: none;
 }
 .cg-ck input { position: absolute; opacity: 0; width: 0; height: 0; }
@@ -4099,24 +4104,25 @@ a.cg-step:hover { background: #F5F8FF; }
   content: ''; width: 8px; height: 4px; margin-top: -2px;
   border-left: 1.4px solid #FFFFFF; border-bottom: 1.4px solid #FFFFFF; transform: rotate(-45deg);
 }
-.cg-sels { margin-left: auto; min-width: 0; display: flex; align-items: center; gap: 8px; }
+.cg-sels { margin-left: 8px; min-width: 0; display: flex; align-items: center; gap: 8px; }
 .cg-sel {
-  height: 28px; padding: 0 8px; border-radius: 4px; max-width: 216px; min-width: 0; flex: 0 1 auto;
+  height: 28px; padding: 0 8px; border-radius: 4px; width: 216px; min-width: 0; flex: 0 1 auto;
   display: inline-flex; align-items: center; gap: 4px;
   background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
   font-size: 14px; line-height: 22px; color: var(--cds-text-primary); white-space: nowrap;
 }
-.cg-sel.is-sm { max-width: 138px; }
+.cg-sel.is-sm { width: 138px; }
 .cg-sel-t { overflow: hidden; text-overflow: ellipsis; }
 .cg-sel .ico { color: var(--cds-text-disabled); flex: 0 0 auto; }
-.cg-sels .cg-pick { margin-left: 0; }
+.cg-sels .cg-pick { margin-left: 16px; }
 
 /* ---- ③ 生成进度 ---- */
 .cg-prog { margin-top: 24px; }
 .cg-prog-head { position: relative; height: 40px; display: flex; align-items: flex-start; }
 .cg-prog-t { margin: 0; font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary); }
-.cg-prog-s { margin: 1px 0 0 auto; font-size: 12px; line-height: 20px; color: var(--cds-text-primary); }
-.cg-prog-s b { font-weight: 400; color: #868686; }
+.cg-prog-s { margin: 1px 0 0 auto; font-size: 12px; line-height: 20px; color: #868686; }
+.cg-prog-s b { font-weight: 400; color: var(--cds-text-primary); }
+.cg-prog-s .cg-dotsep { margin: 0 8px; }
 .cg-bar {
   position: absolute; left: 0; right: 0; bottom: 0; height: 6px; border-radius: 6px;
   background: #F2F2F2; overflow: hidden;
@@ -4126,8 +4132,11 @@ a.cg-step:hover { background: #F5F8FF; }
   transition: width .5s cubic-bezier(.2, .8, .2, 1);
 }
 .cg-list { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
-/* 带「生成流程」的卡在稿面是 106（正文 75 + 上下 16/15） */
-.cg-card[data-state="running"] { padding-bottom: 15px; }
+/* 带「生成流程」的卡在稿面是 106（正文 75 + 上下 16/15）；生成中的卡整卡浅蓝（稿 3154:53540） */
+.cg-card[data-state="running"] { padding-bottom: 15px; background: #F5F8FF; box-shadow: inset 0 0 0 1px #B4C9FC; }
+.cg-card[data-state="running"] .cg-t { color: var(--cds-color-primary); }
+/* 只有「待生成」的卡才给「忽略」，生成中/待确认只留修改（稿 3154:53540） */
+.cg-card:not([data-state="todo"]) [data-cg-ignore] { display: none; }
 .cg-card {
   display: flex; align-items: flex-start; gap: 12px; padding: 16px;
   border-radius: 4px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #EEEEEE;
@@ -4150,9 +4159,10 @@ a.cg-step:hover { background: #F5F8FF; }
   flex: 0 0 auto; height: 22px; padding: 0 8px; border-radius: 3px;
   display: inline-flex; align-items: center;
   font-size: 12px; line-height: 22px; color: #6B6B6B; background: #F7F7F7;
+  box-shadow: inset 0 0 0 1px #EEEEEE;
 }
-.cg-st.is-run { color: var(--cds-color-primary); background: #FFFFFF; }
-.cg-st.is-warn { color: #FF7D00; background: #FFF7E8; }
+.cg-st.is-run { color: var(--cds-color-primary); background: #FFFFFF; box-shadow: inset 0 0 0 1px #DAE4FE; }
+.cg-st.is-warn { color: #FF7D00; background: #FFF7E8; box-shadow: inset 0 0 0 1px #FFE4BA; }
 .cg-meta { margin: 4px 0 0; font-size: 12px; line-height: 22px; color: #868686; }
 .cg-flow { margin-top: 5px; display: flex; align-items: center; gap: 0; }
 .cg-flow-k { flex: 0 0 auto; font-size: 12px; line-height: 22px; color: #868686; }
@@ -4200,6 +4210,7 @@ a.cg-step:hover { background: #F5F8FF; }
 .cg-btn.is-primary { background: var(--cds-color-primary); color: #FFFFFF; }
 .cg-btn.is-primary:hover { background: #2E63DB; }
 .cg-btn.is-primary:disabled { background: #B4C9FC; cursor: default; }
+.cg-btn .cg-mini-spin { animation: cg-spin 1.1s linear infinite; }
 .cg-btn.is-line {
   background: #FFFFFF; box-shadow: inset 0 0 0 1px #6692F9; color: var(--cds-color-primary);
 }
