@@ -81,27 +81,19 @@ ok('C1 点「停止生成」回到 UI设计页（第 1 步内容在）', /cecode
 const plain = await p.evaluate(() => ({ gen: !!document.querySelector('.ui-blank.is-gen'), bg: getComputedStyle(document.querySelector('.ui-blank')).backgroundImage }));
 ok('C2 UI设计页中栏不带点阵底（is-gen 只在生成中页）', !plain.gen && plain.bg === 'none', JSON.stringify(plain));
 
-/* ---------- D 停留约 5s 自动进入生成完成（先留空） ---------- */
+/* ---------- D 停留 10s 自动进入独立的生成完成页 ---------- */
 await p.goto('file:///' + BASE + '/cecoder-uigen.html', { waitUntil: 'load' });
 await wait(300);
 const t0 = Date.now();
 const mid = await p.evaluate(() => ({ gen: !!document.querySelector('.ug-gen:not([hidden])'), stop: !!document.querySelector('#ugStop:not([hidden])') }));
 ok('D1 进入页面即为生成中（插图卡可见、底栏「停止生成」可见）', mid.gen && mid.stop, JSON.stringify(mid));
 await wait(5600);
-const done = await p.evaluate(() => {
-  const gen = document.querySelector('.ug-gen'), stop = document.querySelector('#ugStop'), foot = document.querySelector('.tp-foot');
-  const cs = e => getComputedStyle(e);
-  return {
-    genHidden: gen.hidden && cs(gen).display === 'none',
-    stopHidden: stop.hidden && cs(stop).display === 'none',
-    footH: Math.round(foot.getBoundingClientRect().height),
-    blankH: Math.round(document.querySelector('.ui-blank').getBoundingClientRect().height),
-    blankBg: getComputedStyle(document.querySelector('.ui-blank')).backgroundImage.slice(0, 40),
-  };
-});
-ok('D2 约 5s 后自动进入生成完成：中栏留空（插图卡隐藏）、底栏按钮收起', done.genHidden && done.stopHidden && done.footH === 56, JSON.stringify(done) + ' ' + (Date.now() - t0) + 'ms');
-ok('D3 生成完成态中栏只余底栏（内容区仍占满）', done.blankH > 600, done.blankH);
-ok('D4 生成完成（留空）态点阵底不跳变', /radial-gradient/.test(done.blankBg), done.blankBg);
+const at5 = await p.evaluate(() => ({ page: location.href.split('/').pop(), gen: !!document.querySelector('.ug-gen:not([hidden])') }));
+ok('D2 停留 5.6s 仍在生成中（时长已由 5s 改为 10s）', /cecoder-uigen\.html/.test(at5.page) && at5.gen, JSON.stringify(at5) + ' ' + (Date.now() - t0) + 'ms');
+await wait(5200);
+const at10 = await p.evaluate(() => location.href.split('/').pop());
+ok('D3 约 10s 后自动进入独立的生成完成页 cecoder-uidone.html', /cecoder-uidone\.html/.test(at10), at10 + ' ' + (Date.now() - t0) + 'ms');
+ok('D4 生成完成页有画板工具条与页签（画板 / 页面关系 / 页面预览）', await p.evaluate(() => !!document.querySelector('.ud-bar') && document.querySelectorAll('.ud-tabs .tk-tab').length === 3));
 
 /* ---------- E 响应式 ---------- */
 const resp = [];

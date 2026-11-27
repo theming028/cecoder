@@ -3827,9 +3827,10 @@
   var next = document.getElementById('ugNext');
   if (next) next.addEventListener('click', function () { location.href = 'cecoder-uigen.html'; });
 
-  /* 生成中页：底栏「停止生成」回上一页；停留约 5s 后自动进入生成完成（本页先留空）
+  /* 生成中页：底栏「停止生成」回上一页；停留 10s 后自动进入独立的生成完成页
      bfcache / 前进后退恢复时定时器状态会被带回，导致进来就是空的（看着像“偶发消失”），
      所以 pageshow(persisted) 时重置成生成中并重新计时 */
+  var GEN_MS = 10000;
   var stopBtn = document.getElementById('ugStop');
   if (stopBtn) {
     var genView = document.getElementById('ugGen');
@@ -3838,16 +3839,40 @@
       if (genView) genView.hidden = false;
       stopBtn.hidden = false;
       clearTimeout(doneTimer);
-      doneTimer = setTimeout(function () {
-        if (genView) genView.hidden = true;
-        stopBtn.hidden = true;
-      }, 5000);
+      doneTimer = setTimeout(function () { location.href = 'cecoder-uidone.html'; }, GEN_MS);
     };
     startGen();
     window.addEventListener('pageshow', function (e) { if (e.persisted) startGen(); });
     stopBtn.addEventListener('click', function () {
       clearTimeout(doneTimer);
       location.href = 'cecoder-ui.html';
+    });
+  }
+
+  /* 第 93 轮：生成完成页（cecoder-uidone.html）——缩放组 ±25（25~200）与工具条反馈 */
+  var udZoomVal = document.getElementById('udZoomVal');
+  if (udZoomVal) {
+    var udZoom = 50;
+    var udApplyZoom = function (v) {
+      udZoom = Math.min(200, Math.max(25, v));
+      udZoomVal.textContent = udZoom + '%';
+      var c = document.getElementById('udCanvas');
+      if (c) c.style.setProperty('--ud-zoom', String(udZoom / 50));
+    };
+    udApplyZoom(50);
+    var udIn = document.getElementById('udZoomIn');
+    var udOut = document.getElementById('udZoomOut');
+    if (udIn) udIn.addEventListener('click', function () { udApplyZoom(udZoom + 25); });
+    if (udOut) udOut.addEventListener('click', function () { udApplyZoom(udZoom - 25); });
+
+    var udBar = document.getElementById('udBar');
+    if (udBar) udBar.addEventListener('click', function (e) {
+      var t = e.target.closest('button');
+      if (!t || t === udIn || t === udOut) return;
+      if (!t.classList.contains('ud-tool') && !t.classList.contains('ud-sel') && t.id !== 'udNote') return;
+      var lb = t.id === 'udNote' ? '查看批注（2 条）' : (t.getAttribute('aria-label') || t.textContent.trim());
+      tip(lb + '（稿待补）');
+      if (t.classList.contains('ud-sel')) t.setAttribute('aria-expanded', t.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
     });
   }
 

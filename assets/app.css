@@ -4459,3 +4459,103 @@ body[data-page="ui"] .ui-blank.is-gen {
 }
 .tp-sec:hover { background: #FAFAFA; }
 .tp-sec:active { background: var(--cds-surface-inset); }
+
+/* ============================================================
+   第 93 轮：UI 设计工序 · 生成完成页（cecoder-uidone.html）
+   页签稿 4068:64861 / 工具条稿 4068:72262
+   工具条 1133×44：白底 + 底边 1px #E5E5E5
+     左内距 19：版本选择 129 / 分辨率 134 / 缩放组 107（组间 8）
+     中间画板名 13/500/20 绝对居中
+     右内距 20：5 个 28×28 工具键（间距 4）+ 竖线 1×16 + 批注 63×28
+   ============================================================ */
+.ud-bar {
+  flex: 0 0 auto; position: relative; height: 44px; box-sizing: border-box;
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 20px 0 19px; background: #FFFFFF;
+  box-shadow: inset 0 -1px 0 0 #E5E5E5;
+}
+.ud-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+/* 两颗下拉：白底 + 1px #E5E5E5，圆角 4，内距 8；文字 13/400/22 */
+.ud-sel {
+  flex: 0 0 auto; height: 28px; padding: 0 8px; border-radius: 4px;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  display: inline-flex; align-items: center;
+  font-size: 13px; line-height: 22px; color: var(--cds-text-primary);
+  white-space: nowrap;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.ud-sel:hover { background: var(--cds-surface-subtle); }
+.ud-sel:active { background: var(--cds-surface-inset); }
+.ud-sel-k { color: var(--cds-text-secondary); }
+.ud-sel-v { padding-right: 8px; }
+.ud-desktop, .ud-caret { flex: 0 0 auto; width: 14px; height: 14px; }
+.ud-desktop { margin-right: 4px; }
+
+/* 缩放组 107×28：4 + 20 + 8 + 43 + 8 + 20 + 4 */
+.ud-zoom {
+  flex: 0 0 auto; height: 28px; padding: 0 4px; border-radius: 4px;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.ud-zbtn {
+  width: 20px; height: 20px; border-radius: 4px; flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.ud-zbtn svg { width: 14px; height: 14px; }
+.ud-zbtn:hover { background: var(--cds-surface-subtle); }
+.ud-zval {
+  min-width: 43px; box-sizing: border-box; text-align: center;
+  padding: 0 8px; font-size: 13px; line-height: 20px; color: var(--cds-text-primary);
+  white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+
+/* 画板名绝对居中于工具条（稿 @541，1133/2 = 566.5） */
+.ud-title {
+  position: absolute; left: 50%; top: 12px; transform: translateX(-50%);
+  max-width: 30%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 13px; line-height: 20px; font-weight: 500; color: var(--cds-text-primary);
+  pointer-events: none;
+}
+
+.ud-right { margin-left: auto; display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+.ud-tools { display: flex; align-items: center; gap: 4px; }
+.ud-tool {
+  width: 28px; height: 28px; border-radius: 4px; flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center; background: #FFFFFF;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.ud-tool svg { width: 14px; height: 14px; }
+.ud-tool:hover { background: var(--cds-surface-subtle); }
+.ud-tool:active { background: var(--cds-surface-inset); }
+.ud-vsep { flex: 0 0 auto; width: 1px; height: 16px; background: var(--cds-line-strong); }
+.ud-link {
+  flex: 0 0 auto; min-width: 63px; box-sizing: border-box; height: 28px; padding: 0 8px; border-radius: 4px;
+  font-size: 13px; line-height: 22px; color: var(--cds-text-primary); white-space: nowrap;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.ud-link:hover { background: var(--cds-surface-subtle); }
+
+/* 画布区（等稿）：占满工具条以下 */
+.ud-canvas { flex: 1 1 auto; min-height: 0; overflow: auto; }
+
+/* 页签（稿 4068:64861）：未选中 正文色 + 中粗 500（font_73:3621 Medium）；内距 8 / 选中 12
+   选中态：白底 + 1px #B4C9FC + 主色图标与文字 */
+.ud-tabs .tk-tab { color: var(--cds-text-primary); font-weight: 500; }
+/* 页签选中态（稿 4068:64869）：白底 + 1px #B4C9FC + 主色图标与文字 */
+.ud-tabs .tk-tab.is-on { color: var(--cds-color-primary); box-shadow: inset 0 0 0 1px var(--cds-blue-3); }
+.ud-tabs .tk-tab.is-on .ico { color: var(--cds-color-primary); }
+
+/* 窄栏让位：中栏 1133 的稿宽放不进 654 时先收标题、再收次要键 */
+@container (max-width: 1040px) { .ud-title { display: none; } }
+/* 中栏 654（1440 + AI 栏）：收掉「版本：」两字与组内边距，仍留得住「批注 (2)」 */
+@container (max-width: 700px) {
+  .ud-bar { padding: 0 12px; gap: 8px; }
+  .ud-left { gap: 6px; }
+  .ud-right { gap: 8px; }
+  .ud-sel-k { display: none; }
+}
+@container (max-width: 560px) {
+  .ud-link, .ud-vsep { display: none; }
+  .ud-tools .ud-tool:nth-last-child(-n + 2) { display: none; }
+}
