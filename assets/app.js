@@ -3810,8 +3810,6 @@
    ============================================================ */
 (function () {
   if (document.body.getAttribute('data-page') !== 'ui') return;
-  var sys = document.getElementById('ugSys');
-  if (!sys) return;
 
   function tip(msg) {
     var wrap = document.getElementById('toastWrap');
@@ -3824,6 +3822,27 @@
   }
 
   var CHECK = '<span class="ico ico12" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+
+  /* 第 90 轮：底栏「下一步，输入设计资产」→ 独立的「UI 生成中」页（cecoder-uigen.html） */
+  var next = document.getElementById('ugNext');
+  if (next) next.addEventListener('click', function () { location.href = 'cecoder-uigen.html'; });
+
+  /* 生成中页：底栏「停止生成」回上一页；停留约 5s 后自动进入生成完成（本页先留空） */
+  var stopBtn = document.getElementById('ugStop');
+  if (stopBtn) {
+    var genView = document.getElementById('ugGen');
+    var doneTimer = setTimeout(function () {
+      if (genView) genView.hidden = true;
+      stopBtn.hidden = true;
+    }, 5000);
+    stopBtn.addEventListener('click', function () {
+      clearTimeout(doneTimer);
+      location.href = 'cecoder-ui.html';
+    });
+  }
+
+  var sys = document.getElementById('ugSys');
+  if (!sys) return;
 
   sys.addEventListener('click', function (e) {
     var pv = e.target.closest('[data-preview]');
@@ -3847,7 +3866,4 @@
 
   var exit = document.getElementById('ugExit');
   if (exit) exit.addEventListener('click', function () { tip('退出引导，返回一页式'); });
-
-  var next = document.getElementById('ugNext');
-  if (next) next.addEventListener('click', function () { tip('第 2 步：输入设计资产（设计稿待补）'); });
 })();

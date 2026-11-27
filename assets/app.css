@@ -4404,3 +4404,37 @@ body[data-page="ui"] .ui-blank > .tp-foot { box-shadow: inset 1px 0 0 0 #EBECED,
   .ug-top { width: 100%; height: auto; flex-wrap: wrap; row-gap: 8px; }
   .ug-title { white-space: normal; font-size: 18px; line-height: 26px; }
 }
+
+/* ============================================================
+   第 90 轮：UI 设计工序 · 生成中（稿 3395:76081）
+   中栏居中 400×435 插图卡：背景图铺满 + 内容块（图标 72 / 标题 20·500 / 副文 14·400 两行）
+   稿里内容块在卡内 @46,80（308 宽），即水平居中、距顶 18.39%
+   底栏由主键换成次要按钮「停止生成」
+   ============================================================ */
+.ug-gen {
+  flex: 1 1 auto; min-height: 0; overflow: auto; padding: 20px;
+  display: flex; align-items: center; justify-content: center;
+}
+.ug-gen-card {
+  position: relative; flex: 0 0 auto;
+  width: min(400px, 100%); aspect-ratio: 400 / 435;
+  background: url(images/ui-gen.png) center / 100% 100% no-repeat;
+}
+.ug-gen-in { position: absolute; left: 50%; top: 18.3908%; width: 77%; transform: translateX(-50%); text-align: center; }
+.ug-gen-ico { display: block; width: 72px; height: 72px; margin: 0 auto; }
+.ug-gen-t { margin: 32px 0 0; font-size: 20px; line-height: 28px; font-weight: 500; color: #1F1F1F; }
+.ug-gen-d { margin: 12px 0 0; font-size: 14px; line-height: 22px; color: #6B6B6B; }
+/* .ug-gen / .ug-wrap 这类自带 display 的元素会盖掉 [hidden] 的 UA display:none，兜一层 */
+[hidden] { display: none !important; }
+/* 中栏被左右栏挤到 460 以下时（1152 档中栏 416），把内距收到 8 让 400 宽的卡不缩、副文仍是两行 */
+@container (max-width: 460px) { .ug-gen { padding: 8px; } }
+
+/* 底栏次要按钮（白底 1px #E5E5E5、正文色），与 .tp-primary 同尺寸 */
+.tp-sec {
+  height: 36px; padding: 0 64px; border-radius: 4px;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-size: 14px; line-height: 22px; font-weight: 500; color: var(--cds-text-primary);
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.tp-sec:hover { background: #FAFAFA; }
+.tp-sec:active { background: var(--cds-surface-inset); }

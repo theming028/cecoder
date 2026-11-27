@@ -31,6 +31,7 @@ const P = {
   dispatch: R('src/dispatch.html'),
   /* 第 80 轮：UI设计工序专属页（中栏空） */
   uiview: R('src/uiview.html'),
+  uigenview: R('src/uigen.html'),
   /* 第 82 轮：代码生成与确认页（稿 3561:55208） */
   codegenview: R('src/codegenview.html'),
 };
@@ -105,6 +106,14 @@ const ui = wrap({
   body: chrome(pmChat, P.tasktop + P.uiview, stageChat, '', P.aiside, ''),
 });
 
+/* ---------- 3.6 UI生成中页：第 90 轮，由 UI设计页底栏「下一步，输入设计资产」跳入 ----------
+   与 UI设计页同壳（同一 data-page=ui，共用 task-tabs / 工序条 / AI 栏），中栏换成生成中插图卡 */
+const uigen = wrap({
+  title: 'Cecoder · UI生成中',
+  page: 'ui',
+  body: chrome(pmChat, P.tasktop + P.uigenview, stageChat, '', P.aiside, ''),
+});
+
 /* ---------- 4 任务总结工序页：工序条 6 步 + 内容 1024 列 + 派发弹窗 ---------- */
 /* 第 81 轮：派发弹窗作为 side 槽位插在 panel-main 之后、floats 之前 ——
    弹窗蒙层是 .panel 的绝对定位子层（panel 有 overflow:hidden），
@@ -128,6 +137,7 @@ for (const [name, html] of [
   ['cecoder-session.html', session],
   ['cecoder-task.html', task],
   ['cecoder-ui.html', ui],
+  ['cecoder-uigen.html', uigen],
   ['cecoder-summary.html', summary],
   ['cecoder-codegen.html', codegen],
 ]) {

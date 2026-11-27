@@ -113,13 +113,12 @@ await p.evaluate(() => document.querySelectorAll('.ug-rd')[1].click());
 await wait(150);
 const e2 = await p.evaluate(() => ({ cb: [...document.querySelectorAll('.ug-cbx input')].map(i => i.checked), rd: [...document.querySelectorAll('.ug-rd input')].map(i => i.checked) }));
 ok('E2 复选「手机端」与单选「1920px」可切换', e2.cb[1] === true && e2.rd[1] === true && e2.rd[0] === false, JSON.stringify(e2));
-await p.click('#ugNext'); await wait(200);
-const e3 = await p.evaluate(() => { const t = [...document.querySelectorAll('.semi-toast')]; return t.length ? t[t.length - 1].textContent : ''; });
-ok('E3 点「下一步」有反馈提示', /输入设计资产/.test(e3), e3);
-await p.evaluate(() => { const c = document.querySelectorAll('.ug-scard')[0]; c.querySelector('[data-pick]').click(); });
-await wait(200);
-const e4 = await p.evaluate(() => [...document.querySelectorAll('.ug-scard')].map(c => c.classList.contains('is-on') + ':' + c.querySelector('[data-pick]').textContent.trim())[0]);
-ok('E4 再选回 Cecoder → 仍是「已选」，无重复选中', e4 === 'true:已选', e4);
+await p.click('#ugNext'); await wait(700);
+const e3 = p.url().split('/').pop();
+ok('E3 点「下一步，输入设计资产」跳转到独立页 cecoder-uigen.html（第 90 轮）', /cecoder-uigen\.html/.test(e3), e3);
+await p.goBack({ waitUntil: 'load' }); await wait(500);
+const e4 = await p.evaluate(() => [...document.querySelectorAll('.ug-scard')].map(c => c.classList.contains('is-on') + ':' + c.querySelector('[data-pick]').textContent.trim()));
+ok('E4 返回后仍是「Cecoder 已选」单选态，无重复选中', e4[0] === 'true:已选' && e4.filter(v => v.indexOf('true') === 0).length === 1, JSON.stringify(e4));
 
 /* ---------- F 响应式 ---------- */
 const resp = [];
