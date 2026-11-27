@@ -60,12 +60,12 @@ ok('A2 网格线降到 alpha .04（比上一轮 .08 浅一倍）',
 ok('A3 画布底色仍是 #F5F5F5', A.grid[2] === 'rgb(245, 245, 245)', A.grid[2]);
 
 /* ---------- ② 左侧浮层 ---------- */
-ok('B1 浮层 240 宽、绝对定位浮在画布上', A.pages[0][2] === 240 && A.pages[1] === 'absolute', JSON.stringify(A.pages[0]));
-ok('B2 浮层距画布左/上各 12', A.pages[0][0] - A.canvasBox[0] === 12 && A.pages[0][1] - A.canvasBox[1] === 12, JSON.stringify([A.pages[0], A.canvasBox]));
+ok('B1 左列 240 定宽、在流内（第 97 轮改成贴边列）', A.pages[0][2] === 240 && A.pages[1] === 'relative', JSON.stringify([A.pages[0], A.pages[1]]));
+ok('B2 左列与画布左上贴齐、上下拉通', A.pages[0][0] === A.canvasBox[0] && A.pages[0][1] === A.canvasBox[1] && A.pages[0][3] === A.canvasBox[3], JSON.stringify([A.pages[0], A.canvasBox]));
 ok('B3 浮层底 #F7F7F7 + 右侧 1px #E5E5E5', A.pages[2] === 'rgb(247, 247, 247)' && /rgb\(229, 229, 229\) -1px 0px 0px 0px inset/.test(A.pages[3]), JSON.stringify([A.pages[2], A.pages[3]]));
-ok('B4 头 16/12/0/19 内距（标题距左 19）', A.head[1] === '16px 12px 0px 19px', A.head[1]);
+ok('B4 头 12/8/0/16 内距（32 折叠键要占位）', A.head[1] === '12px 8px 0px 16px', A.head[1]);
 ok('B5 标题「页面层级和状态」14/22、正文色', A.title[0] === '页面层级和状态' && A.title[1] === '14px' && A.title[2] === '400' && A.title[3] === 'rgb(31, 31, 31)' && A.title[4] === '22px', JSON.stringify(A.title));
-ok('B6 折叠图标 14×14，默认提示「折叠」', A.fold[0][2] === 14 && A.fold[0][3] === 14 && A.fold[1] === '折叠' && A.fold[2] === 'true', JSON.stringify(A.fold));
+ok('B6 折叠键 32×32（稿 4068:57550），默认提示「折叠」', A.fold[0][2] === 32 && A.fold[0][3] === 32 && A.fold[1] === '折叠' && A.fold[2] === 'true', JSON.stringify(A.fold));
 
 /* ---------- 分组卡 / 状态行 / 页面项 ---------- */
 ok('C1 分组卡 216 宽、白底、1px #EEEEEE、圆角 6', A.tree[0][2] === 216 && A.tree[1] === 'rgb(255, 255, 255)'
@@ -82,12 +82,12 @@ ok('C9 下方两个页面项 44 高，箭头 16 / 文档 34 / 文字 52（与分
 ok('C10 页面项文案：Gmail 邮箱登录 / 账号恢复页', A.pages2[0][0] === 'Gmail 邮箱登录' && A.pages2[1][0] === '账号恢复页', JSON.stringify(A.pages2.map(v => v[0])));
 
 /* ---------- ③ 画板 ---------- */
-ok('D1 画板原生 800×400', A.board[1] === '800px' && A.board[2] === '400px', JSON.stringify([A.board[1], A.board[2]]));
+ok('D1 画板原生 1440×900', A.board[1] === '1440px' && A.board[2] === '900px', JSON.stringify([A.board[1], A.board[2]]));
 ok('D2 画板白底圆角 4 + 1px #E5E5E5 + 0/8/16 阴影', A.board[3] === '4px'
   && /rgb\(229, 229, 229\) 0px 0px 0px 1px inset/.test(A.board[4]) && /rgba\(0, 0, 0, 0\.04\) 0px 8px 16px 0px/.test(A.board[4]), A.board[4]);
 ok('D3 画板名 12/20 #868686「账密登录 · 默认」', A.name[2] === '12px' && A.name[3] === '20px' && A.name[4] === 'rgb(134, 134, 134)' && A.name[0] === '账密登录 · 默认', JSON.stringify(A.name));
 ok('D4 标签 20 高、与画板间距 8（画板顶 28）', A.name[1] === 20, A.name[1]);
-ok('D5 默认按可用区域自适应：46%（1440 下中栏 654）', A.zoom === '46%' && A.s === '0.46', A.zoom + ' / ' + A.s);
+ok('D5 默认按可用区域自适应：25%（1440 下中栏 654 − 左列 240 = 414）', A.zoom === '25%' && A.s === '0.25', A.zoom + ' / ' + A.s);
 ok('D6 缩放写在 --ud-s 上（画板用 transform 缩放，不改 800/400）', !!A.s, A.s);
 ok('D7 四角手柄 4 个', A.handles === 4, A.handles);
 ok('D8 未选中时手柄不显示', await p.evaluate(() => getComputedStyle(document.querySelector('.ud-handle')).display) === 'none');
@@ -115,7 +115,7 @@ ok('D13 点空白取消选中', await p.evaluate(() => !document.querySelector('
 /* 工具栏 ± */
 await p.click('#udZoomIn'); await wait(200);
 const z1 = await p.evaluate(() => [document.querySelector('#udZoomVal').textContent, document.querySelector('#udBoardWrap').style.getPropertyValue('--ud-s')]);
-ok('D14 「+」按 25 步进（46→71）', z1[0] === '71%' && z1[1] === '0.71', JSON.stringify(z1));
+ok('D14 「+」按 25 步进（25→50）', z1[0] === '50%' && z1[1] === '0.5', JSON.stringify(z1));
 await p.click('#udZoomOut'); await p.click('#udZoomOut'); await wait(200);
 const z2 = await p.evaluate(() => document.querySelector('#udZoomVal').textContent);
 ok('D15 「−」回落到 21 时被夹到 25%', z2 === '25%', z2);
@@ -123,12 +123,13 @@ await p.click('#udFold'); await wait(300);
 const F = await p.evaluate(() => {
   const pg = document.querySelector('#udPages'); const cv = document.querySelector('.ud-canvas');
   return { cls: pg.classList.contains('is-fold'), body: getComputedStyle(pg.querySelector('.ud-pages-body')).display,
-    h: Math.round(pg.getBoundingClientRect().height), folded: cv.classList.contains('is-folded'),
+    h: Math.round(pg.getBoundingClientRect().height), w: Math.round(pg.getBoundingClientRect().width),
+    abs: getComputedStyle(pg).position === 'absolute', folded: cv.classList.contains('is-folded'),
     pad: getComputedStyle(document.querySelector('.ud-stage')).paddingLeft, tip: document.querySelector('#udFold').getAttribute('data-tip') };
 });
 ok('F1 折叠后只剩标题条（body 不显示）', F.cls === true && F.body === 'none', JSON.stringify(F));
-ok('F2 折叠后浮层高 54（16+22+16）', F.h === 54, F.h);
-ok('F3 折叠后画板改用整幅宽度（stage 左内距 24）', F.folded === true && F.pad === '24px', JSON.stringify([F.folded, F.pad]));
+ok('F2 折叠后收成 32×32 浮键', F.h === 32 && F.w === 32, JSON.stringify([F.w, F.h]));
+ok('F3 折叠后画布吃满整幅（stage 内距恒 24）', F.folded === true && F.pad === '24px' && F.abs === true, JSON.stringify([F.folded, F.pad, F.abs]));
 ok('F4 折叠图标提示变「展开」', F.tip === '展开', F.tip);
 
 /* 展开 + 分组收起 */
@@ -149,12 +150,14 @@ await q.setViewport({ width: 1920, height: 1000 });
 await q.goto('file:///' + BASE + '/cecoder-uidone.html', { waitUntil: 'load' });
 await wait(400);
 const z3 = await q.$eval('#udZoomVal', e => e.textContent);
-ok('H1 1920 下按可用宽度自适应到 100%（不放大）', z3 === '100%', z3);
+ok('H1 1920 下自适应按可用宽度算（1440 画板 → 59%）', z3 === '59%', z3);
 const q2 = await q.evaluate(() => {
   const st = document.querySelector('.ud-stage'), sc = document.querySelector('.ud-scroll');
-  return [Math.round(sc.clientWidth), getComputedStyle(st).paddingLeft];
+  return [Math.round(sc.clientWidth), getComputedStyle(st).paddingLeft,
+    Math.round(document.querySelector('.ud-pages').getBoundingClientRect().width),
+    Math.round(document.querySelector('.ud-canvas').getBoundingClientRect().width)];
 });
-ok('H2 1920 下浮层让出 264 的左内距', q2[1] === '264px' && q2[0] > 1000, JSON.stringify(q2));
+ok('H2 1920 下滚动区 = 画布 − 240 左列', q2[1] === '24px' && q2[2] === 240 && q2[0] === q2[3] - 240, JSON.stringify(q2));
 await q.close();
 
 ok('I1 无 JS 报错', p.__e.length === 0, p.__e.join(' | '));

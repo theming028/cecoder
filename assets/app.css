@@ -4553,11 +4553,12 @@ body[data-page="ui"] .ui-blank.is-gen {
 }
 .ud-link:hover { background: var(--cds-surface-subtle); }
 
-/* 画布区（第 96 轮）：灰底 + 16px 田字网格（线再浅一倍：alpha .04），占满工具条以下
-   .ud-scroll 负责滚动（网格画在 .ud-canvas 上，不跟着内容滚）
-   .ud-pages 是绝对定位浮层，下方内容可以从它底下穿过 */
+/* 画布区（第 97 轮）：灰底 + 16px 田字网格（线 alpha .04），占满工具条以下
+   display:flex —— 左列「页面层级和状态」240 定宽、上下拉通、与画布贴边；
+   .ud-scroll 是右侧滚动区（网格画在 .ud-canvas 上，不跟着内容滚） */
 .ud-canvas {
   position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden;
+  display: flex; align-items: stretch;
   background-color: #F5F5F5;
   background-image:
     linear-gradient(to right, rgba(31, 31, 31, .04) 1px, transparent 1px),
@@ -4566,29 +4567,33 @@ body[data-page="ui"] .ui-blank.is-gen {
   background-position: 0 0;
 }
 .ud-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
-.ud-scroll { position: absolute; inset: 0; overflow: auto; }
-/* 左侧浮层 240 + 左距 12 + 缝 12 = 264 的左内距，画板在剩余区域里居中 */
+.ud-scroll { position: relative; flex: 1 1 auto; min-width: 0; overflow: auto; }
+/* 画板在滚动区里居中；拖动靠 translate，不改布局 */
 .ud-stage {
   box-sizing: border-box; min-width: 100%; min-height: 100%;
   display: flex; align-items: center; justify-content: center;
-  padding: 24px 24px 24px 264px;
+  padding: 24px;
 }
 
 /* ---------- 画板（稿 4068:64885 / 选中态 4138:57012） ---------- */
 .ud-board-wrap { position: relative; flex: 0 0 auto; --ud-s: 1;
-  width: calc(800px * var(--ud-s)); height: calc(400px * var(--ud-s) + 28px); }
+  width: calc(1440px * var(--ud-s)); height: calc(900px * var(--ud-s) + 28px); }
 .ud-board-name {
   height: 20px; font-size: 12px; line-height: 20px; color: #868686;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .ud-board {
   position: absolute; left: 0; top: 28px; padding: 0; display: block;
-  width: 800px; height: 400px; border-radius: 4px; background: #FFFFFF;
+  width: 1440px; height: 900px; border-radius: 4px; background: #FFFFFF;
+  cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none;
   transform: scale(var(--ud-s)); transform-origin: 0 0;
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, .04), inset 0 0 0 1px #E5E5E5;
   transition: box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
 }
 .ud-board.is-sel { box-shadow: 0 8px 16px 0 rgba(0, 0, 0, .04), inset 0 0 0 1.6px var(--cds-color-primary); }
+/* 拖动画板时别把光标变成文本/收缩手 */
+.ud-board.is-drag, body.ud-dragging .ud-board { cursor: grabbing; }
+body.ud-dragging { cursor: grabbing; -webkit-user-select: none; user-select: none; }
 /* 四角手柄 8×8：位置跟画板缩放走，尺寸反向除回来，缩放后视觉仍是 8px */
 .ud-handle { display: none; position: absolute; box-sizing: border-box;
   width: calc(8px / var(--ud-s)); height: calc(8px / var(--ud-s));
@@ -4601,42 +4606,47 @@ body[data-page="ui"] .ui-blank.is-gen {
 .ud-h-bl { left: 0; top: 100%; }
 .ud-h-br { left: 100%; top: 100%; }
 
-/* ---------- 浮层「页面层级和状态」（稿 4068:65598） ---------- */
+/* ---------- 左列「页面层级和状态」（稿 4068:65598）：240 定宽、上下拉通、与画布贴边 ---------- */
 .ud-pages {
-  position: absolute; left: 12px; top: 12px; z-index: 2;
-  width: 240px; max-height: calc(100% - 24px); box-sizing: border-box;
-  display: flex; flex-direction: column;
+  order: -1; position: relative; flex: 0 0 240px;
+  width: 240px; height: 100%; box-sizing: border-box;
+  display: flex; flex-direction: column; overflow: hidden;
   background: #F7F7F7; box-shadow: inset -1px 0 0 0 #E5E5E5;
-  transition: box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
 }
 .ud-pages-head {
   flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
-  padding: 16px 12px 0 19px;
+  padding: 12px 8px 0 16px;
 }
 .ud-pages-t {
   flex: 1 1 auto; min-width: 0;
   font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+/* 折叠键（稿 4068:57550）：32×32 白底 r4、inset 1px #E5E5E5、0 1px 8px rgba(0,0,0,.06)，内嵌 16 图标 */
 .ud-pages-fold {
-  position: relative; flex: 0 0 auto; width: 14px; height: 14px;
-  display: inline-flex; align-items: center; justify-content: center; color: #6B6B6B;
-  transition: color var(--cds-motion-duration) var(--cds-motion-ease);
+  flex: 0 0 auto; width: 32px; height: 32px; border-radius: 4px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--cds-text-primary); background: #FFFFFF;
+  box-shadow: inset 0 0 0 1px #E5E5E5, 0 1px 8px 0 rgba(0, 0, 0, .06);
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-/* 图标 14，但热区补到 28（稿里 hit 面积太小） */
-.ud-pages-fold::after { content: ''; position: absolute; inset: -7px; }
-.ud-pages-fold svg { width: 14px; height: 14px; transition: transform var(--cds-motion-duration) var(--cds-motion-ease); }
-.ud-pages-fold:hover { color: var(--cds-text-primary); }
+.ud-pages-fold svg { width: 16px; height: 16px; }
+.ud-pages-fold:hover { background: #FAFAFA; }
 .ud-pages-body {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin;
   padding: 12px 12px 12px; display: flex; flex-direction: column; gap: 8px;
 }
 .ud-pages-body::-webkit-scrollbar { width: 6px; }
 .ud-pages-body::-webkit-scrollbar-thumb { background: #DCDFE5; border-radius: 3px; }
-/* 折叠：只留标题条 */
-.ud-pages.is-fold .ud-pages-body { display: none; }
-.ud-pages.is-fold .ud-pages-head { padding-bottom: 16px; }
-.ud-pages.is-fold .ud-pages-fold svg { transform: rotate(180deg); }
+/* 折叠：整列收成左上角一颗 32×32 浮键（就是 .ud-pages-fold 本体），点它再展开 */
+.ud-canvas.is-folded .ud-pages {
+  position: absolute; left: 12px; top: 12px; z-index: 3;
+  width: 32px; height: 32px; flex: 0 0 auto; overflow: visible;
+  background: none; box-shadow: none;
+}
+.ud-canvas.is-folded .ud-pages-head { padding: 0; gap: 0; }
+.ud-canvas.is-folded .ud-pages-t,
+.ud-canvas.is-folded .ud-pages-body { display: none; }
 
 .ud-tree, .ud-page {
   flex: 0 0 auto; width: 100%; box-sizing: border-box; text-align: left;
@@ -4663,12 +4673,7 @@ body[data-page="ui"] .ui-blank.is-gen {
 .ud-page-t { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ud-page:hover, .ud-tree-row:hover { background: #FAFAFA; }
 
-/* 中栏窄到连浮层都放不下时，画板才回到整幅居中（浮层压在上面） */
-@container (max-width: 620px) {
-  .ud-stage { padding-left: 24px; }
-}
-/* 浮层收起后画板用整幅宽度（折叠条只有 54 高，压不到画板） */
-.ud-canvas.is-folded .ud-stage { padding-left: 24px; }
+/* 左列折叠后 .ud-scroll 自动吃满整幅宽度（左列已脱离文档流），无需再让内距 */
 
 /* 页签（稿 4068:64861）：未选中 正文色 + 中粗 500（font_73:3621 Medium）；内距 8 / 选中 12
    选中态：白底 + 1px #B4C9FC + 主色图标与文字 */

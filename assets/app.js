@@ -3868,12 +3868,12 @@
     var udStageEl = document.getElementById('udStage');
     var udWrap = document.getElementById('udBoardWrap');
     var udBoardEl = document.getElementById('udBoard');
-    var UD_W = 800, UD_H = 400, UD_LABEL = 28;
+    var UD_W = 1440, UD_H = 900, UD_LABEL = 28;
     var udUser = 0;          /* 0 = 跟随自适应 */
     var udFitPct = function () {
       if (!udScroll) return 100;
-      var padL = udStageEl ? parseFloat(getComputedStyle(udStageEl).paddingLeft) || 24 : 24;
-      var aw = udScroll.clientWidth - padL - 24;
+      /* 滚动区两侧各留 24 内距、上下各 24，画板名再占 28 */
+      var aw = udScroll.clientWidth - 48;
       var ah = udScroll.clientHeight - 48 - UD_LABEL;
       var fit = Math.min(aw / UD_W, ah / UD_H, 1);
       return Math.max(10, Math.round(fit * 100));
@@ -3900,14 +3900,59 @@
       udBoardEl.classList.toggle('is-sel', on);
       udBoardEl.setAttribute('aria-pressed', on ? 'true' : 'false');
     };
-    if (udBoardEl) udBoardEl.addEventListener('click', function (e) { e.stopPropagation(); udSel(!udBoardEl.classList.contains('is-sel')); });
+    /* 拖动（第 97 轮）：pointerdown 记起点，move 时给 .ud-board-wrap 加 translate；
+       没挪动（<3px）才算点击 → 切选中态。拖动时保证至少 80px 露在可视区内，别拖丢 */
+    var udTx = 0, udTy = 0, udDrag = null;
+    var udSetPos = function (x, y) {
+      udTx = x; udTy = y;
+      if (udWrap) udWrap.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+    };
+    if (udBoardEl && udWrap) {
+      udBoardEl.addEventListener('click', function (e) { e.stopPropagation(); });
+      udBoardEl.addEventListener('pointerdown', function (e) {
+        if (e.button !== 0) return;
+        var sr = udScroll.getBoundingClientRect(), wr = udWrap.getBoundingClientRect();
+        udDrag = {
+          id: e.pointerId, sx: e.clientX, sy: e.clientY, tx: udTx, ty: udTy, moved: false,
+          baseL: wr.left - udTx, baseT: wr.top - udTy, w: wr.width, h: wr.height,
+          vaL: sr.left, vaT: sr.top, vaR: sr.right, vaB: sr.bottom
+        };
+        try { udBoardEl.setPointerCapture(e.pointerId); } catch (err) {}
+        e.preventDefault();
+      });
+      udBoardEl.addEventListener('pointermove', function (e) {
+        if (!udDrag || e.pointerId !== udDrag.id) return;
+        var dx = e.clientX - udDrag.sx, dy = e.clientY - udDrag.sy;
+        if (!udDrag.moved && Math.abs(dx) + Math.abs(dy) > 3) {
+          udDrag.moved = true;
+          document.body.classList.add('ud-dragging');
+          udSel(true);
+        }
+        if (!udDrag.moved) return;
+        /* 至少留 80px 在可视区内 */
+        var nx = Math.min(udDrag.vaR - 80 - udDrag.baseL,
+                 Math.max(udDrag.vaL + 80 - (udDrag.baseL + udDrag.w), udDrag.tx + dx));
+        var ny = Math.min(udDrag.vaB - 80 - udDrag.baseT,
+                 Math.max(udDrag.vaT + 80 - (udDrag.baseT + udDrag.h), udDrag.ty + dy));
+        udSetPos(Math.round(nx), Math.round(ny));
+      });
+      var udDragEnd = function (e) {
+        if (!udDrag || (e && e.pointerId !== udDrag.id)) return;
+        var moved = udDrag.moved;
+        udDrag = null;
+        document.body.classList.remove('ud-dragging');
+        if (!moved) udSel(!udBoardEl.classList.contains('is-sel'));
+      };
+      udBoardEl.addEventListener('pointerup', udDragEnd);
+      udBoardEl.addEventListener('pointercancel', udDragEnd);
+    }
     if (udScroll) udScroll.addEventListener('click', function (e) { if (e.target === udScroll || e.target === udStageEl) udSel(false); });
 
-    /* 左侧浮层折叠（只留标题条，图标翻成向右） */
+    /* 左列折叠（第 97 轮）：整列收成左上角 32×32 浮键，点同一颗键再展开 */
     var udFold = document.getElementById('udFold');
     var udPagesEl = document.getElementById('udPages');
     if (udFold && udPagesEl) udFold.addEventListener('click', function () {
-      var folded = udPagesEl.classList.toggle('is-fold');
+      var folded = udPagesEl.classList.toggle('is-fold');   /* 保留类名，供旧断言 */
       udFold.setAttribute('aria-expanded', folded ? 'false' : 'true');
       udFold.setAttribute('aria-label', (folded ? '展开' : '折叠') + '面板');
       udFold.setAttribute('data-tip', folded ? '展开' : '折叠');
