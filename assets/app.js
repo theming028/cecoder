@@ -2044,7 +2044,8 @@
       tip.classList.remove('is-above', 'is-below');
       tip.style.left = '0px'; tip.style.top = '0px';
       var tw = tip.offsetWidth, th = tip.offsetHeight;
-      var above = r.top - th - 10 >= 8;
+      /* data-tip-below：工具条这类贴顶的控件强制往下弹，别盖住上面的页签 */
+      var above = !el.hasAttribute('data-tip-below') && r.top - th - 10 >= 8;
       var x = Math.max(8, Math.min(r.left + r.width / 2 - tw / 2, window.innerWidth - tw - 8));
       var y = above ? r.top - th - 10 : r.bottom + 10;
       tip.style.left = x + 'px';
@@ -3870,6 +3871,7 @@
       var t = e.target.closest('button');
       if (!t || t === udIn || t === udOut) return;
       if (!t.classList.contains('ud-tool') && !t.classList.contains('ud-sel') && t.id !== 'udNote') return;
+      if (t.closest('.cds-dd')) return;
       var lb = t.id === 'udNote' ? '查看批注（2 条）' : (t.getAttribute('aria-label') || t.textContent.trim());
       tip(lb + '（稿待补）');
       if (t.classList.contains('ud-sel')) t.setAttribute('aria-expanded', t.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
@@ -3879,10 +3881,135 @@
   var sys = document.getElementById('ugSys');
   if (!sys) return;
 
+  /* ============================================================
+     第 94 轮：设计系统预览抽屉（右侧 800）
+     稿面无此层，内容按设计系统的通用结构自拟：概览 / 色彩 / 字体 / 圆角与间距 / 组件示例
+     数据按卡片 data-sys 取，组件示例的主色通过 --dsd-c 注入
+     ============================================================ */
+  var dsd = document.getElementById('dsDrawer');
+  var DS = {
+    cecoder: {
+      name: 'Cecoder 设计系统', c: '#3770F7', radius: 4,
+      desc: '中电金信自研企业级设计系统，覆盖中后台、AI 协作与研发工具三类场景，提供色彩、字体、间距与组件的完整规范。',
+      colors: [['主色', '#3770F7'], ['成功', '#00A870'], ['警告', '#ED7B2F'], ['错误', '#F53F3F'], ['文本主色', '#1F1F1F'], ['描边', '#E5E5E5']]
+    },
+    arco: {
+      name: 'Arco Design', c: '#165DFF', radius: 2,
+      desc: '字节跳动推出的企业级设计系统，以清晰、一致、高效为原则，组件密度偏紧凑，适合中后台的复杂表单与数据场景。',
+      colors: [['主色', '#165DFF'], ['成功', '#00B42A'], ['警告', '#FF7D00'], ['错误', '#F53F3F'], ['文本主色', '#1D2129'], ['描边', '#E5E6EB']]
+    },
+    antd: {
+      name: 'Ant Design', c: '#1677FF', radius: 6,
+      desc: '蚂蚁集团打造的企业级中后台设计语言，组件覆盖最全、生态最成熟，适合流程长、角色多的管理系统。',
+      colors: [['主色', '#1677FF'], ['成功', '#52C41A'], ['警告', '#FAAD14'], ['错误', '#FF4D4F'], ['文本主色', '#1F1F1F'], ['描边', '#D9D9D9']]
+    },
+    tdesign: {
+      name: 'TDesign', c: '#0052D9', radius: 3,
+      desc: '腾讯开源的企业级设计体系，强调克制的色彩与稳定的栅格，桌面端与移动端共用一套语义化 Token。',
+      colors: [['主色', '#0052D9'], ['成功', '#2BA471'], ['警告', '#E37318'], ['错误', '#D54941'], ['文本主色', '#1A1A1A'], ['描边', '#DCDCDC']]
+    },
+    semi: {
+      name: 'Semi Design', c: '#0064FA', radius: 6,
+      desc: '抖音前端与 MED 设计团队出品，主打内容型产品的界面密度与可读性，暗色模式与主题定制支持完善。',
+      colors: [['主色', '#0064FA'], ['成功', '#3BB346'], ['警告', '#FF8800'], ['错误', '#F93920'], ['文本主色', '#1C1F23'], ['描边', '#E4E7EC']]
+    }
+  };
+  /* 字体五级：字号 / 行高 / 字重 / 样例 */
+  var DSD_TYPE = [
+    [20, 28, 500, '页面标题 Heading'],
+    [16, 24, 500, '区块标题 Title'],
+    [14, 22, 400, '正文与表单输入 Body'],
+    [13, 20, 500, '工具条标签 Label'],
+    [12, 20, 400, '辅助说明 Caption']
+  ];
+  var DSD_RADII = [2, 4, 6, 8, 12];
+  var DSD_GAPS = [4, 8, 12, 16, 24];
+
+  function dsdEsc(v) {
+    return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function dsdTint(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+  function openDs(card) {
+    if (!dsd) return;
+    var key = (card && card.getAttribute('data-sys')) || 'cecoder';
+    var d = DS[key] || DS.cecoder;
+    dsd.style.setProperty('--dsd-c', d.c);
+    dsd.style.setProperty('--dsd-c1', dsdTint(d.c, .1));
+
+    var icoEl = document.getElementById('dsdIco');
+    var src = card && card.querySelector('.ug-sico svg');
+    if (icoEl) icoEl.innerHTML = src ? src.outerHTML : '';
+    var nameEl = document.getElementById('dsdName');
+    if (nameEl) nameEl.textContent = d.name;
+    var descEl = document.getElementById('dsdDesc');
+    if (descEl) descEl.textContent = d.desc;
+
+    var facts = [['主色', d.c], ['圆角基数', d.radius + 'px'], ['基准字号', '14px'], ['栅格', '8pt']];
+    var factsEl = document.getElementById('dsdFacts');
+    if (factsEl) {
+      factsEl.innerHTML = facts.map(function (f) {
+        return '<div class="dsd-fact"><p class="dsd-fact-k">' + dsdEsc(f[0]) + '</p>'
+          + '<p class="dsd-fact-v">' + dsdEsc(f[1]) + '</p></div>';
+      }).join('');
+    }
+
+    var colorsEl = document.getElementById('dsdColors');
+    if (colorsEl) {
+      colorsEl.innerHTML = d.colors.map(function (c) {
+        return '<div class="dsd-sw"><span class="dsd-sw-c" style="background:' + c[1] + '"></span>'
+          + '<p class="dsd-sw-n">' + dsdEsc(c[0]) + '</p>'
+          + '<p class="dsd-sw-h">' + dsdEsc(c[1]) + '</p></div>';
+      }).join('');
+    }
+
+    var typeEl = document.getElementById('dsdType');
+    if (typeEl) {
+      typeEl.innerHTML = DSD_TYPE.map(function (t) {
+        return '<div class="dsd-tr">'
+          + '<span class="dsd-tr-s" style="font-size:' + t[0] + 'px;line-height:' + t[1] + 'px;font-weight:' + t[2] + '">' + dsdEsc(t[3]) + '</span>'
+          + '<span class="dsd-tr-m">' + t[0] + ' / ' + t[1] + ' · ' + t[2] + '</span></div>';
+      }).join('');
+    }
+
+    var radiiEl = document.getElementById('dsdRadii');
+    if (radiiEl) {
+      radiiEl.innerHTML = DSD_RADII.map(function (r) {
+        return '<span class="dsd-r"><span class="dsd-r-b" style="border-radius:' + r + 'px"></span>' + r + 'px</span>';
+      }).join('');
+    }
+    var gapsEl = document.getElementById('dsdGaps');
+    if (gapsEl) {
+      gapsEl.innerHTML = DSD_GAPS.map(function (g) {
+        return '<span class="dsd-g"><span class="dsd-g-b" style="width:' + (g * 3) + 'px"></span>' + g + 'px</span>';
+      }).join('');
+    }
+
+    dsd.classList.add('is-open');
+    dsd.setAttribute('aria-hidden', 'false');
+    var x = dsd.querySelector('.dsd-x');
+    if (x) x.focus();
+  }
+  function closeDs() {
+    if (!dsd) return;
+    dsd.classList.remove('is-open');
+    dsd.setAttribute('aria-hidden', 'true');
+  }
+  if (dsd) {
+    dsd.addEventListener('click', function (e) {
+      if (e.target.closest('[data-dsd-close]')) closeDs();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && dsd.classList.contains('is-open')) closeDs();
+    });
+  }
+
   sys.addEventListener('click', function (e) {
     var pv = e.target.closest('[data-preview]');
     if (pv) {
-      tip('预览「' + pv.closest('.ug-scard').querySelector('.ug-sname').textContent + '」');
+      openDs(pv.closest('.ug-scard'));
       return;
     }
     var pick = e.target.closest('[data-pick]');

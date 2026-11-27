@@ -891,6 +891,84 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
 
    </div><!-- /ai-side-in -->
   </aside><!-- /ai-side -->
+  <!-- ============================================================
+       第 94 轮：设计系统预览抽屉（右侧 800，从右滑入）
+       入口：UI设计页 · 第 1 步设计系统卡的「预览」
+       头 56：图标 20 + 名称 16/500 + 「设计系统」标签 + 关闭 28
+       体：一句话简介 / 概览 4 项 / 色彩 6 色 / 字体 5 级 / 圆角与间距 / 组件示例
+       名称、色板、主色由 app.js 按卡片 data-sys 注入（--dsd-c 是整套示例的取色）
+       ============================================================ -->
+  <div class="cds-modal dsd" id="dsDrawer" aria-hidden="true">
+    <div class="dsd-mask" data-dsd-close></div>
+    <aside class="dsd-panel" role="dialog" aria-modal="true" aria-labelledby="dsdName">
+      <header class="dsd-head">
+        <span class="dsd-ico" id="dsdIco" aria-hidden="true"></span>
+        <h2 class="dsd-name" id="dsdName">Cecoder 设计系统</h2>
+        <span class="dsd-badge">设计系统</span>
+        <button class="dsd-x" type="button" data-dsd-close aria-label="关闭预览"><span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.6 3.6l6.8 6.8M10.4 3.6l-6.8 6.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span></button>
+      </header>
+
+      <div class="dsd-body">
+        <p class="dsd-desc" id="dsdDesc"></p>
+        <div class="dsd-facts" id="dsdFacts"></div>
+
+        <section class="dsd-sec">
+          <h3 class="dsd-h">色彩</h3>
+          <div class="dsd-sw-row" id="dsdColors"></div>
+        </section>
+
+        <section class="dsd-sec">
+          <h3 class="dsd-h">字体</h3>
+          <div class="dsd-type" id="dsdType"></div>
+        </section>
+
+        <section class="dsd-sec">
+          <h3 class="dsd-h">圆角与间距</h3>
+          <div class="dsd-sub">
+            <span class="dsd-k">圆角</span>
+            <div class="dsd-radii" id="dsdRadii"></div>
+          </div>
+          <div class="dsd-sub">
+            <span class="dsd-k">间距</span>
+            <div class="dsd-gaps" id="dsdGaps"></div>
+          </div>
+        </section>
+
+        <section class="dsd-sec">
+          <h3 class="dsd-h">组件示例</h3>
+          <div class="dsd-comps">
+            <div class="dsd-cbox">
+              <p class="dsd-ck">按钮</p>
+              <div class="dsd-crow">
+                <span class="dsd-btn is-pri">主按钮</span>
+                <span class="dsd-btn">次按钮</span>
+                <span class="dsd-btn is-txt">文字按钮</span>
+              </div>
+            </div>
+            <div class="dsd-cbox">
+              <p class="dsd-ck">输入框</p>
+              <div class="dsd-crow"><span class="dsd-input">请输入内容</span></div>
+            </div>
+            <div class="dsd-cbox">
+              <p class="dsd-ck">标签</p>
+              <div class="dsd-crow">
+                <span class="dsd-tag is-pri">进行中</span>
+                <span class="dsd-tag">已完成</span>
+                <span class="dsd-tag">已归档</span>
+              </div>
+            </div>
+            <div class="dsd-cbox">
+              <p class="dsd-ck">选择与开关</p>
+              <div class="dsd-crow">
+                <span class="dsd-check"><span class="dsd-check-b"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.4 6.2 4.8 8.6 9.6 3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>已同意协议</span>
+                <span class="dsd-switch" aria-hidden="true"></span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </div>
 
   <!-- ===== 模态层：panel 的绝对定位子层（蒙层只在窗口面板内，不溢出到顶栏） ===== -->
 

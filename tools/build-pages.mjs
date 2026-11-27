@@ -31,6 +31,8 @@ const P = {
   dispatch: R('src/dispatch.html'),
   /* 第 80 轮：UI设计工序专属页（中栏空） */
   uiview: R('src/uiview.html'),
+  /* 第 94 轮：设计系统预览抽屉（右侧 800）—— 只挂在 UI设计页 */
+  dsdrawer: R('src/dsdrawer.html'),
   uigenview: R('src/uigen.html'),
   uidoneview: R('src/uidone.html'),
   /* 第 82 轮：代码生成与确认页（稿 3561:55208） */
@@ -101,10 +103,11 @@ const task = wrap({
 });
 
 /* ---------- 3.5 UI设计工序页：顶栏 + 工序条 + 中栏空 + 右栏 AI 协作（第 82 轮：默认带出对话栏） ---------- */
+/* 第 94 轮：设计系统预览抽屉也是 .panel 的绝对定位子层，跟 aiside 一起走 side 槽位 */
 const ui = wrap({
   title: 'Cecoder · UI设计',
   page: 'ui',
-  body: chrome(pmChat, P.tasktop + P.uiview, stageChat, '', P.aiside, ''),
+  body: chrome(pmChat, P.tasktop + P.uiview, stageChat, '', P.aiside + P.dsdrawer, ''),
 });
 
 /* ---------- 3.6 UI生成中页：第 90 轮，由 UI设计页底栏「下一步，输入设计资产」跳入 ----------
