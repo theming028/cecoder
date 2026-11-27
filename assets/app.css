@@ -3570,8 +3570,17 @@ body[data-page="summary"] { --sum-col: 1024px; }
 body[data-page="summary"] .stage.is-chat { display: none; }
 /* 第 80 轮：UI设计工序页 —— 顶栏 44 + 工序条 87，中栏留空 */
 body[data-page="ui"] .stage.is-chat { display: none; }
-.ui-blank { position: absolute; left: 0; right: 0; top: 131px; bottom: 0; z-index: 3; background: var(--cds-bg-container); transition: top .26s cubic-bezier(.2, .8, .2, 1); }
-body[data-page="ui"] .panel-main.is-steps-off .ui-blank { top: 44px; }
+/* 第 87 轮：中栏顶部补一条 40 高的工序资产页签条（复用 .task-tabs），正文从 171 起；
+   同时给白底加 1px 内阴影 —— .ui-blank 的 z-index 3 白底会盖掉 .ws-drawer 的 1px 外阴影，
+   左栏右侧那条分隔线在这一段就断了（只有工序条那段还看得见）。
+   稿 4068:69848：轨道 40 / 页签 28 / 左内距 19 / 右专注模式 80×28 */
+.ui-blank { position: absolute; left: 0; right: 0; top: 171px; bottom: 0; z-index: 3; background: var(--cds-bg-container); box-shadow: inset 1px 0 0 0 #EBECED; transition: top .26s cubic-bezier(.2, .8, .2, 1); }
+body[data-page="ui"] .panel-main.is-steps-off .ui-blank { top: 84px; }
+body.is-focus[data-page="ui"] .ui-blank { top: 40px; }
+/* 专注态：工序条与顶栏收平，页签条升到最顶（和任务页同款） */
+body.is-focus[data-page="ui"] .task-tabs { top: 0; }
+/* 稿里两颗页签都是 12 的内距（66 = 12+42+12 / 122 = 12+98+12） */
+.ui-tabs .tk-tab { padding: 0 12px; }
 
 .sum-back {
   height: 28px; padding: 0 10px; border-radius: 4px;
