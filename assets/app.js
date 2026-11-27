@@ -3827,14 +3827,24 @@
   var next = document.getElementById('ugNext');
   if (next) next.addEventListener('click', function () { location.href = 'cecoder-uigen.html'; });
 
-  /* 生成中页：底栏「停止生成」回上一页；停留约 5s 后自动进入生成完成（本页先留空） */
+  /* 生成中页：底栏「停止生成」回上一页；停留约 5s 后自动进入生成完成（本页先留空）
+     bfcache / 前进后退恢复时定时器状态会被带回，导致进来就是空的（看着像“偶发消失”），
+     所以 pageshow(persisted) 时重置成生成中并重新计时 */
   var stopBtn = document.getElementById('ugStop');
   if (stopBtn) {
     var genView = document.getElementById('ugGen');
-    var doneTimer = setTimeout(function () {
-      if (genView) genView.hidden = true;
-      stopBtn.hidden = true;
-    }, 5000);
+    var doneTimer = null;
+    var startGen = function () {
+      if (genView) genView.hidden = false;
+      stopBtn.hidden = false;
+      clearTimeout(doneTimer);
+      doneTimer = setTimeout(function () {
+        if (genView) genView.hidden = true;
+        stopBtn.hidden = true;
+      }, 5000);
+    };
+    startGen();
+    window.addEventListener('pageshow', function (e) { if (e.persisted) startGen(); });
     stopBtn.addEventListener('click', function () {
       clearTimeout(doneTimer);
       location.href = 'cecoder-ui.html';

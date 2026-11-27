@@ -4274,7 +4274,12 @@ a.cg-step:hover { background: #FFFFFF; }
 .ui-blank { display: flex; flex-direction: column; container-type: inline-size; }
 /* 底栏 tp-foot 白底同样会盖掉 .ui-blank 的 inset 左描边，这里补回那 1px（与左栏外阴影同色），
    否则中栏左侧那条分隔线到底栏这 56 高就断了 */
-body[data-page="ui"] .ui-blank > .tp-foot { box-shadow: inset 1px 0 0 0 #EBECED, inset 0 1px 0 0 #EBECED; }
+body[data-page="ui"] .ui-blank > .tp-foot { box-shadow: inset 1px 0 0 0 #EBECED; }
+/* 顶部那条分隔线两端断开，左右各留 20（不动左竖线，它负责中栏左边缘贯通） */
+body[data-page="ui"] .ui-blank > .tp-foot::before {
+  content: ''; position: absolute; left: 20px; right: 20px; top: 0; height: 1px;
+  background: #EBECED; pointer-events: none;
+}
 .ug-wrap {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden;
   padding: 20px 20px 24px; display: flex; justify-content: center;
@@ -4422,6 +4427,10 @@ body[data-page="ui"] .ui-blank > .tp-foot { box-shadow: inset 1px 0 0 0 #EBECED,
 }
 .ug-gen-in { position: absolute; left: 50%; top: 18.3908%; width: 77%; transform: translateX(-50%); text-align: center; }
 .ug-gen-ico { display: block; width: 72px; height: 72px; margin: 0 auto; }
+/* 稿里那段 90° 主色弧是持续旋转的加载环（绕圆心 36,36） */
+.ug-gen-arc { transform-box: view-box; transform-origin: 36px 36px; animation: ug-gen-spin 1.4s linear infinite; }
+@keyframes ug-gen-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .ug-gen-arc { animation: none; } }
 .ug-gen-t { margin: 32px 0 0; font-size: 20px; line-height: 28px; font-weight: 500; color: #1F1F1F; }
 .ug-gen-d { margin: 12px 0 0; font-size: 14px; line-height: 22px; color: #6B6B6B; }
 /* .ug-gen / .ug-wrap 这类自带 display 的元素会盖掉 [hidden] 的 UA display:none，兜一层 */

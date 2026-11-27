@@ -57,6 +57,7 @@ const g = await p.evaluate(() => {
     cbx: cbx.map(l => ({ on: l.querySelector('input').checked, boxBg: cs(l.querySelector('.ug-box')).backgroundColor, w: Math.round(l.getBoundingClientRect().width) })),
     rd: rd.map(l => ({ on: l.querySelector('input').checked, sh: cs(l.querySelector('.ug-dot')).boxShadow, w: Math.round(l.getBoundingClientRect().width) })),
     foot: [Math.round(ftb.height), Math.round(ftb.y), Math.round(ftb.width), cs(foot).boxShadow, cs(foot).backgroundColor],
+    footBefore: (() => { const b = getComputedStyle(foot, '::before'); return b.left + '/' + b.right + '/' + b.height + '/' + b.backgroundColor; })(),
     prim: { t: prim.textContent.trim(), h: Math.round(prim.getBoundingClientRect().height), bg: cs(prim).backgroundColor, w: Math.round(prim.getBoundingClientRect().width), cx: Math.round(prim.getBoundingClientRect().x + prim.getBoundingClientRect().width / 2), footCx: Math.round(ftb.x + ftb.width / 2) },
     wrapOver: q('.ug-wrap').scrollHeight > q('.ug-wrap').clientHeight,
   };
@@ -100,7 +101,7 @@ ok('C4 复选框「网页端」选中（蓝底）、「手机端」未选（白�
 ok('C5 单选「1440px」选中（蓝圈）、「1920px」未选（文字完整，宽 60~70）', g.rd[0].on && /rgb\(55, 112, 247\)/.test(g.rd[0].sh) && !g.rd[1].on && g.rd[0].w >= 60 && g.rd[0].w <= 70, JSON.stringify(g.rd));
 
 /* ---------- D 底栏 tp-foot ---------- */
-ok('D1 tp-foot 56 高、白底、顶部与左侧各 1px #EBECED（左线不断）、满中栏宽', g.foot[0] === 56 && g.foot[2] === 1134 && g.foot[4] === 'rgb(255, 255, 255)' && /rgb\(235, 236, 237\) 0px 1px 0px 0px inset/.test(g.foot[3]) && /rgb\(235, 236, 237\) 1px 0px 0px 0px inset/.test(g.foot[3]), JSON.stringify(g.foot));
+ok('D1 tp-foot 56 高、白底、左侧 1px #EBECED；顶线两端断开左右各留 20', g.foot[0] === 56 && g.foot[2] === 1134 && g.foot[4] === 'rgb(255, 255, 255)' && /rgb\(235, 236, 237\) 1px 0px 0px 0px inset/.test(g.foot[3]) && g.footBefore === '20px/20px/1px/rgb(235, 236, 237)', JSON.stringify(g.foot) + ' ' + g.footBefore);
 ok('D2 主键「下一步，输入设计资产」36 高、主色、居中', g.prim.t === '下一步，输入设计资产' && g.prim.h === 36 && g.prim.bg === 'rgb(55, 112, 247)' && Math.abs(g.prim.cx - g.prim.footCx) <= 1, JSON.stringify(g.prim));
 
 /* ---------- E 交互 ---------- */

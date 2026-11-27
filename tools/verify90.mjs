@@ -49,6 +49,9 @@ const g = await p.evaluate(() => {
     dLines: Math.round(d.getBoundingClientRect().height / 22),
     stop: [stop.textContent.trim(), box(stop), cs(stop).backgroundColor, cs(stop).boxShadow, cs(stop).color],
     foot: box(foot),
+    footBefore: (() => { const b = getComputedStyle(foot, '::before'); return b.left + '/' + b.right + '/' + b.height + '/' + b.backgroundColor; })(),
+    icoMask: (() => { const c = ico.querySelector('circle'); const m = c && c.getAttribute('mask'); const mp = m && document.querySelector(m.slice(4, -1) + ' path'); return { mask: m, holeFill: mp ? mp.getAttribute('fill') : null, ringFill: ico.querySelector(':scope > path').getAttribute('fill') }; })(),
+    arcAnim: (() => { const a = ico.querySelector('.ug-gen-arc'); const c2 = cs(a); return c2.animationName + '/' + c2.animationDuration + '/' + c2.animationIterationCount + '/' + c2.transformOrigin; })(),
     over: document.documentElement.scrollWidth - innerWidth,
   };
 });
@@ -62,6 +65,9 @@ ok('B7 副文 14/22 #6B6B6B、固定两行、距标题 12', g.d[1] === '14px/22p
 ok('B8 底栏次要按钮「停止生成」184×36、白底 + 1px #E5E5E5、正文色', g.stop[0] === '停止生成' && g.stop[1][2] === 184 && g.stop[1][3] === 36 && g.stop[2] === 'rgb(255, 255, 255)' && /rgb\(229, 229, 229\) 0px 0px 0px 1px inset/.test(g.stop[3]) && g.stop[4] === 'rgb(31, 31, 31)', JSON.stringify(g.stop));
 ok('B9 底栏 56 高、按钮居中', g.foot[3] === 56 && Math.abs((g.stop[1][0] + 92) - (g.foot[0] + g.foot[2] / 2)) <= 1, JSON.stringify(g.foot));
 ok('B10 1920 收左栏：无横向溢出', g.over <= 0, g.over);
+ok('B11 底栏顶线两端断开、左右各留 20（左侧竖线仍在）', g.footBefore === '20px/20px/1px/rgb(235, 236, 237)', g.footBefore);
+ok('B12 图标中间镂空：黑圆用 mask 挖掉调色板（透出渐变底）', g.icoMask.mask === 'url(#ugIcoMask)' && g.icoMask.holeFill === '#000' && g.icoMask.ringFill === '#DAE4FE', JSON.stringify(g.icoMask));
+ok('B13 蓝环持续旋转（ug-gen-spin / 1.4s / infinite / 绕 36,36）', /ug-gen-spin/.test(g.arcAnim) && /1\.4s/.test(g.arcAnim) && /infinite/.test(g.arcAnim) && g.arcAnim.indexOf('36px 36px') > 0, g.arcAnim);
 
 /* ---------- C 停止生成 → 回上一页 ---------- */
 await p.click('#ugStop');
