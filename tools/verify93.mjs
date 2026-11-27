@@ -120,7 +120,7 @@ for (const w of sizes) {
       noOverlap: Math.round(right.x - left.right) >= 0,
       titleVis,
       linkVis: getComputedStyle(document.querySelector('.ud-link')).display !== 'none',
-      toolsVis: [...document.querySelectorAll('.ud-tool')].filter(e => getComputedStyle(e).display !== 'none').length,
+      toolsVis: [...document.querySelectorAll('.ud-tools > *')].filter(e => getComputedStyle(e).display !== 'none').length,
     };
   }));
   await q.close();

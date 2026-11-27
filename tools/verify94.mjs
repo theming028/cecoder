@@ -83,12 +83,12 @@ await wait(220);
 const ddOpen = await p.evaluate(() => {
   const dd = document.querySelector('#udVer').closest('.cds-dd');
   const list = dd.querySelector('.semi-select-option-list-wrapper');
-  const r = list.getBoundingClientRect(), br = document.querySelector('.ud-bar').getBoundingClientRect();
-  return [dd.classList.contains('is-open'), getComputedStyle(list).display, Math.round(r.height), Math.round(r.top - br.bottom)];
+  const r = list.getBoundingClientRect(), tr = document.getElementById('udVer').getBoundingClientRect();
+  return [dd.classList.contains('is-open'), getComputedStyle(list).display, Math.round(r.height), Math.round(r.top - tr.bottom)];
 });
 ok('B1 点「版本」展开下拉', ddOpen[0] === true && ddOpen[1] === 'flex', JSON.stringify(ddOpen));
 ok('B2 菜单高 68（2×28 + 4 内距 + 2 间隔）', ddOpen[2] === 68, ddOpen[2]);
-ok('B3 菜单在工具条下方 4px', ddOpen[3] === 4, ddOpen[3]);
+ok('B3 菜单距触发器 6px（第 99 轮规范）', ddOpen[3] === 6, ddOpen[3]);
 await p.click('.ud-dd .semi-select-option:nth-child(2)');
 await wait(220);
 const afterPick = await p.evaluate(() => {

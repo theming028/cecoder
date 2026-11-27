@@ -4489,8 +4489,8 @@ body[data-page="ui"] .ui-blank.is-gen {
   white-space: nowrap;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.ud-sel:hover { background: var(--cds-surface-subtle); }
-.ud-sel:active { background: var(--cds-surface-inset); }
+.ud-sel:hover { background: var(--cds-surface-inset); }
+.ud-sel:active { background: var(--cds-gray-hover); }
 .ud-sel-k { color: var(--cds-text-secondary); }
 .ud-sel-v { padding-right: 8px; }
 .ud-desktop, .ud-caret { flex: 0 0 auto; width: 14px; height: 14px; }
@@ -4499,9 +4499,8 @@ body[data-page="ui"] .ui-blank.is-gen {
 .ud-dd { flex: 0 0 auto; }
 .ud-sel .c-pill-txt { font-size: 13px; line-height: 22px; }
 .ud-dd .semi-select-option-list-wrapper {
-  /* 触发器 28 居中在 44 的工具条里，菜单要落在工具条下方 4px：
-     28 + 8（上下留白）= 36，再 +12 = 48 = 工具条底边 + 4 */
-  min-width: 132px; padding: 4px; top: calc(100% + 12px);
+  /* 第 99 轮：下拉与触发器的间距按规范收成 6px（触发器 28 居中在 44 条里，底边 36 → 菜单顶 42） */
+  min-width: 132px; padding: 4px; top: calc(100% + 6px);
 }
 .ud-dd .semi-select-option {
   display: flex; align-items: center; height: 28px; padding: 0 8px;
@@ -4521,7 +4520,7 @@ body[data-page="ui"] .ui-blank.is-gen {
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
 .ud-zbtn svg { width: 14px; height: 14px; }
-.ud-zbtn:hover { background: var(--cds-surface-subtle); }
+.ud-zbtn:hover { background: var(--cds-surface-inset); }
 .ud-zval {
   /* 定宽 43：缩放值是 25~200 的三/四字符（autofit 还会出现 46%），内距 4 才放得下「100%」不撑宽组 */
   min-width: 43px; height: 20px; box-sizing: border-box; text-align: center;
@@ -4530,9 +4529,9 @@ body[data-page="ui"] .ui-blank.is-gen {
   white-space: nowrap; font-variant-numeric: tabular-nums; cursor: pointer;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-/* 第 98 轮：点缩放值直接回到 100% */
-.ud-zval:hover { background: var(--cds-surface-subtle); }
-.ud-zval:active { background: var(--cds-surface-inset); }
+/* 第 98 轮：点缩放值直接回到 100%；第 99 轮：hover 深一级（#F7F7F7 → #F2F2F2） */
+.ud-zval:hover { background: var(--cds-surface-inset); }
+.ud-zval:active { background: var(--cds-gray-hover); }
 
 /* 画板名绝对居中于工具条（稿 @541，1133/2 = 566.5） */
 .ud-title {
@@ -4550,15 +4549,20 @@ body[data-page="ui"] .ui-blank.is-gen {
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
 .ud-tool svg { width: 14px; height: 14px; }
-.ud-tool:hover { background: var(--cds-surface-subtle); }
-.ud-tool:active { background: var(--cds-surface-inset); }
+/* 第 99 轮：hover / 按下各深一级（原来 #F7F7F7 太浅，看不出按过） */
+.ud-tool:hover { background: var(--cds-surface-inset); }
+.ud-tool:active { background: var(--cds-gray-hover); }
+.ud-tool.is-open { background: var(--cds-surface-inset); }
+/* 「更多」下拉（第 99 轮）：打开文件夹 / 在外部浏览器打开；复用 .wd-menu 外观，右对齐、距触发器 6px */
+.ud-more { position: relative; flex: 0 0 auto; display: inline-flex; }
+.ud-menu { left: auto; right: 0; top: calc(100% + 6px); min-width: 148px; }
 .ud-vsep { flex: 0 0 auto; width: 1px; height: 16px; background: var(--cds-line-strong); }
 .ud-link {
   flex: 0 0 auto; min-width: 63px; box-sizing: border-box; height: 28px; padding: 0 8px; border-radius: 4px;
   font-size: 13px; line-height: 22px; color: var(--cds-text-primary); white-space: nowrap;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.ud-link:hover { background: var(--cds-surface-subtle); }
+.ud-link:hover { background: var(--cds-surface-inset); }
 
 /* 画布区（第 97 轮）：灰底 + 16px 田字网格（线 alpha .04），占满工具条以下
    display:flex —— 左列「页面层级和状态」240 定宽、上下拉通、与画布贴边；
@@ -4618,14 +4622,18 @@ body.ud-dragging { cursor: grabbing; -webkit-user-select: none; user-select: non
   order: -1; position: relative; flex: 0 0 240px;
   width: 240px; height: 100%; box-sizing: border-box;
   display: flex; flex-direction: column; overflow: hidden;
-  background: #F7F7F7;
+  /* 第 99 轮：实底 #F7F7F7 换成毛玻璃 —— 画布那层淡田字网格从底下透上来，左列才像浮在画布之上 */
+  background: rgba(255, 255, 255, .58);
+  -webkit-backdrop-filter: blur(6px) saturate(150%);
+  backdrop-filter: blur(6px) saturate(150%);
   /* 第 98 轮：左边那根 1px 竖线（贴画布左缘，之前被白底吃掉过）+ 右边 1px 线 + 向右投影，把前景从灰底网格里托起来 */
   box-shadow: inset 1px 0 0 0 #EBECED, inset -1px 0 0 0 #E5E5E5, 2px 0 10px 0 rgba(0, 0, 0, .08);
 }
 .ud-pages-head {
   flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
-  /* 稿 4068:65598：标题距左 19、距上 16；折叠图标 14 右边距 12 → 28×28 热区，右内距 5 让图标落在 221 */
-  padding: 13px 5px 8px 19px;
+  /* 稿 4068:65598：标题距左 19、距上 16；折叠图标 14 右边距 12 → 28×28 热区，右内距 5 让图标落在 221
+     第 99 轮：底部内距 8 → 0（卡片自带的 9px 顶距已够，头上不再叠两层留白） */
+  padding: 13px 5px 0 19px;
 }
 .ud-pages-t {
   flex: 1 1 auto; min-width: 0;
@@ -4691,14 +4699,20 @@ body.ud-dragging { cursor: grabbing; -webkit-user-select: none; user-select: non
 .ud-doc { color: #1F1F1F; }
 .ud-tree-row.is-fold .ud-chev-d { transform: rotate(-90deg); }
 .ud-states { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
-.ud-state { height: 28px; padding: 0 8px 0 32px; gap: 6px; }
+/* 第 99 轮：状态行可点切换（同组单选），所以要有指针 + 悬停底 */
+.ud-state {
+  width: 100%; box-sizing: border-box; height: 28px; padding: 0 8px 0 32px; gap: 6px;
+  cursor: pointer; transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.ud-state:not(.is-on):hover { background: var(--cds-surface-inset); }
 .ud-state.is-on { background: #F5F8FF; box-shadow: inset 0 0 0 1px #DAE4FE; color: var(--cds-color-primary); font-weight: 500; }
 /* 圆点 6×6 + 1px 白描边（稿里 dot 是 6 带 inset 1 白边） */
 .ud-dot { flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: var(--cds-color-primary);
   box-shadow: inset 0 0 0 1px #FFFFFF; }
 .ud-dot.is-idle { background: #C9C9C9; }
 .ud-page-t { flex: 1 1 auto; min-width: 0; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ud-tree-row:hover { background: #FAFAFA; }
+/* 第 99 轮：行 hover 从 #FAFAFA 提到 #F2F2F2（白卡上要能看出来） */
+.ud-tree-row:hover { background: var(--cds-surface-inset); }
 /* 页面组的折叠箭头：收起朝右，展开转 90° 朝下 */
 .ud-chev-r { transition: transform var(--cds-motion-duration) var(--cds-motion-ease); }
 .ud-tree-row[aria-expanded="true"] .ud-chev-r { transform: rotate(90deg); }
@@ -4723,7 +4737,7 @@ body.ud-dragging { cursor: grabbing; -webkit-user-select: none; user-select: non
 }
 @container (max-width: 560px) {
   .ud-link, .ud-vsep { display: none; }
-  .ud-tools .ud-tool:nth-last-child(-n + 2) { display: none; }
+  .ud-tools > :nth-last-child(-n + 2) { display: none; }
 }
 
 /* ============================================================

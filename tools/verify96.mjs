@@ -65,8 +65,8 @@ ok('A3 画布底色仍是 #F5F5F5', A.grid[2] === 'rgb(245, 245, 245)', A.grid[2
 /* ---------- ② 左侧浮层 ---------- */
 ok('B1 左列 240 定宽、在流内（第 97 轮改成贴边列）', A.pages[0][2] === 240 && A.pages[1] === 'relative', JSON.stringify([A.pages[0], A.pages[1]]));
 ok('B2 左列与画布左上贴齐、上下拉通', A.pages[0][0] === A.canvasBox[0] && A.pages[0][1] === A.canvasBox[1] && A.pages[0][3] === A.canvasBox[3], JSON.stringify([A.pages[0], A.canvasBox]));
-ok('B3 浮层底 #F7F7F7 + 右侧 1px #E5E5E5', A.pages[2] === 'rgb(247, 247, 247)' && /rgb\(229, 229, 229\) -1px 0px 0px 0px inset/.test(A.pages[3]), JSON.stringify([A.pages[2], A.pages[3]]));
-ok('B4 头 13/5/8/19 内距（标题 19、28 折叠键右 5）', A.head[1] === '13px 5px 8px 19px', A.head[1]);
+ok('B3 浮层底是毛玻璃半透明白 + 右侧 1px #E5E5E5', /rgba\(255, 255, 255, 0\./.test(A.pages[2]) && /rgb\(229, 229, 229\) -1px 0px 0px 0px inset/.test(A.pages[3]), JSON.stringify([A.pages[2], A.pages[3]]));
+ok('B4 头 13/5/0/19 内距（第 99 轮底距归 0）', A.head[1] === '13px 5px 0px 19px', A.head[1]);
 ok('B5 标题「页面层级和状态」14/22、正文色', A.title[0] === '页面层级和状态' && A.title[1] === '14px' && A.title[2] === '400' && A.title[3] === 'rgb(31, 31, 31)' && A.title[4] === '22px', JSON.stringify(A.title));
 ok('B6 展开态折叠键 28×28（图标 14），默认提示「折叠」', A.fold[0][2] === 28 && A.fold[0][3] === 28 && A.fold[1] === '折叠' && A.fold[2] === 'true', JSON.stringify(A.fold));
 

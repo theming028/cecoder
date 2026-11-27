@@ -3974,6 +3974,64 @@
       });
     });
 
+    /* 第 99 轮：状态行可点切换 —— 同组内单选，「选中」= 主色底 + 亮圆点，其余回灰点 */
+    var udStatesBox = document.querySelector('.ud-pages-body');
+    if (udStatesBox) {
+      var udPickState = function (row) {
+        var list = row.parentNode;
+        if (!list) return;
+        Array.prototype.forEach.call(list.querySelectorAll('.ud-state'), function (li) {
+          var on = li === row;
+          li.classList.toggle('is-on', on);
+          li.setAttribute('aria-selected', on ? 'true' : 'false');
+          var dot = li.querySelector('.ud-dot');
+          if (dot) dot.classList.toggle('is-idle', !on);
+        });
+      };
+      Array.prototype.forEach.call(document.querySelectorAll('.ud-states'), function (ul) {
+        ul.setAttribute('role', 'listbox');
+        Array.prototype.forEach.call(ul.querySelectorAll('.ud-state'), function (li) {
+          li.setAttribute('role', 'option');
+          li.setAttribute('aria-selected', li.classList.contains('is-on') ? 'true' : 'false');
+        });
+      });
+      udStatesBox.addEventListener('click', function (e) {
+        var row = e.target.closest('.ud-state');
+        if (row) udPickState(row);
+      });
+    }
+
+    /* 第 99 轮：「更多」下拉（打开文件夹 / 在外部浏览器打开）—— 点键开合、点项执行、点外部或 Esc 关 */
+    var udMore = document.getElementById('udMore');
+    var udMoreMenu = document.getElementById('udMoreMenu');
+    if (udMore && udMoreMenu) {
+      var udMoreClose = function () {
+        udMoreMenu.hidden = true;
+        udMore.setAttribute('aria-expanded', 'false');
+        udMore.classList.remove('is-open');
+      };
+      udMore.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = udMoreMenu.hidden;
+        udMoreMenu.hidden = !open;
+        udMore.setAttribute('aria-expanded', open ? 'true' : 'false');
+        udMore.classList.toggle('is-open', open);
+      });
+      udMoreMenu.addEventListener('click', function (e) {
+        var it = e.target.closest('.wd-menu-item');
+        if (!it) return;
+        e.stopPropagation();
+        udMoreClose();
+        tip(it.textContent.trim() + '（稿待补）');
+      });
+      document.addEventListener('click', function (e) {
+        if (!udMoreMenu.hidden && !e.target.closest('#udMore')) udMoreClose();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !udMoreMenu.hidden) udMoreClose();
+      });
+    }
+
     /* 分组展开/收起（默认展开，与稿一致） */
     var udTreeHead = document.getElementById('udTreeHead');
     var udStatesEl = document.getElementById('udStates');
@@ -3988,6 +4046,7 @@
     if (udBar) udBar.addEventListener('click', function (e) {
       var t = e.target.closest('button');
       if (!t || t === udIn || t === udOut) return;
+      if (t.id === 'udMore') return;   /* 第 99 轮：更多键自己管下拉 */
       if (!t.classList.contains('ud-tool') && !t.classList.contains('ud-sel') && t.id !== 'udNote') return;
       if (t.closest('.cds-dd')) return;
       var lb = t.id === 'udNote' ? '查看批注（2 条）' : (t.getAttribute('aria-label') || t.textContent.trim());

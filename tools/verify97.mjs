@@ -48,8 +48,8 @@ const A = await p.evaluate(() => {
 ok('A1 左列 240 宽、在流内（相对定位）', A.pages[0][2] === 240 && A.pages[1] === 'relative' && A.pages[2] === '240px', JSON.stringify([A.pages[0], A.pages[1], A.pages[2]]));
 ok('A2 左列与画布左上贴齐、上下拉通（高度 = 画布高）', A.pages[0][0] === A.canvas[0] && A.pages[0][1] === A.canvas[1] && A.pages[0][3] === A.canvas[3], JSON.stringify([A.pages[0], A.canvas]));
 ok('A3 画布是 flex 行容器，左列 order -1 排在最前', A.canvasDisplay === 'flex' && A.pages[6] === '-1', JSON.stringify([A.canvasDisplay, A.pages[6]]));
-ok('A4 左列底 #F7F7F7 + 右侧 1px #E5E5E5 贴边线', A.pages[4] === 'rgb(247, 247, 247)' && /rgb\(229, 229, 229\) -1px 0px 0px 0px inset/.test(A.pages[5]), JSON.stringify([A.pages[4], A.pages[5]]));
-ok('A5 头部内距 13/5/8/19（标题 19、28 折叠键右 5）', A.head === '13px 5px 8px 19px', A.head);
+ok('A4 左列底是毛玻璃半透明白 + 右侧 1px #E5E5E5 贴边线', /rgba\(255, 255, 255, 0\./.test(A.pages[4]) && /rgb\(229, 229, 229\) -1px 0px 0px 0px inset/.test(A.pages[5]), JSON.stringify([A.pages[4], A.pages[5]]));
+ok('A5 头部内距 13/5/0/19（第 99 轮底距归 0）', A.head === '13px 5px 0px 19px', A.head);
 ok('A6 滚动区 = 画布宽 − 240', A.scrollW === A.canvas[2] - 240, A.scrollW + ' / ' + A.canvas[2]);
 
 /* ---------- ② 折叠键用稿内图标 ---------- */
