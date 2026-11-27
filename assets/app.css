@@ -1546,6 +1546,8 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .wd-menu {
   position: absolute; right: 0; top: calc(100% + 4px); z-index: 20;
   min-width: 172px; padding: 6px; margin: 0;
+  /* 第 101 轮：ul 默认 disc，marker 会落在 6px 内距里冒出一个小圆点 → 关掉 */
+  list-style: none;
   background: var(--cds-bg-elevated); border: 1px solid #E5E5E5;
   border-radius: 8px; box-shadow: var(--cds-shadow-elevated);
 }
@@ -4615,6 +4617,33 @@ body.ud-dragging { cursor: grabbing; -webkit-user-select: none; user-select: non
   box-shadow: 0 0 0 1.6px var(--cds-color-primary);
   transform: translate(-50%, -50%); }
 .ud-board.is-sel .ud-handle { display: block; }
+/* 第 101 轮：框选图层 —— 点工具条「框选」后在画板（生成的 html）里拖出红色框并自动编号；
+   框按画板原始 1440×900 坐标存，随缩放与拖动一起走；线宽与序号反向除以 --ud-s，视觉尺寸恒定 */
+.ud-mq-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.ud-mq, .ud-mq-preview {
+  display: none; position: absolute; box-sizing: border-box; border-radius: 2px;
+  border: calc(1.5px / var(--ud-s)) solid var(--cds-danger-6);
+  background: rgba(245, 63, 63, .08);
+}
+.ud-mq.is-on, .ud-mq-preview.is-on { display: block; }
+.ud-mq-preview { border-style: dashed; background: rgba(245, 63, 63, .05); }
+/* 零尺寸锚点贴在框左上角，按 1/缩放 反向缩，序号视觉固定 18×18 */
+.ud-mq-no {
+  display: block; position: absolute; left: 0; top: 0; width: 0; height: 0;
+  transform: scale(var(--ud-inv, 1)); transform-origin: 0 0;
+}
+.ud-mq-no i {
+  position: absolute; left: -9px; top: -9px; box-sizing: border-box;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--cds-danger-6); box-shadow: 0 0 0 1.5px #FFFFFF;
+  font-style: normal; font-size: 11px; line-height: 15px; font-weight: 600; color: #FFFFFF; text-align: center;
+}
+/* 框选模式：画板光标变十字，拖拽期间锁住选中文本 */
+.ud-canvas.is-mq .ud-board { cursor: crosshair; }
+body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-select: none; user-select: none; }
+/* 「框选」键按下态（工具键） */
+.ud-tool.is-on { background: rgba(55, 112, 247, .10); }
+.ud-tool.is-on svg path { fill: var(--cds-color-primary); }
 .ud-h-tl { left: 0; top: 0; }
 .ud-h-tr { left: 100%; top: 0; }
 .ud-h-bl { left: 0; top: 100%; }

@@ -2840,9 +2840,11 @@
     })();
 
     /* 折叠：点已选中的「工序进度」把整条工序栏收起，再点展开 */
-    function setStepsOff(off) {
+    function setStepsOff(off, silent) {
       if (!panelMain) return;
       panelMain.classList.toggle('is-steps-off', off);
+      /* 第 101 轮：展开/收起记进 localStorage，所有页面共用（默认展开） */
+      if (!silent) { try { localStorage.setItem('cecoder.stepsOff', off ? '1' : '0'); } catch (err) {} }
       if (stepsBtn) {
         stepsBtn.setAttribute('aria-expanded', off ? 'false' : 'true');
         /* 文案跟着状态走：收起 ⇄ 展开 */
@@ -2855,6 +2857,12 @@
         if (sb) sb.classList.remove('is-on');
       } else requestAnimationFrame(layoutSteps);
     }
+
+    /* 第 101 轮：进页面先按上次的选择还原（silent = 别再写回去） */
+    try {
+      var stepsSaved = localStorage.getItem('cecoder.stepsOff');
+      if (stepsSaved === '1' || stepsSaved === '0') setStepsOff(stepsSaved === '1', true);
+    } catch (err) {}
 
     /* 「收起 / 展开」：单独一颗键控制工序条 */
     if (stepsBtn) {
@@ -3884,7 +3892,11 @@
       udUser = typeof v === 'number' ? Math.min(200, Math.max(25, Math.round(v))) : 0;
       var pct = udUser || udFitPct();
       udZoomVal.textContent = pct + '%';
-      if (udWrap) udWrap.style.setProperty('--ud-s', String(pct / 100));
+      if (udWrap) {
+        udWrap.style.setProperty('--ud-s', String(pct / 100));
+        /* 第 101 轮：框选序号按 1/缩放 反向缩，视觉尺寸恒定 */
+        udWrap.style.setProperty('--ud-inv', String(100 / pct));
+      }
     };
     udApplyZoom();
     window.addEventListener('resize', function () { if (!udUser) udApplyZoom(); });
@@ -3914,6 +3926,8 @@
       udBoardEl.addEventListener('click', function (e) { e.stopPropagation(); });
       udBoardEl.addEventListener('pointerdown', function (e) {
         if (e.button !== 0) return;
+        /* 第 101 轮：框选模式下不拖画板，改成画红框 */
+        if (udMqOn) { udMqStart(e); return; }
         var sr = udScroll.getBoundingClientRect(), wr = udWrap.getBoundingClientRect();
         udDrag = {
           id: e.pointerId, sx: e.clientX, sy: e.clientY, tx: udTx, ty: udTy, moved: false,
@@ -3950,6 +3964,92 @@
       udBoardEl.addEventListener('pointercancel', udDragEnd);
     }
     if (udScroll) udScroll.addEventListener('click', function (e) { if (e.target === udScroll || e.target === udStageEl) udSel(false); });
+
+    /* ============================================================
+       第 101 轮：框选 —— 点工具条「框选」进入模式，在画板（生成的 html）里拖出红框并自动编号；
+       再点一次或按 Esc 退出，框留在画板上；框存画板原始坐标，缩放/拖动都跟着走
+       ============================================================ */
+    var udMqLayer = document.getElementById('udMqLayer');
+    var udMqPreview = document.getElementById('udMqPreview');
+    var udMqFrame = document.getElementById('udFrame');
+    var udCanvasBox = document.getElementById('udCanvas');
+    var udMqOn = false, udMqSeq = 0, udMqDrag = null;
+
+    var udMqSetMode = function (on) {
+      udMqOn = on;
+      if (udMqFrame) {
+        udMqFrame.classList.toggle('is-on', on);
+        udMqFrame.setAttribute('aria-pressed', on ? 'true' : 'false');
+      }
+      if (udCanvasBox) udCanvasBox.classList.toggle('is-mq', on);
+      if (!on) {
+        if (udMqPreview) udMqPreview.classList.remove('is-on');
+        udMqDrag = null;
+        document.body.classList.remove('ud-mq-drag');
+      }
+    };
+    /* 画板当前缩放比 = 元素实际宽 / 1440 */
+    var udMqScale = function (r) { return (r && r.width ? r.width : UD_W) / UD_W; };
+    var udMqPoint = function (e, r, s) {
+      return {
+        x: Math.min(UD_W, Math.max(0, (e.clientX - r.left) / s)),
+        y: Math.min(UD_H, Math.max(0, (e.clientY - r.top) / s))
+      };
+    };
+    var udMqBox = function (el, a, b) {
+      el.style.left = Math.round(Math.min(a.x, b.x)) + 'px';
+      el.style.top = Math.round(Math.min(a.y, b.y)) + 'px';
+      el.style.width = Math.round(Math.abs(a.x - b.x)) + 'px';
+      el.style.height = Math.round(Math.abs(a.y - b.y)) + 'px';
+    };
+    var udMqStart = function (e) {
+      if (!udBoardEl) return;
+      var r = udBoardEl.getBoundingClientRect();
+      udMqDrag = { id: e.pointerId, a: udMqPoint(e, r, udMqScale(r)), r: r };
+      udMqBox(udMqPreview, udMqDrag.a, udMqDrag.a);
+      udMqPreview.classList.add('is-on');
+      document.body.classList.add('ud-mq-drag');
+      try { udBoardEl.setPointerCapture(e.pointerId); } catch (err) {}
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    if (udBoardEl && udMqPreview) {
+      udBoardEl.addEventListener('pointermove', function (e) {
+        if (!udMqDrag || e.pointerId !== udMqDrag.id) return;
+        udMqBox(udMqPreview, udMqDrag.a, udMqPoint(e, udMqDrag.r, udMqScale(udMqDrag.r)));
+      });
+      var udMqEnd = function (e) {
+        if (!udMqDrag || (e && e.pointerId !== udMqDrag.id)) return;
+        var r = udMqDrag.r, a = udMqDrag.a;
+        var b = udMqPoint(e, r, udMqScale(r));
+        udMqDrag = null;
+        document.body.classList.remove('ud-mq-drag');
+        udMqPreview.classList.remove('is-on');
+        /* 小于 8 板内像素当误点，不记框 */
+        if (Math.abs(a.x - b.x) < 8 || Math.abs(a.y - b.y) < 8) return;
+        udMqSeq += 1;
+        var box = document.createElement('div');
+        box.className = 'ud-mq is-on';
+        box.setAttribute('data-no', String(udMqSeq));
+        udMqBox(box, a, b);
+        var no = document.createElement('span');
+        no.className = 'ud-mq-no';
+        var num = document.createElement('i');
+        num.textContent = String(udMqSeq);
+        no.appendChild(num);
+        box.appendChild(no);
+        if (udMqLayer) udMqLayer.appendChild(box);
+      };
+      udBoardEl.addEventListener('pointerup', udMqEnd);
+      udBoardEl.addEventListener('pointercancel', udMqEnd);
+    }
+    if (udMqFrame) udMqFrame.addEventListener('click', function (e) {
+      e.stopPropagation();
+      udMqSetMode(!udMqOn);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && udMqOn) udMqSetMode(false);
+    });
 
     /* 左列折叠（第 97 轮）：整列收成左上角 32×32 浮键，点同一颗键再展开 */
     var udFold = document.getElementById('udFold');
@@ -4048,6 +4148,7 @@
       var t = e.target.closest('button');
       if (!t || t === udIn || t === udOut) return;
       if (t.id === 'udMore') return;   /* 第 99 轮：更多键自己管下拉 */
+      if (t.id === 'udFrame') return;  /* 第 101 轮：框选键自己管模式 */
       if (!t.classList.contains('ud-tool') && !t.classList.contains('ud-sel') && t.id !== 'udNote') return;
       if (t.closest('.cds-dd')) return;
       var lb = t.id === 'udNote' ? '查看批注（2 条）' : (t.getAttribute('aria-label') || t.textContent.trim());
