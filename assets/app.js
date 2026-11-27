@@ -4041,10 +4041,42 @@
         num.textContent = String(udMqSeq);
         no.appendChild(num);
         box.appendChild(no);
+        var del = document.createElement('span');
+        del.className = 'ud-mq-del';
+        del.setAttribute('aria-hidden', 'true');
+        del.appendChild(document.createElement('i'));
+        box.appendChild(del);
         if (udMqLayer) udMqLayer.appendChild(box);
       };
       udBoardEl.addEventListener('pointerup', udMqEnd);
       udBoardEl.addEventListener('pointercancel', udMqEnd);
+    }
+    /* 第 103 轮：框选模式下点红框即删，删完把剩下的序号重排成 1..n */
+    var udMqRenumber = function () {
+      if (!udMqLayer) return;
+      var list = [].slice.call(udMqLayer.querySelectorAll('.ud-mq'));
+      list.forEach(function (el, i) {
+        el.setAttribute('data-no', String(i + 1));
+        var n = el.querySelector('.ud-mq-no i');
+        if (n) n.textContent = String(i + 1);
+      });
+      udMqSeq = list.length;
+    };
+    if (udMqLayer) {
+      /* 先拦住 pointerdown：别让画板开始拖动、也别在框上起一个新框 */
+      udMqLayer.addEventListener('pointerdown', function (e) {
+        if (!udMqOn || !e.target.closest('.ud-mq')) return;
+        e.stopPropagation();
+        e.preventDefault();
+      });
+      udMqLayer.addEventListener('click', function (e) {
+        if (!udMqOn) return;
+        var box = e.target.closest('.ud-mq');
+        if (!box) return;
+        e.stopPropagation();
+        box.parentNode.removeChild(box);
+        udMqRenumber();
+      });
     }
     if (udMqFrame) udMqFrame.addEventListener('click', function (e) {
       e.stopPropagation();

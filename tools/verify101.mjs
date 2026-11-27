@@ -135,7 +135,7 @@ ok('C8 缩放后框的原始宽不变、屏幕宽 = 原宽×缩放', after.style
 ok('C9 100% 时序号缩放比 = 1（视觉恒 18px）', Math.abs(sc(after.inv) - 1 / after.s) < 0.1, JSON.stringify([sc(after.inv), after.s]));
 
 /* 误点（<8 板内像素）不记框 */
-await drag(0.5, 0.2, 0.501, 0.201);
+await drag(0.86, 0.06, 0.861, 0.061);   /* 挑一个没有红框的空地，第 103 轮起框上按下=删除 */
 const R3 = await p.evaluate(() => document.querySelectorAll('.ud-mq').length);
 ok('C10 小拖动（<8px）不算框', R3 === 2, R3);
 

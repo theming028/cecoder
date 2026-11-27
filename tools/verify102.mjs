@@ -68,6 +68,7 @@ const C = await p.evaluate(() => {
   const shot = atts.querySelector('.ai-att.is-shot');
   const clone = shot ? shot.querySelector('.ud-board-doc') : null;
   const thumb = atts.querySelector('.ai-att.is-shot .ud-thumb-in');
+  const win = atts.querySelector('.ai-att.is-shot .ud-thumb');
   const fly = document.querySelector('.ud-fly');
   return {
     n: list.length,
@@ -79,9 +80,10 @@ const C = await p.evaluate(() => {
     cloneItems: clone ? clone.querySelectorAll('.kb-item').length : 0,
     cloneIds: clone ? clone.querySelectorAll('[id]').length : -1,
     cloneScale: thumb ? getComputedStyle(thumb).transform : '',
-    thumbW: thumb ? Math.round(thumb.getBoundingClientRect().width) : 0,
-    thumbH: thumb ? Math.round(thumb.getBoundingClientRect().height) : 0,
-    chipW: shot ? Math.round(shot.getBoundingClientRect().width) : 0,
+    /* 用 offset* 量布局尺寸，避开 is-pop 动画的 scale 干扰；缩略窗口 = 44×28，里面等比缩 */
+    thumbW: win ? win.offsetWidth : 0,
+    thumbH: win ? win.offsetHeight : 0,
+    chipW: shot ? shot.offsetWidth : 0,
     flyLeft: !!fly,
     xBtn: !!(shot && shot.querySelector('.ai-att-x'))
   };
@@ -90,7 +92,8 @@ ok('C1 ai-atts 变成 3 个附件且不是隐藏态', C.n === 3 && C.hidden === 
 ok('C2 新附件是截图件、已淡入（无 ghost）', C.isLast && C.ghost === false && C.opacity === '1', JSON.stringify([C.isLast, C.ghost, C.opacity]));
 ok('C3 截图里是画板页面的克隆（会话列表 11 条一起带过来）', C.hasClone && C.cloneItems === 11, C.cloneItems);
 ok('C4 克隆里没有重复 id（不与画板原节点冲突）', C.cloneIds === 0, C.cloneIds);
-ok('C5 缩略图按 44/1440 等比缩（屏幕上 44×28）', /matrix\(0?\.0\d+/.test(C.cloneScale) && C.thumbW === 44 && C.thumbH === 28, JSON.stringify([C.cloneScale, C.thumbW, C.thumbH]));
+const kk = /matrix\(([-\d.]+)/.exec(C.cloneScale || '');
+ok('C5 缩略窗口 44×28，内容按 44/1440 等比缩', C.thumbW === 44 && C.thumbH === 28 && kk && Math.abs(parseFloat(kk[1]) - 44 / 1440) < 0.0006, JSON.stringify([C.cloneScale, C.thumbW, C.thumbH]));
 ok('C6 飞行元素已移除、附件是 56×56 槽位', !C.flyLeft && C.chipW === 56, JSON.stringify([C.flyLeft, C.chipW]));
 ok('C7 截图件带自己的 × 删除键', C.xBtn, C.xBtn);
 
