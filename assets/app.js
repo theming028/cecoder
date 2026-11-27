@@ -3614,6 +3614,7 @@
     if (numGen) numGen.textContent = n + '/' + total;
     if (numWait) numWait.textContent = countState('confirm');
     if (numOk) numOk.textContent = countState('done') + '/' + total;
+    if (confirmBtn) confirmBtn.textContent = '代码变更确认 (' + total + ')';
   }
 
   /* ---------- 变更卡逐张生成（从第一张开始，全部生成完进度条跑满） ---------- */
@@ -3623,6 +3624,7 @@
   var SVG_CHEV = '<svg viewBox="0 0 12 12" fill="none"><path d="M4.4 2.4 7.6 6l-3.2 3.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var CHIP_MS = 700, CARD_GAP_MS = 420;
   var timer = null;
+  var phase = 'idle';
 
   function flowHtml() {
     var out = '<div class="cg-flow"><span class="cg-flow-k">生成流程：</span><span class="cg-flow-in">';
@@ -3663,7 +3665,12 @@
     if (flow) flow.remove();
     paintBar();
     var nx = nextTodo();
-    if (nx) timer = setTimeout(function () { startCard(nx, 0); }, CARD_GAP_MS);
+    if (nx) {
+      timer = setTimeout(function () { startCard(nx, 0); }, CARD_GAP_MS);
+    } else {
+      setPhase('done');
+      tip('代码生成完成，请确认变更');
+    }
   }
 
   function pump(card, i) {
@@ -3704,10 +3711,8 @@
   }
 
   if (list) {
-    /* 第一张卡在稿里就是「生成中」，从第 1 颗 chip 开始跑，跑完顺次向下 */
-    var running = list.querySelector('.cg-card[data-state="running"]');
+    /* 第 85 轮：进页面不自动跑，等底栏「开始生成代码」点了才从第一张开始 */
     paintBar();
-    if (running) pump(running, 0);
 
     list.addEventListener('click', function (e) {
       var ig = e.target.closest ? e.target.closest('[data-cg-ignore]') : null;
@@ -3737,24 +3742,64 @@
     });
   });
 
-  /* ---------- 底栏 ---------- */
+  /* ---------- 底栏：上一步 / 开始生成代码 / 全部重新生成 / 代码变更确认 ---------- */
+  var backBtn = document.getElementById('cgBack');
+  var genBtn = document.getElementById('cgGen');
   var regen = document.getElementById('cgRegen');
-  if (regen) {
-    regen.addEventListener('click', function () {
+  var confirmBtn = document.getElementById('cgConfirm');
+  var SPIN14 = '<span class="ico cg-mini-spin" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path d="M11.4 5.4A4.6 4.6 0 1 0 11.6 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M11.6 2.6v2.9H8.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+
+  /* 三态：idle 待开始 / run 生成中 / done 全部生成完 */
+  function setPhase(ph) {
+    phase = ph;
+    if (genBtn) {
+      genBtn.hidden = ph === 'done';
+      genBtn.disabled = ph === 'run';
+      genBtn.innerHTML = ph === 'run' ? SPIN14 + '代码生成中' : '开始生成代码';
+    }
+    /* 第 85 轮：全部生成完之后「上一步」也收起，底栏只留收尾动作 */
+    if (backBtn) backBtn.hidden = ph === 'done';
+    if (regen) regen.hidden = ph !== 'done';
+    /* 第 85 轮：代码变更确认只在全部生成完之后才出现 */
+    if (confirmBtn) { confirmBtn.hidden = ph !== 'done'; confirmBtn.disabled = ph !== 'done'; }
+  }
+
+  function startGeneration() {
+    if (timer) clearTimeout(timer);
+    var cards = list ? [].slice.call(list.querySelectorAll('.cg-card')) : [];
+    if (!cards.length) return;
+    cards.forEach(resetCard);
+    if (bar) bar.style.width = '0';
+    setPhase('run');
+    /* 让进度条先归零，再从第一张卡起跑 */
+    setTimeout(function () {
+      paintBar();
+      startCard(cards[0], 0);
+    }, 120);
+  }
+
+  if (backBtn) {
+    backBtn.addEventListener('click', function () {
       if (timer) clearTimeout(timer);
-      if (bar) bar.style.width = '0';
-      var cards = list ? [].slice.call(list.querySelectorAll('.cg-card')) : [];
-      cards.forEach(resetCard);
-      setTimeout(function () {
-        paintBar();
-        if (cards.length) startCard(cards[0], 0);
-      }, 120);
-      tip('已重新开始生成');
+      location.href = 'cecoder-task.html';
     });
   }
 
-  var confirmBtn = document.getElementById('cgConfirm');
+  if (genBtn) genBtn.addEventListener('click', function () {
+    if (phase === 'run') return;
+    startGeneration();
+  });
+
+  if (regen) regen.addEventListener('click', function () {
+    startGeneration();
+    tip('已重新开始生成');
+  });
+
   if (confirmBtn) {
-    confirmBtn.addEventListener('click', function () { tip('已提交 4 处代码变更，进入代码审查'); });
+    confirmBtn.addEventListener('click', function () {
+      tip('已提交 ' + (liveCards().length) + ' 处代码变更，进入代码审查');
+    });
   }
+
+  setPhase('idle');
 })();

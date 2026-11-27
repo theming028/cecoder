@@ -42,23 +42,47 @@ ok('A1 代码生成页右栏带出 AI 对话栏（450×满高、挂在 .panel �
 ok('A2 AI 对话栏标题仍是「生成任务的业务代码」，中栏让位（< 1094 且不溢出）',
   a.headTxt === '生成任务的业务代码' && a.colW > 0 && a.colW < 1094, JSON.stringify([a.headTxt, a.colW]));
 
-/* ---------- B 从第一张卡开始生成，全部生成完 = 进度条 100% ---------- */
-const b1 = await p.evaluate(() => {
+/* ---------- B 点「开始生成代码」后从第一张卡逐张生成，全部生成完 = 进度条 100% ---------- */
+const b0 = await p.evaluate(() => {
+  const btns = [...document.querySelectorAll('.cg-foot .cg-btn')];
   const cards = [...document.querySelectorAll('.cg-card')];
   return {
     n: cards.length,
-    states: cards.map(c => c.getAttribute('data-state')),
-    firstFlow: !!cards[0].querySelector('.cg-flow'),
-    firstChipsDone: cards[0].querySelectorAll('.cg-chip.is-done').length,
+    states: cards.map(c => c.dataset.state),
+    tags: cards.map(c => c.querySelector('.cg-st').textContent),
+    flows: document.querySelectorAll('.cg-flow').length,
     stats: document.getElementById('cgStats').textContent.replace(/\s+/g, ''),
     barW: document.getElementById('cgBar').getBoundingClientRect().width,
-    trackW: document.querySelector('.cg-bar').getBoundingClientRect().width,
+    btns: btns.map(e => ({ t: e.textContent.trim(), hidden: e.hidden, dis: e.disabled })),
   };
 });
-ok('B1 四张卡里第一张就是「生成中」（带生成流程），其余待生成',
-  b1.n === 4 && b1.states[0] === 'running' && b1.states.slice(1).every(s => s === 'todo') && b1.firstFlow,
-  JSON.stringify(b1.states));
-ok('B2 起手统计 已生成 0/4 · 待确认 0 · 已确认 0/4，进度条 0', b1.stats === '已生成0/4·待确认0·已确认0/4' && b1.barW < 2, b1.stats + ' / ' + b1.barW);
+ok('B1 进页面不自动生成：四张卡都是「待生成」、无生成流程、进度条 0、统计 0/4',
+  b0.n === 4 && b0.states.every(x => x === 'todo') && b0.tags.every(t => t === '待生成') &&
+  b0.flows === 0 && b0.barW < 2 && b0.stats === '已生成0/4·待确认0·已确认0/4', JSON.stringify(b0));
+ok('B2 底栏初态只留：上一步（次要）/ 开始生成代码（主），后两颗收起',
+  b0.btns.length === 4 && b0.btns[0].t === '上一步' && !b0.btns[0].dis && !b0.btns[0].hidden &&
+  b0.btns[1].t === '开始生成代码' && !b0.btns[1].dis &&
+  b0.btns[2].hidden && b0.btns[3].hidden,
+  JSON.stringify(b0.btns));
+
+await p.click('#cgGen');
+await wait(900);
+const b1 = await p.evaluate(() => {
+  const cards = [...document.querySelectorAll('.cg-card')];
+  const gen = document.getElementById('cgGen');
+  return {
+    states: cards.map(c => c.dataset.state),
+    firstFlow: !!cards[0].querySelector('.cg-flow'),
+    done: cards[0].querySelectorAll('.cg-chip.is-done').length,
+    genTxt: gen.textContent.trim(), genDis: gen.disabled,
+    barW: +document.getElementById('cgBar').getBoundingClientRect().width.toFixed(1),
+    stats: document.getElementById('cgStats').textContent.replace(/\s+/g, ''),
+  };
+});
+ok('B3 点击「开始生成代码」：第一张卡转「生成中」带流程，主键变「代码生成中」并禁用，进度条起步',
+  b1.states[0] === 'running' && b1.states.slice(1).every(s => s === 'todo') && b1.firstFlow &&
+  b1.genTxt === '代码生成中' && b1.genDis && b1.barW > 0 && b1.stats.indexOf('已生成0/4') === 0,
+  JSON.stringify(b1));
 
 /* 逐张生成：等到没有 running / todo（4 张 × 5 chip × 700ms + 卡间 420ms ≈ 15.3s） */
 let done = false;
@@ -74,6 +98,7 @@ await wait(700);
 const b2 = await p.evaluate(() => {
   const bar = document.getElementById('cgBar');
   const track = document.querySelector('.cg-bar');
+  const btns = [...document.querySelectorAll('.cg-foot .cg-btn')];
   return {
     barW: +bar.getBoundingClientRect().width.toFixed(1),
     trackW: +track.getBoundingClientRect().width.toFixed(1),
@@ -84,22 +109,31 @@ const b2 = await p.evaluate(() => {
     states: [...document.querySelectorAll('.cg-card')].map(c => c.getAttribute('data-state')),
     tags: [...document.querySelectorAll('.cg-card .cg-st')].map(e => e.textContent),
     flows: document.querySelectorAll('.cg-flow').length,
+    btns: btns.map(e => ({ t: e.textContent.trim(), hidden: e.hidden, dis: e.disabled })),
   };
 });
-ok('B3 全部 4 张生成完（依次转「待确认」，流程条收起）', done && b2.states.every(s => s === 'confirm') && b2.tags.every(t => t === '待确认') && b2.flows === 0, JSON.stringify(b2.states));
-ok('B4 全部生成完后进度条跑满（100%，与轨道等宽）',
+ok('B4 全部 4 张生成完（依次转「待确认」，流程条收起）', done && b2.states.every(s => s === 'confirm') && b2.tags.every(t => t === '待确认') && b2.flows === 0, JSON.stringify(b2.states));
+ok('B5 全部生成完后进度条跑满（100%，与轨道等宽）',
   b2.trackW - b2.barW < 1 && parseFloat(b2.pct) === 100 && b2.now === '4' && b2.max === '4', JSON.stringify([b2.barW, b2.trackW, b2.pct]));
-ok('B5 统计随之落定 已生成 4/4 · 待确认 4 · 已确认 0/4', b2.stats === '已生成4/4·待确认4·已确认0/4', b2.stats);
+ok('B6 统计随之落定 已生成 4/4 · 待确认 4 · 已确认 0/4', b2.stats === '已生成4/4·待确认4·已确认0/4', b2.stats);
+ok('B7 生成完收尾：上一步与主键都收起，只留「全部重新生成」+ 可用的「代码变更确认 (4)」',
+  b2.btns[0].hidden && b2.btns[1].hidden && !b2.btns[2].hidden && b2.btns[2].t === '全部重新生成' &&
+  !b2.btns[3].hidden && b2.btns[3].t === '代码变更确认 (4)' && !b2.btns[3].dis,
+  JSON.stringify(b2.btns));
 
 /* 重新生成：清零后从第一张再来 */
 await p.click('#cgRegen');
-await wait(400);
+await wait(500);
 const b3 = await p.evaluate(() => ({
   stats: document.getElementById('cgStats').textContent.replace(/\s+/g, ''),
   first: document.querySelector('.cg-card').getAttribute('data-state'),
   barW: +document.getElementById('cgBar').getBoundingClientRect().width.toFixed(1),
+  genTxt: document.getElementById('cgGen').textContent.trim(),
+  regenHidden: document.getElementById('cgRegen').hidden,
 }));
-ok('B6 「全部重新生成」清零并回到第 1 张生成中', b3.first === 'running' && b3.stats === '已生成0/4·待确认0·已确认0/4' && b3.barW < 40, JSON.stringify(b3));
+ok('B8 「全部重新生成」清零并从第 1 张重跑，主键回到「代码生成中」',
+  b3.first === 'running' && b3.stats === '已生成0/4·待确认0·已确认0/4' && b3.barW < 40 &&
+  b3.genTxt === '代码生成中' && b3.regenHidden === true, JSON.stringify(b3));
 
 /* ---------- C 选择本地仓库：稿面文件夹图标 + 文字 #1F1F1F + 真实文件夹选择 ---------- */
 const c1 = await p.evaluate(() => {

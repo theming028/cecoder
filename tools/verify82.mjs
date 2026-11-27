@@ -93,6 +93,8 @@ const R = (p, s) => p.evaluate(sel => { const e = document.querySelector(sel); i
       foot: f('.cg-foot'),
       btn1: { t: document.getElementById('cgGen').textContent.trim(), dis: document.getElementById('cgGen').disabled },
       btn2: document.getElementById('cgRegen').textContent.trim(),
+      regenHidden: document.getElementById('cgRegen').hidden,
+      back: document.getElementById('cgBack').textContent.trim(),
       step9: (document.querySelector('.ts-item[data-step="9"]') || {}).getAttribute && document.querySelector('.ts-item[data-step="9"]').getAttribute('href'),
       nowStep: document.querySelector('.ts-item.is-now .ts-name').textContent,
     };
@@ -104,17 +106,17 @@ const R = (p, s) => p.evaluate(sel => { const e = document.querySelector(sel); i
   ok('C3 已完成那块右侧挂「已确认」', c.tag === '已确认', c.tag);
   ok('C4 生成设置卡 1094×262，头 36', c.set[2] === 1094 && c.set[3] === 262 && c.setHead[3] === 36, [c.set, c.setHead].join(' '));
   ok('C5 两行仓库各 1044×44', c.repos.length === 2 && c.repos.every(r => r[1] === 44 && r[2] === 1044), JSON.stringify(c.repos));
-  ok('C6 生成进度块 427（稿 426）、进度条 6 高、起手从 0 开始涨',
-    Math.abs(c.prog[3] - 426) <= 1 && c.bar[3] === 6 && c.barIn < 80, [c.prog[3], c.bar[3], c.barIn].join('/'));
-  ok('C7 统计文案（第 84 轮起从 0 开始，总数 = 卡数 4）', c.stats.replace(/\s+/g, '') === '已生成0/4·待确认0·已确认0/4', c.stats);
-  ok('C8 四张卡 106/80/80/80（第一张即生成中），纵向 418 起',
-    JSON.stringify(c.cards.map(x => [x[0], x[1]])) === JSON.stringify([[418, 106], [532, 80], [620, 80], [708, 80]]),
+  ok('C6 生成进度块 400（四张卡都未开跑时的高度）、进度条 6 高、填充 0',
+    Math.abs(c.prog[3] - 400) <= 1 && c.bar[3] === 6 && c.barIn === 0, [c.prog[3], c.bar[3], c.barIn].join('/'));
+  ok('C7 统计文案从 0 起，总数 = 卡数 4', c.stats.replace(/\s+/g, '') === '已生成0/4·待确认0·已确认0/4', c.stats);
+  ok('C8 四张卡统一 80 高（都还没开始生成），纵向 418 起',
+    JSON.stringify(c.cards.map(x => [x[0], x[1]])) === JSON.stringify([[418, 80], [506, 80], [594, 80], [682, 80]]),
     JSON.stringify(c.cards));
-  ok('C9 风险徽标与状态文案齐全', c.risks.join('/') === '中风险/低风险/高风险/低风险' && c.states.join('/') === '生成中/待生成/待生成/待生成', c.risks.join('/') + ' | ' + c.states.join('/'));
-  ok('C10 生成流程 5 步（读取Spec/对比现有代码/生成代码/规则检查/核对Spec）',
-    c.chips.join('/') === '读取Spec/对比现有代码/生成代码/规则检查/核对Spec', c.chips.join('/'));
-  ok('C11 底栏 = 代码生成中（禁用，带转圈）+ 全部重新生成',
-    c.foot[3] === 56 && c.btn1.t === '代码生成中' && c.btn1.dis === true && c.btn2 === '全部重新生成', JSON.stringify(c.btn1) + ' ' + c.btn2);
+  ok('C9 风险徽标与状态文案齐全', c.risks.join('/') === '中风险/低风险/高风险/低风险' && c.states.join('/') === '待生成/待生成/待生成/待生成', c.risks.join('/') + ' | ' + c.states.join('/'));
+  ok('C10 未开始生成时不渲染流程条（点「开始生成代码」后卡内才逐颗点亮）', c.chips.length === 0, c.chips.join('/'));
+  ok('C11 底栏初态 = 上一步 + 开始生成代码（可用），后两颗收起',
+    c.foot[3] === 56 && c.btn1.t === '开始生成代码' && c.btn1.dis === false && c.btn2 === '全部重新生成' && c.regenHidden === true,
+    JSON.stringify(c.btn1) + ' hidden=' + c.regenHidden);
   ok('C12 工序条第 5 道「代码开发」为当前，第 9 道仍回任务总结',
     c.nowStep === '代码开发' && c.step9 === 'cecoder-summary.html?id=0', c.nowStep + ' ' + c.step9);
 
@@ -126,12 +128,12 @@ const R = (p, s) => p.evaluate(sel => { const e = document.querySelector(sel); i
   ok('C13 生成设置可折叠（caret 转 -90、正文 display:none）', i1.closed === true && i1.exp === 'false' && i1.body === 'none', JSON.stringify(i1));
   const i2 = await p.evaluate(() => {
     document.getElementById('cgSetToggle').click();
-    document.getElementById('cgRegen').click();
+    document.getElementById('cgGen').click();
     return document.querySelector('.cg-bar-in').style.width;
   });
-  await wait(700);
+  await wait(1600);
   const i3 = await p.evaluate(() => Math.round(document.querySelector('.cg-bar-in').getBoundingClientRect().width));
-  ok('C14 全部重新生成 → 进度条清零重跑', parseFloat(i2) === 0 && i3 === 0, i2 + ' → ' + i3);
+  ok('C14 点「开始生成代码」→ 进度条从 0 起步推进', parseFloat(i2) === 0 && i3 > 0, i2 + ' → ' + i3);
   const i4 = await p.evaluate(() => {
     const n0 = document.querySelectorAll('.cg-card').length;
     document.querySelector('.cg-card[data-risk="high"] [data-cg-ignore]').click();

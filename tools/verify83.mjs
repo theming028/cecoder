@@ -104,11 +104,16 @@ await p2.setViewport({ width: 1920, height: 1080 });
 await p2.goto('file:///' + BASE + '/cecoder-codegen.html', { waitUntil: 'domcontentloaded' });
 const d0 = await p2.evaluate(() => document.querySelector('.cg-bar-in').style.width || 'auto');
 await wait(800);
+const dIdle = await p2.evaluate(() => Math.round(document.querySelector('.cg-bar-in').getBoundingClientRect().width));
+await p2.click('#cgGen');
+await wait(1800);
 const d2 = await p2.evaluate(() => Math.round(document.querySelector('.cg-bar-in').getBoundingClientRect().width));
 await p2.close();
-ok('D3 进度条从 0 起步、随卡片生成推进', parseFloat(d0) === 0 && d2 > 20, d0 + ' → ' + d2);
+ok('D3 进度条起手 0、不点「开始生成代码」不动，点了才推进',
+  parseFloat(d0) === 0 && dIdle === 0 && d2 > 20, d0 + ' / idle ' + dIdle + ' → ' + d2);
 
 /* ---------- E 生成中的卡 = 稿面样式 ---------- */
+await p.click('#cgGen');
 await wait(1200);
 const e1 = await p.evaluate(() => {
   const card = document.querySelector('.cg-card[data-state="running"]');
@@ -142,6 +147,7 @@ const p3 = await b.newPage(); p3.__e = [];
 p3.on('pageerror', e => p3.__e.push(e.message));
 await p3.setViewport({ width: 1920, height: 1080 });
 await p3.goto('file:///' + BASE + '/cecoder-codegen.html', { waitUntil: 'load' });
+await p3.click('#cgGen');
 const snap = () => p3.evaluate(() => [...document.querySelectorAll('.cg-card')].map(c => {
   const chips = [...c.querySelectorAll('.cg-chip')];
   return { s: c.dataset.state, done: chips.filter(x => x.classList.contains('is-done')).length, run: chips.filter(x => x.classList.contains('is-run')).length };
@@ -171,13 +177,29 @@ ok('F4 统计随生成推进（已生成 4/4 · 待确认 4 · 已确认 0/4）'
 ok('F5 A→F 期间无脚本报错（续跑页）', p3.__e.length === 0, p3.__e.join(' | '));
 await p3.close();
 
-/* ---------- G 底栏 ---------- */
-const g1 = await p.evaluate(() => [...document.querySelectorAll('.cg-foot .cg-btn')].map(e => [e.textContent.trim(), getComputedStyle(e).backgroundColor]));
-ok('G1 底栏三颗：代码生成中 / 全部重新生成 / 代码变更确认 (4)',
-  g1.length === 3 && g1[0][0] === '代码生成中' && g1[1][0] === '全部重新生成' && g1[2][0] === '代码变更确认 (4)',
-  JSON.stringify(g1.map(x => x[0])));
-ok('G2 代码生成中为浅蓝禁用底、确认键主色',
-  g1[0][1] === 'rgb(180, 201, 252)' && g1[2][1] === 'rgb(55, 112, 247)', JSON.stringify(g1.map(x => x[1])));
+/* ---------- G 底栏：上一步 / 开始生成代码 → 代码生成中 ---------- */
+const p4 = await b.newPage(); p4.__e = [];
+p4.on('pageerror', e => p4.__e.push(e.message));
+await p4.setViewport({ width: 1920, height: 1080 });
+await p4.goto('file:///' + BASE + '/cecoder-codegen.html', { waitUntil: 'load' });
+const footOf = () => p4.evaluate(() => [...document.querySelectorAll('.cg-foot .cg-btn')].map(e => {
+  const c = getComputedStyle(e);
+  return { t: e.textContent.trim(), hid: e.hidden, dis: e.disabled, bg: c.backgroundColor, shadow: c.boxShadow, color: c.color };
+}));
+const g0 = await footOf();
+ok('G1 初态底栏只有两颗：上一步（白底灰边次要）+ 开始生成代码（主色）',
+  g0[0].t === '上一步' && !g0[0].hid && g0[0].bg === 'rgb(255, 255, 255)' && /rgb\(229, 229, 229\)/.test(g0[0].shadow) &&
+  g0[1].t === '开始生成代码' && g0[1].bg === 'rgb(55, 112, 247)' &&
+  g0[2].hid && g0[3].hid,
+  JSON.stringify(g0));
+await p4.click('#cgGen');
+await wait(600);
+const g1 = await footOf();
+ok('G2 点了「开始生成代码」→ 主键变「代码生成中」浅蓝禁用，确认键仍未出现',
+  g1[1].t === '代码生成中' && g1[1].dis && g1[1].bg === 'rgb(180, 201, 252)' && g1[3].hid,
+  JSON.stringify(g1));
+ok('G3 上一步可点（次要按钮不禁用）', !g1[0].dis && g1[0].t === '上一步', JSON.stringify(g1[0]));
+await p4.close();
 
 ok('Z 无脚本报错', p.__e.length === 0, p.__e.join(' | '));
 

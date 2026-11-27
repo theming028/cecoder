@@ -4245,6 +4245,8 @@ a.cg-step:hover { background: #FFFFFF; }
   background: #FFFFFF; box-shadow: inset 0 0 0 1px #6692F9; color: var(--cds-color-primary);
 }
 .cg-btn.is-line:hover { background: #F5F8FF; }
+.cg-btn.is-plain { background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5; color: var(--cds-text-primary); }
+.cg-btn.is-plain:hover { background: var(--cds-surface-subtle); }
 .cg-btn .ico { width: 14px; height: 14px; display: inline-flex; }
 .cg-btn[hidden] { display: none; }
 .cg-spin {
