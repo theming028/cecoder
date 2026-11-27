@@ -10,3 +10,17 @@ node_modules/
 # 系统与本地工作区
 .DS_Store
 .workbuddy/
+
+# 过程截图（根目录快照，assets/ 下的资源图不受影响）
+/*.png
+/cecoder-*.png
+tmp-*
+*.tmp
+
+# 抓稿缓存与一次性探针脚本
+tools/layers/*.json
+tools/layers/*.txt
+tools/crop*.mjs
+tools/dump7*.mjs
+tools/probe*.mjs
+tools/shot*.mjs
