@@ -3803,3 +3803,51 @@
 
   setPhase('idle');
 })();
+
+/* ============================================================
+   第 88 轮：UI 设计工序 · 第 1 / 2 步（稿 4138:56968）
+   设计系统卡单选（已选 / 选用）+ 预览 / 退出引导 / 下一步
+   ============================================================ */
+(function () {
+  if (document.body.getAttribute('data-page') !== 'ui') return;
+  var sys = document.getElementById('ugSys');
+  if (!sys) return;
+
+  function tip(msg) {
+    var wrap = document.getElementById('toastWrap');
+    if (!wrap) return;
+    var el = document.createElement('div');
+    el.className = 'semi-toast';
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(function () { el.remove(); }, 1800);
+  }
+
+  var CHECK = '<span class="ico ico12" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.2 6.2 4.8 8.8 9.8 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+
+  sys.addEventListener('click', function (e) {
+    var pv = e.target.closest('[data-preview]');
+    if (pv) {
+      tip('预览「' + pv.closest('.ug-scard').querySelector('.ug-sname').textContent + '」');
+      return;
+    }
+    var pick = e.target.closest('[data-pick]');
+    if (!pick) return;
+    var card = pick.closest('.ug-scard');
+    if (card.classList.contains('is-on')) return;   /* 单选：已选再点不取消 */
+    sys.querySelectorAll('.ug-scard').forEach(function (c) {
+      var on = c === card;
+      c.classList.toggle('is-on', on);
+      var b = c.querySelector('[data-pick]');
+      b.className = 'ug-sbtn' + (on ? ' is-sel' : ' is-pick');
+      b.innerHTML = on ? CHECK + '已选' : '选用';
+    });
+    tip('已选用「' + card.querySelector('.ug-sname').textContent + '」');
+  });
+
+  var exit = document.getElementById('ugExit');
+  if (exit) exit.addEventListener('click', function () { tip('退出引导，返回一页式'); });
+
+  var next = document.getElementById('ugNext');
+  if (next) next.addEventListener('click', function () { tip('第 2 步：输入设计资产（设计稿待补）'); });
+})();

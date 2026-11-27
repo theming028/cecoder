@@ -3579,8 +3579,9 @@ body[data-page="ui"] .panel-main.is-steps-off .ui-blank { top: 84px; }
 body.is-focus[data-page="ui"] .ui-blank { top: 40px; }
 /* 专注态：工序条与顶栏收平，页签条升到最顶（和任务页同款） */
 body.is-focus[data-page="ui"] .task-tabs { top: 0; }
-/* 稿里两颗页签都是 12 的内距（66 = 12+42+12 / 122 = 12+98+12） */
-.ui-tabs .tk-tab { padding: 0 12px; }
+/* 稿 4068:69848：两颗页签都是 12 的内距（66 = 12+42+12 / 122 = 12+98+12），
+   且未选中也是正文色 #1F1F1F + 中粗 500（稿里 font_73:3621 就是 Medium） */
+.ui-tabs .tk-tab { padding: 0 12px; color: var(--cds-text-primary); font-weight: 500; }
 
 .sum-back {
   height: 28px; padding: 0 10px; border-radius: 4px;
@@ -4265,3 +4266,133 @@ a.cg-step:hover { background: #FFFFFF; }
 }
 @keyframes cg-spin { to { transform: rotate(360deg); } }
 .cg-mini-spin { width: 12px; height: 12px; animation: cg-spin 1.1s linear infinite; }
+
+/* ============================================================
+   第 88 轮：UI 设计工序 · 第 1 / 2 步「选择设计系统与生成设置」（稿 4138:56968）
+   位于 task-tabs 下方，中栏 = 可滚动内容列（max 1024）+ 底栏 tp-foot
+   ============================================================ */
+.ui-blank { display: flex; flex-direction: column; container-type: inline-size; }
+.ug-wrap {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden;
+  padding: 20px 20px 24px; display: flex; justify-content: center;
+  scrollbar-width: thin;
+}
+.ug-wrap::-webkit-scrollbar { width: 8px; }
+.ug-wrap::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, .16); border-radius: 4px; }
+.ug-col { width: 100%; max-width: 1024px; }
+
+/* 顶部 32：标题 20/500 + 「退出引导，返回一页式」172×32（白底 1px #E5E5E5）
+   稿里这行 640 宽靠右（x=384 起），标题与按钮两端对齐 */
+.ug-top {
+  width: min(640px, 100%); height: 32px; margin-left: auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.ug-title { margin: 0; font-size: 20px; line-height: 28px; font-weight: 500; color: #1F1F1F; white-space: nowrap; }
+.ug-exit {
+  flex: 0 0 auto; height: 32px; padding: 0 16px; border-radius: 4px;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-size: 14px; line-height: 22px; color: #1F1F1F; white-space: nowrap;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.ug-exit:hover { background: var(--cds-surface-subtle); }
+
+/* 主卡 1024×478：白底 + 1px #E5E5E5 */
+.ug-card { margin-top: 20px; background: #FFFFFF; border-radius: 4px; box-shadow: inset 0 0 0 1px #E5E5E5; }
+.ug-ch {
+  height: 78px; box-sizing: border-box; padding: 16px 20px; border-radius: 4px 4px 0 0;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  background: #F7F7F7; box-shadow: inset 0 -1px 0 0 #E5E5E5;
+}
+.ug-chl { min-width: 0; }
+.ug-ct { margin: 0; font-size: 16px; line-height: 24px; font-weight: 500; color: #1F1F1F; }
+.ug-cs { margin: 2px 0 0; font-size: 12px; line-height: 20px; color: #6B6B6B; }
+/* 「第 1 / 2 步」90×28 药丸（白底 1px #E5E5E5，12/400），垂直居中于 78 卡头 */
+.ug-step {
+  flex: 0 0 auto; height: 28px; min-width: 90px; margin-top: 9px; padding: 0 16px; border-radius: 32px;
+  justify-content: center;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  display: inline-flex; align-items: center; font-size: 12px; line-height: 20px; color: #1F1F1F; white-space: nowrap;
+}
+.ug-cb { padding: 20px 20px 32px; }
+
+/* 设计系统卡：稿里 234×112、间距 16；列数交给容器宽度（够宽自然 4 列，窄了 2 / 1 列居中） */
+.ug-sys { display: grid; grid-template-columns: repeat(auto-fill, 234px); gap: 16px; justify-content: center; }
+.ug-scard {
+  position: relative; width: 234px; height: 112px; border-radius: 4px;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #EEEEEE;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease),
+              box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
+}
+/* 选中：浅蓝底 #F5F8FF + 1.6px #1F1F1F 描边（稿 4068:70554） */
+.ug-scard.is-on { background: #F5F8FF; box-shadow: inset 0 0 0 1.6px #1F1F1F; }
+.ug-sico {
+  position: absolute; left: 16px; top: 16px; width: 40px; height: 40px; border-radius: 4px;
+  display: inline-flex; align-items: center; justify-content: center; background: #FFFFFF;
+}
+.ug-sico.is-cecoder { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .08); }
+.ug-sico.is-arco { background: #F1EAFF; }
+.ug-sico.is-semi { background: #F7EDD9; }
+.ug-sico.is-antd { background: #D6EBFF; }
+.ug-sico.is-tdesign { background: #D5F7DB; }
+.ug-sico svg { width: 20px; height: 20px; }
+.ug-sbody { position: absolute; left: 68px; top: 16px; right: 16px; }
+.ug-sname {
+  margin: 0; font-size: 14px; line-height: 22px; font-weight: 500; color: #1F1F1F;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ug-scard.is-on .ug-sname { color: var(--cds-color-primary); }
+.ug-sdesc {
+  margin: 2px 0 0; font-size: 12px; line-height: 16px; color: #868686;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ug-scard.is-on .ug-sdesc { color: #1F1F1F; }
+.ug-sacts { position: absolute; left: 68px; top: 68px; display: flex; align-items: center; gap: 8px; }
+.ug-sbtn {
+  height: 28px; padding: 0 12px; border-radius: 4px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-size: 13px; line-height: 20px; color: #1F1F1F; white-space: nowrap;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.ug-sbtn:hover { background: var(--cds-surface-subtle); }
+.ug-sbtn.is-sel { min-width: 68px; color: var(--cds-color-primary); box-shadow: inset 0 0 0 1px #DAE4FE; }
+.ug-sbtn.is-sel:hover { background: #F5F8FF; }
+
+/* 生成设置：分隔线 → 标题 16/500 → 页面类型（复选）/ 竖线 / 页面宽度（单选） */
+.ug-sep { height: 1px; margin: 24px 0 0; background: #EEEEEE; }
+.ug-set { margin: 23px 0 0; font-size: 16px; line-height: 24px; font-weight: 500; color: #1F1F1F; }
+.ug-opts { margin-top: 12px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; row-gap: 12px; }
+.ug-opt { display: flex; align-items: center; height: 24px; }
+.ug-opt-l { font-size: 14px; line-height: 22px; color: #1F1F1F; white-space: nowrap; }
+.ug-vsep { flex: 0 0 auto; width: 1px; height: 16px; background: #E5E5E5; }
+.ug-cbx, .ug-rd { display: inline-flex; align-items: center; gap: 4px; height: 22px; margin-left: 8px; cursor: pointer; }
+.ug-cbx + .ug-cbx { margin-left: 16px; }
+.ug-rd + .ug-rd { margin-left: 12px; }
+.ug-cbx input, .ug-rd input { position: absolute; width: 0; height: 0; opacity: 0; }
+.ug-box {
+  position: relative; flex: 0 0 auto; width: 16px; height: 16px; border-radius: 2px;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #C4C7C9;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.ug-cbx input:checked + .ug-box { background: var(--cds-color-primary); box-shadow: none; }
+.ug-cbx input:checked + .ug-box::after {
+  content: ''; position: absolute; left: 5px; top: 1.5px; width: 5px; height: 9px;
+  border: 1.5px solid #FFFFFF; border-top: 0; border-left: 0; transform: rotate(42deg);
+}
+.ug-dot {
+  position: relative; flex: 0 0 auto; width: 16px; height: 16px; border-radius: 50%;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #C4C7C9;
+  transition: box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.ug-rd input:checked + .ug-dot { box-shadow: inset 0 0 0 1.5px var(--cds-color-primary); }
+.ug-rd input:checked + .ug-dot::after {
+  content: ''; position: absolute; left: 4px; top: 4px; width: 8px; height: 8px;
+  border-radius: 50%; background: var(--cds-color-primary);
+}
+.ug-txt { font-size: 14px; line-height: 22px; color: #1F1F1F; white-space: nowrap; }
+
+/* 中栏被左右栏挤压时（1152 / 1280 下带 AI 栏约 380~510）：标题不再硬撑一行 */
+@container (max-width: 620px) {
+  .ug-top { width: 100%; height: auto; flex-wrap: wrap; row-gap: 8px; }
+  .ug-title { white-space: normal; font-size: 18px; line-height: 26px; }
+}

@@ -45,7 +45,7 @@ const bb = await p.evaluate(() => {
   const cs = getComputedStyle(tabs);
   const tabsAll = [...tabs.querySelectorAll('.tk-tab')].map(t => {
     const r = t.getBoundingClientRect(), c = getComputedStyle(t);
-    return { txt: t.textContent.trim(), w: Math.round(r.width), h: Math.round(r.height), x: Math.round(r.x), on: t.classList.contains('is-on'), bg: c.backgroundColor, sh: c.boxShadow, fw: c.fontWeight, pad: c.paddingLeft };
+    return { txt: t.textContent.trim(), w: Math.round(r.width), h: Math.round(r.height), x: Math.round(r.x), on: t.classList.contains('is-on'), bg: c.backgroundColor, sh: c.boxShadow, fw: c.fontWeight, col: c.color, pad: c.paddingLeft };
   });
   const vs = tabs.querySelector('.tk-vsep').getBoundingClientRect();
   const plus = tabs.querySelector('.tk-tabs-l .tk-icon-btn').getBoundingClientRect();
@@ -64,7 +64,7 @@ const bb = await p.evaluate(() => {
 ok('B1 工序条下方有一条 40 高的页签条，紧贴工序条底', bb.h === 40 && Math.abs(bb.top - bb.stepsBottom) < 1, bb.top + '/' + bb.stepsBottom);
 ok('B2 页签条左内距 19、底边 1px #E5E5E5 分隔线', bb.padL === '19px' && bb.bottomLine, bb.padL);
 ok('B3 第 1 颗页签「UI设计」66×28 选中：白底 + 1px #EEEEEE 描边 + 500', bb.tabsAll[0] && bb.tabsAll[0].txt === 'UI设计' && bb.tabsAll[0].w === 66 && bb.tabsAll[0].h === 28 && bb.tabsAll[0].on && bb.tabsAll[0].bg === 'rgb(255, 255, 255)' && /rgb\(238, 238, 238\)/.test(bb.tabsAll[0].sh) && bb.tabsAll[0].fw === '500', JSON.stringify(bb.tabsAll[0]));
-ok('B4 第 2 颗页签「校验差异与记录」122×28 非选中（透明底、无描边）', bb.tabsAll[1] && bb.tabsAll[1].txt === '校验差异与记录' && bb.tabsAll[1].w === 122 && bb.tabsAll[1].h === 28 && !bb.tabsAll[1].on && bb.tabsAll[1].bg === 'rgba(0, 0, 0, 0)' && bb.tabsAll[1].sh === 'none', JSON.stringify(bb.tabsAll[1]));
+ok('B4 第 2 颗页签「校验差异与记录」122×28 非选中（透明底无描边，正文色 #1F1F1F + 中粗 500）', bb.tabsAll[1] && bb.tabsAll[1].txt === '校验差异与记录' && bb.tabsAll[1].w === 122 && bb.tabsAll[1].h === 28 && !bb.tabsAll[1].on && bb.tabsAll[1].bg === 'rgba(0, 0, 0, 0)' && bb.tabsAll[1].sh === 'none' && bb.tabsAll[1].col === 'rgb(31, 31, 31)' && bb.tabsAll[1].fw === '500', JSON.stringify(bb.tabsAll[1]));
 ok('B5 两颗页签之后是 1×16 竖线，再是 28×28 的「＋」', bb.vs[0] === 1 && bb.vs[1] === 16 && bb.plus[0] === 28 && bb.plus[1] === 28 && bb.plus[2] - bb.vs[2] > 1 && bb.vs[2] > bb.tabsAll[1].x + bb.tabsAll[1].w - 1, JSON.stringify(bb.vs) + ' plus=' + JSON.stringify(bb.plus));
 ok('B6 右端「专注模式」80×28、主色 #3770F7、右内距 20', bb.focus[0] === 80 && bb.focus[1] === 28 && bb.focus[3] === 'rgb(55, 112, 247)' && Math.abs(bb.tabsRight - (bb.focus[2] + 80) - 20) < 1, JSON.stringify(bb.focus));
 ok('B7 中栏正文从页签条下沿起（171 = 131 + 40，无缝隙）', bb.blankTop === 171 && bb.blankGap === 0, bb.blankTop + '/' + bb.blankGap);
