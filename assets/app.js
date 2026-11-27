@@ -3857,21 +3857,74 @@
     });
   }
 
-  /* 第 93 轮：生成完成页（cecoder-uidone.html）——缩放组 ±25（25~200）与工具条反馈 */
+  /* ============================================================
+     第 93/96 轮：生成完成页（cecoder-uidone.html）
+     画板 800×400 默认按可用区域自适应（分辨率变了跟着缩），工具栏 ±25% 自定义
+     点画板选中 / 点空白取消；左侧浮层可折叠
+     ============================================================ */
   var udZoomVal = document.getElementById('udZoomVal');
   if (udZoomVal) {
-    var udZoom = 50;
-    var udApplyZoom = function (v) {
-      udZoom = Math.min(200, Math.max(25, v));
-      udZoomVal.textContent = udZoom + '%';
-      var c = document.getElementById('udCanvas');
-      if (c) c.style.setProperty('--ud-zoom', String(udZoom / 50));
+    var udScroll = document.getElementById('udScroll');
+    var udStageEl = document.getElementById('udStage');
+    var udWrap = document.getElementById('udBoardWrap');
+    var udBoardEl = document.getElementById('udBoard');
+    var UD_W = 800, UD_H = 400, UD_LABEL = 28;
+    var udUser = 0;          /* 0 = 跟随自适应 */
+    var udFitPct = function () {
+      if (!udScroll) return 100;
+      var padL = udStageEl ? parseFloat(getComputedStyle(udStageEl).paddingLeft) || 24 : 24;
+      var aw = udScroll.clientWidth - padL - 24;
+      var ah = udScroll.clientHeight - 48 - UD_LABEL;
+      var fit = Math.min(aw / UD_W, ah / UD_H, 1);
+      return Math.max(10, Math.round(fit * 100));
     };
-    udApplyZoom(50);
+    /* 传数字 = 用户自定义比例（25~200）；不传 = 跟随自适应
+       注意别用 v ? 判空 —— 缩到 0 会被当成「自适应」，从 25% 再点一次就跳回 100% */
+    var udApplyZoom = function (v) {
+      udUser = typeof v === 'number' ? Math.min(200, Math.max(25, Math.round(v))) : 0;
+      var pct = udUser || udFitPct();
+      udZoomVal.textContent = pct + '%';
+      if (udWrap) udWrap.style.setProperty('--ud-s', String(pct / 100));
+    };
+    udApplyZoom();
+    window.addEventListener('resize', function () { if (!udUser) udApplyZoom(); });
+
     var udIn = document.getElementById('udZoomIn');
     var udOut = document.getElementById('udZoomOut');
-    if (udIn) udIn.addEventListener('click', function () { udApplyZoom(udZoom + 25); });
-    if (udOut) udOut.addEventListener('click', function () { udApplyZoom(udZoom - 25); });
+    if (udIn) udIn.addEventListener('click', function () { udApplyZoom((udUser || udFitPct()) + 25); });
+    if (udOut) udOut.addEventListener('click', function () { udApplyZoom((udUser || udFitPct()) - 25); });
+
+    /* 画板选中态（稿 4138:57012） */
+    var udSel = function (on) {
+      if (!udBoardEl) return;
+      udBoardEl.classList.toggle('is-sel', on);
+      udBoardEl.setAttribute('aria-pressed', on ? 'true' : 'false');
+    };
+    if (udBoardEl) udBoardEl.addEventListener('click', function (e) { e.stopPropagation(); udSel(!udBoardEl.classList.contains('is-sel')); });
+    if (udScroll) udScroll.addEventListener('click', function (e) { if (e.target === udScroll || e.target === udStageEl) udSel(false); });
+
+    /* 左侧浮层折叠（只留标题条，图标翻成向右） */
+    var udFold = document.getElementById('udFold');
+    var udPagesEl = document.getElementById('udPages');
+    if (udFold && udPagesEl) udFold.addEventListener('click', function () {
+      var folded = udPagesEl.classList.toggle('is-fold');
+      udFold.setAttribute('aria-expanded', folded ? 'false' : 'true');
+      udFold.setAttribute('aria-label', (folded ? '展开' : '折叠') + '面板');
+      udFold.setAttribute('data-tip', folded ? '展开' : '折叠');
+      var cv = document.getElementById('udCanvas');
+      if (cv) cv.classList.toggle('is-folded', folded);
+      if (!udUser) udApplyZoom();
+    });
+
+    /* 分组展开/收起（默认展开，与稿一致） */
+    var udTreeHead = document.getElementById('udTreeHead');
+    var udStatesEl = document.getElementById('udStates');
+    if (udTreeHead && udStatesEl) udTreeHead.addEventListener('click', function () {
+      var open = udTreeHead.getAttribute('aria-expanded') !== 'false';
+      udTreeHead.setAttribute('aria-expanded', open ? 'false' : 'true');
+      udTreeHead.classList.toggle('is-fold', open);
+      udStatesEl.hidden = open;
+    });
 
     var udBar = document.getElementById('udBar');
     if (udBar) udBar.addEventListener('click', function (e) {

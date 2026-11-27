@@ -640,8 +640,70 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
         </div>
       </div>
 
-      <!-- 第 95 轮：中栏画布底 —— 灰底 + 16px 田字网格（稿：工具条下方整片网格） -->
-      <div class="ud-canvas" id="udCanvas"></div>
+      <!-- ============================================================
+           第 96 轮：中栏画布区（稿 4068:65598 浮层 / 4068:64885 画板 / 4138:57012 选中态）
+           底色 #F5F5F5 + 16px 田字网格（线已按要求再浅一倍：alpha .04）
+           左侧「页面层级和状态」是绝对定位浮层（下方内容可穿过），可折叠
+           画板 800×400 + 上方 12/20 画板名；默认按分辨率自适应缩放，工具栏 ± 可自定义
+           点画板 = 选中（1.6px 主色描边 + 四角 8×8 白色手柄），点空白 = 取消
+           ============================================================ -->
+      <div class="ud-canvas" id="udCanvas">
+        <svg class="ud-sprite" aria-hidden="true" focusable="false"><defs>
+          <symbol id="udIcoDoc" viewBox="0 0 48 48"><path fill="currentColor" d="M43,6L43,42Q43,43.656876,41.828438,44.828438Q40.656876,46,39,46L11,46Q9.3431487,46,8.1715795,44.828442Q7,43.656876,7,42L7,6Q7,4.3431454,8.1715724,3.1715729Q9.343145100000001,2,11,2L39,2Q40.656876,2.00000011920929,41.828445,3.1715798Q43,4.3431456,43,6ZM39,6L11,6L11,42L39,42L39,6Z"/><path fill="currentColor" d="M17,32L31,32C32.104568,32,33,31.1045694,33,30C33,28.89543045,32.104568,28,31,28L17,28C15.89543045,28,15,28.89543045,15,30C15,31.1045694,15.89543045,32,17,32Z"/><path fill="currentColor" d="M17,38L24,38C25.104568999999998,38,26,37.1045694,26,36C26,34.89543045,25.104568999999998,34,24,34L17,34C15.89543045,34,15,34.89543045,15,36C15,37.1045694,15.89543045,38,17,38Z"/><path fill="currentColor" d="M15,12L15,22C15,23.104568999999998,15.89543045,24,17,24L31,24C32.104568,24,33,23.104568999999998,33,22L33,12C33,10.89543045,32.104568,10,31,10L17,10C15.89543045,10,15,10.89543045,15,12ZM19,20L19,14L29,14L29,20L19,20Z"/></symbol>
+          <symbol id="udIcoChevR" viewBox="0 0 48 48"><path fill="currentColor" d="M26.727348,23.363676L14,10.6363521L17.636377799999998,7L34,23.363676L17.636377799999998,39.727142L14,36.090816000000004L26.727348,23.363676Z"/></symbol>
+          <symbol id="udIcoChevD" viewBox="0 0 48 48"><path fill="currentColor" d="M23.363409,26.727128999999998L36.090742,14L39.727047,17.6363342L23.363409,34L7,17.6363342L10.6363328,14L23.363409,26.727128999999998Z"/></symbol>
+        </defs></svg>
+
+        <div class="ud-scroll" id="udScroll">
+          <div class="ud-stage" id="udStage">
+            <div class="ud-board-wrap" id="udBoardWrap" style="--ud-s:1">
+              <div class="ud-board-name">账密登录 · 默认</div>
+              <button class="ud-board" type="button" id="udBoard" aria-pressed="false" aria-label="画板：账密登录 · 默认">
+                <span class="ud-handle ud-h-tl" aria-hidden="true"></span>
+                <span class="ud-handle ud-h-tr" aria-hidden="true"></span>
+                <span class="ud-handle ud-h-bl" aria-hidden="true"></span>
+                <span class="ud-handle ud-h-br" aria-hidden="true"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="ud-pages" id="udPages" aria-label="页面层级和状态">
+          <div class="ud-pages-head">
+            <span class="ud-pages-t">页面层级和状态</span>
+            <button class="ud-pages-fold" type="button" id="udFold" data-tip="折叠" aria-expanded="true" aria-label="折叠面板">
+              <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M12.2,7 L2.4,7 M6.05,3.15 L2.2,7 L6.05,10.85" stroke="#6B6B6B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <div class="ud-pages-body">
+            <div class="ud-tree">
+              <button class="ud-tree-row" type="button" id="udTreeHead" aria-expanded="true" aria-controls="udStates">
+                <svg class="ud-chev ud-chev-d" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoChevD"/></svg>
+                <svg class="ud-doc" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoDoc"/></svg>
+                <span class="ud-tree-t">账密登录</span>
+              </button>
+              <ul class="ud-states" id="udStates">
+                <li class="ud-state is-on"><span class="ud-dot" aria-hidden="true"></span>默认</li>
+                <li class="ud-state"><span class="ud-dot is-idle" aria-hidden="true"></span>账号或密码错误</li>
+                <li class="ud-state"><span class="ud-dot is-idle" aria-hidden="true"></span>凭证过期</li>
+                <li class="ud-state"><span class="ud-dot is-idle" aria-hidden="true"></span>账号锁定</li>
+                <li class="ud-state"><span class="ud-dot is-idle" aria-hidden="true"></span>访问限流</li>
+                <li class="ud-state"><span class="ud-dot is-idle" aria-hidden="true"></span>未知错误</li>
+              </ul>
+            </div>
+            <button class="ud-page" type="button">
+              <svg class="ud-chev" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoChevR"/></svg>
+              <svg class="ud-doc" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoDoc"/></svg>
+              <span class="ud-page-t">Gmail 邮箱登录</span>
+            </button>
+            <button class="ud-page" type="button">
+              <svg class="ud-chev" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoChevR"/></svg>
+              <svg class="ud-doc" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoDoc"/></svg>
+              <span class="ud-page-t">账号恢复页</span>
+            </button>
+          </div>
+        </aside>
+      </div>
 
       <!-- 第 95 轮：底栏复用 tp-foot，次要「重新生成」+ 主要「完成工序」 -->
       <div class="tp-foot">

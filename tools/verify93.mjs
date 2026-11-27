@@ -79,11 +79,15 @@ ok('B12 画布区从工具条下沿开始、占满剩余高度', g.canvas[1] ===
 /* ---------- C 交互：缩放 ---------- */
 const z0 = await p.evaluate(() => document.querySelector('.ud-zval').textContent.trim());
 await p.click('#udZoomIn'); await wait(120);
-const z1 = await p.evaluate(() => ({ t: document.querySelector('.ud-zval').textContent.trim(), v: getComputedStyle(document.querySelector('.ud-canvas')).getPropertyValue('--ud-zoom') }));
+const z1 = await p.evaluate(() => ({ t: document.querySelector('.ud-zval').textContent.trim(), v: getComputedStyle(document.querySelector('#udBoardWrap')).getPropertyValue('--ud-s') }));
 await p.click('#udZoomOut'); await p.click('#udZoomOut'); await wait(120);
 const z2 = await p.evaluate(() => document.querySelector('.ud-zval').textContent.trim());
-ok('C1 默认 50%、点「＋」到 75%（--ud-zoom 1.5）', z0 === '50%' && z1.t === '75%' && z1.v.trim() === '1.5', z0 + ' → ' + JSON.stringify(z1));
-ok('C2 点两次「−」回到 25%', z2 === '25%', z2);
+/* 第 96 轮：默认改成「按可用区域自适应」（视口越宽越接近 100%），缩放写在 --ud-s 上 */
+const n0 = parseInt(z0, 10);
+ok('C1 默认按可用区域自适应、点「＋」加 25%（--ud-s 跟着走）',
+  /^\d+%$/.test(z0) && z1.t === (n0 + 25) + '%' && Math.abs(parseFloat(z1.v) - (n0 + 25) / 100) < 1e-6,
+  z0 + ' → ' + JSON.stringify(z1));
+ok('C2 连点两次「−」递减 50%（不足下限则夹到 25%）', z2 === Math.max(25, n0 + 25 - 50) + '%', z2 + ' (from ' + z0 + ')');
 for (let i = 0; i < 8; i++) await p.click('#udZoomIn');
 await wait(120);
 const z3 = await p.evaluate(() => document.querySelector('.ud-zval').textContent.trim());
