@@ -82,7 +82,7 @@ ok('C4 收起后画布吃满整幅宽度', F.scrollW === F.canvas[2], F.scrollW 
 ok('C5 收起后自适应重算（654−48 → 42%）', F.zoom === '42%', F.zoom);
 ok('C6 收起后提示改「展开」、aria-expanded=false', F.tip === '展开' && F.tf === 'false', F.tip + ' / ' + F.tf);
 ok('C9 收起后折叠键变 32×32 白底 + 1px #E5E5E5 + 0 1px 8px', F.btn[0][2] === 32 && F.btn[0][3] === 32
-  && F.btn[1] === 'rgb(255, 255, 255)' && /rgb\(229, 229, 229\) 0px 0px 0px 1px inset/.test(F.btn[2])
+  && /rgba?\(255, 255, 255(, 1)?\)/.test(F.btn[1]) && /rgb\(229, 229, 229\) 0px 0px 0px 1px inset/.test(F.btn[2])
   && /rgba\(0, 0, 0, 0\.06\) 0px 1px 8px/.test(F.btn[2]), JSON.stringify(F.btn));
 ok('C10 收起后换面板图标（ico-fold 隐藏 / ico-expand 显示）', F.btn[3] === 'none' && F.btn[4] === 'block', F.btn[3] + ' / ' + F.btn[4]);
 

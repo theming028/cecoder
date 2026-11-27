@@ -3356,6 +3356,22 @@ body.is-focus[data-page="task"] .tp-wrap { top: 40px; }
   transition: opacity .12s linear, transform .12s var(--cds-motion-ease),
               color .12s linear;
 }
+/* 第 102 轮：画板截图作为附件落进 ai-atts —— 缩略图是画板页面（.ud-board-doc）的等比缩小克隆 */
+.ai-att.is-shot { background: #FFFFFF; }
+/* 注意别叫 .ai-shot —— 那是 70 轮截图带的 72×72 瓦片，会串样式 */
+.ud-thumb { display: block; flex: 0 0 auto; width: 44px; height: 28px; overflow: hidden; border-radius: 2px; box-shadow: 0 0 0 1px #EBECED; pointer-events: none; }
+.ud-thumb-in { display: block; width: 1440px; height: 900px; transform-origin: 0 0; }
+.ai-att.is-ghost { opacity: 0; }
+.ai-att.is-pop { animation: ai-att-pop .3s var(--cds-motion-ease); }
+@keyframes ai-att-pop { 0% { transform: scale(.72); } 62% { transform: scale(1.06); } 100% { transform: scale(1); } }
+/* 飞行中的截图：从画板位置沿抛物线落到输入框附件位，飞行途中同步缩小 */
+.ud-fly {
+  position: fixed; z-index: 900; overflow: hidden; pointer-events: none;
+  border-radius: 6px; background: #FFFFFF;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .08), 0 16px 40px rgba(0, 0, 0, .22);
+  will-change: left, top, width, height;
+}
+.ud-fly-in { width: 1440px; height: 900px; transform-origin: 0 0; }
 .ai-att:hover .ai-att-x, .ai-att-x:focus-visible { opacity: 1; transform: none; }
 .ai-att-x:hover { color: var(--cds-text-primary); background: #F5F5F5; }
 .ai-ta {

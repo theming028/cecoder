@@ -2907,9 +2907,12 @@
         if (!x) return;
         var att = x.closest('.ai-att');
         var left = aiAtts.querySelectorAll('.ai-att').length - 1;
+        var wasShot = !!(att && att.classList.contains('is-shot'));
         if (att) att.remove();
         if (!left) aiAtts.hidden = true;
-        toast(left ? '已移除参考图，还剩 ' + left + ' 张' : '已移除全部参考图');
+        /* 第 102 轮：截图附件措辞分开 */
+        toast(wasShot ? (left ? '已移除截图，还剩 ' + left + ' 个附件' : '已移除全部附件')
+                      : (left ? '已移除参考图，还剩 ' + left + ' 张' : '已移除全部参考图'));
       });
     }
 
@@ -4051,6 +4054,104 @@
       if (e.key === 'Escape' && udMqOn) udMqSetMode(false);
     });
 
+    /* ============================================================
+       第 102 轮：截图 —— 把画板里的页面（.ud-board-doc）等比克隆成缩略图，
+       从画板位置沿抛物线飞进右栏 AI 输入框的 #aiAtts，落地后淡入 + 弹一下
+       ============================================================ */
+    var udShotBtn = document.getElementById('udShot');
+    var udShotBusy = false;
+    var UD_X_ICO = '<span class="ico ico12"><svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.3 3.3 8.7 8.7M8.7 3.3 3.3 8.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>';
+    var udTakeShot = function () {
+      if (!udBoardEl || udShotBusy) return;
+      var doc = udBoardEl.querySelector('.ud-board-doc');
+      var atts = document.getElementById('aiAtts');
+      if (!doc || !atts) return;
+      udShotBusy = true;
+
+      /* 克隆页面：去掉所有 id，避免和画板里的原节点撞；量到的截图按画板原始 1440×900 存 */
+      var clone = doc.cloneNode(true);
+      Array.prototype.forEach.call(clone.querySelectorAll('[id]'), function (n) { n.removeAttribute('id'); });
+      clone.removeAttribute('id');
+
+      /* 缩略图槽位先落位（透明），量到真实落点再飞；落地时才把克隆塞进去 */
+      var att = document.createElement('div');
+      att.className = 'ai-att is-shot is-ghost';
+      var shot = document.createElement('div');
+      shot.className = 'ud-thumb';
+      shot.setAttribute('aria-hidden', 'true');
+      var inner = document.createElement('div');
+      inner.className = 'ud-thumb-in';
+      inner.style.transform = 'scale(' + (44 / UD_W) + ')';
+      shot.appendChild(inner);
+      att.appendChild(shot);
+      var attX = document.createElement('button');
+      attX.className = 'ai-att-x';
+      attX.type = 'button';
+      attX.setAttribute('aria-label', '移除截图');
+      attX.innerHTML = UD_X_ICO;
+      att.appendChild(attX);
+      atts.hidden = false;
+      atts.appendChild(att);
+
+      var from = udBoardEl.getBoundingClientRect();
+      var to = att.getBoundingClientRect();
+
+      var done = function () {
+        inner.appendChild(clone);
+        att.classList.remove('is-ghost');
+        att.classList.add('is-pop');
+        setTimeout(function () { att.classList.remove('is-pop'); }, 320);
+        udShotBusy = false;
+      };
+      /* 落点不可见（AI 栏收起 / 专注模式）时不做飞行动画，直接落位 */
+      if (!to.width || !from.width) { done(); return; }
+
+      var fly = document.createElement('div');
+      fly.className = 'ud-fly';
+      var flyIn = document.createElement('div');
+      flyIn.className = 'ud-fly-in';
+      flyIn.appendChild(clone);
+      fly.appendChild(flyIn);
+      document.body.appendChild(fly);
+
+      var W0 = from.width, H0 = from.height;
+      var x0 = from.left, y0 = from.top;
+      var x1 = to.left + (to.width - 44) / 2, y1 = to.top + (to.height - 28) / 2;
+      /* 抛物线：控制点抬到两端之上，弧顶高度随水平跨度走 */
+      var cx = (x0 + x1) / 2;
+      var cy = Math.min(y0, y1) - Math.max(120, Math.abs(x1 - x0) * 0.3);
+      var t0 = 0, DUR = 820;
+      fly.style.left = x0 + 'px';
+      fly.style.top = y0 + 'px';
+      fly.style.width = W0 + 'px';
+      fly.style.height = H0 + 'px';
+      flyIn.style.transform = 'scale(' + (W0 / UD_W) + ')';
+
+      var frame = function (now) {
+        if (!t0) t0 = now;
+        var t = Math.min(1, (now - t0) / DUR);
+        var e = t * t * (3 - 2 * t);            /* smoothstep：起停都软，中段快 */
+        var u = 1 - e;
+        var x = u * u * x0 + 2 * u * e * cx + e * e * x1;
+        var y = u * u * y0 + 2 * u * e * cy + e * e * y1;
+        var w = W0 + (44 - W0) * e, h = H0 + (28 - H0) * e;
+        fly.style.left = x + 'px';
+        fly.style.top = y + 'px';
+        fly.style.width = w + 'px';
+        fly.style.height = h + 'px';
+        flyIn.style.transform = 'scale(' + (w / UD_W) + ')';
+        fly.style.opacity = t > 0.86 ? String(1 - (t - 0.86) / 0.14) : '1';
+        if (t < 1) { requestAnimationFrame(frame); return; }
+        if (fly.parentNode) fly.parentNode.removeChild(fly);
+        done();
+      };
+      requestAnimationFrame(frame);
+    };
+    if (udShotBtn) udShotBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      udTakeShot();
+    });
+
     /* 左列折叠（第 97 轮）：整列收成左上角 32×32 浮键，点同一颗键再展开 */
     var udFold = document.getElementById('udFold');
     var udPagesEl = document.getElementById('udPages');
@@ -4149,6 +4250,7 @@
       if (!t || t === udIn || t === udOut) return;
       if (t.id === 'udMore') return;   /* 第 99 轮：更多键自己管下拉 */
       if (t.id === 'udFrame') return;  /* 第 101 轮：框选键自己管模式 */
+      if (t.id === 'udShot') return;   /* 第 102 轮：截图键自己管飞行 */
       if (!t.classList.contains('ud-tool') && !t.classList.contains('ud-sel') && t.id !== 'udNote') return;
       if (t.closest('.cds-dd')) return;
       var lb = t.id === 'udNote' ? '查看批注（2 条）' : (t.getAttribute('aria-label') || t.textContent.trim());
