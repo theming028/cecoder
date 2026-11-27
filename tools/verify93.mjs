@@ -64,7 +64,8 @@ ok('A6 「页面关系」「页面预览」各 72×28：透明底、正文色中
 
 /* ---------- B 工具条 ---------- */
 ok('B1 工具条 44 高、白底、底边 1px #E5E5E5，紧贴页签条下沿', g.bar[3] === 44 && g.barBg === 'rgb(255, 255, 255)' && /rgb\(229, 229, 229\) 0px -1px 0px 0px inset/.test(g.barSh) && g.bar[1] === g.tabsBar[0][1] + 40, JSON.stringify(g.bar) + ' tabs=' + g.tabsBar[0][1]);
-ok('B2 左侧内距 19、三组总宽 386（129 + 134 + 107 + 2×8）', g.leftRel[0] === 19 && g.leftW === 386, g.leftRel[0] + ' ' + g.leftW);
+/* 第 98 轮：分辨率 + 缩放组挪到工具条右侧（批注左侧），左组只剩「版本」129 */
+ok('B2 左侧内距 19、左组只剩「版本」129', g.leftRel[0] === 19 && g.leftW === 129, g.leftRel[0] + ' ' + g.leftW);
 ok('B3 版本下拉 129×28：白底 + 1px #E5E5E5、内距 8、13/22', g.sels[0][0][2] === 129 && g.sels[0][0][3] === 28 && g.sels[0][2] === 'rgb(255, 255, 255)' && /rgb\(229, 229, 229\) 0px 0px 0px 1px inset/.test(g.sels[0][3]) && g.sels[0][4] === '8px' && g.sels[0][5] === '13px/22px', JSON.stringify(g.sels[0]));
 ok('B4「版本：」#6B6B6B +「当前设计」#1F1F1F', g.selsk === 'rgb(107, 107, 107)' && g.selv === 'rgb(31, 31, 31)', g.selsk + ' / ' + g.selv);
 ok('B5 分辨率下拉 134×28（14 图标 + 4 + 文字 + 8 + 14 箭头）', g.sels[1][0][2] === 134 && g.sels[1][0][3] === 28, JSON.stringify(g.sels[1][0]));

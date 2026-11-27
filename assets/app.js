@@ -3893,6 +3893,8 @@
     var udOut = document.getElementById('udZoomOut');
     if (udIn) udIn.addEventListener('click', function () { udApplyZoom((udUser || udFitPct()) + 25); });
     if (udOut) udOut.addEventListener('click', function () { udApplyZoom((udUser || udFitPct()) - 25); });
+    /* 第 98 轮：点缩放值直接回到 100% */
+    if (udZoomVal) udZoomVal.addEventListener('click', function () { udApplyZoom(100); });
 
     /* 画板选中态（稿 4138:57012） */
     var udSel = function (on) {
@@ -3959,6 +3961,17 @@
       var cv = document.getElementById('udCanvas');
       if (cv) cv.classList.toggle('is-folded', folded);
       if (!udUser) udApplyZoom();
+    });
+
+    /* 页面组展开/收起（第 98 轮）：两个页面卡与「账密登录」同构，点行切自己的状态列表 */
+    Array.prototype.forEach.call(document.querySelectorAll('.ud-page > .ud-tree-row'), function (row) {
+      var list = document.getElementById(row.getAttribute('aria-controls') || '');
+      if (!list) return;
+      row.addEventListener('click', function () {
+        var open = row.getAttribute('aria-expanded') === 'true';
+        row.setAttribute('aria-expanded', open ? 'false' : 'true');
+        list.hidden = open;
+      });
     });
 
     /* 分组展开/收起（默认展开，与稿一致） */

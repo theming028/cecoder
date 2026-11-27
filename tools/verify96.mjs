@@ -24,8 +24,8 @@ const A = await p.evaluate(() => {
   const cs = e => getComputedStyle(e);
   const box = e => { const r = e.getBoundingClientRect(); return [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)]; };
   const canvas = q('.ud-canvas'), pages = q('.ud-pages'), head = q('.ud-pages-head'), fold = q('#udFold');
-  const tree = q('.ud-tree'), row = q('.ud-tree-row'), states = qa('.ud-state'), pagesEls = qa('.ud-page');
-  const on = q('.ud-state.is-on'), dot = q('.ud-state .ud-dot');
+  const tree = q('.ud-tree'), row = q('.ud-tree-row'), states = qa('.ud-tree .ud-state'), pagesEls = qa('.ud-page');
+  const on = q('.ud-tree .ud-state.is-on'), dot = q('.ud-tree .ud-state .ud-dot');
   const wrap = q('.ud-board-wrap'), board = q('#udBoard'), name = q('.ud-board-name');
   const ccs = cs(canvas);
   return {
@@ -41,7 +41,10 @@ const A = await p.evaluate(() => {
     states: states.map(e => [e.textContent.trim(), Math.round(e.getBoundingClientRect().height), cs(e).padding,
       e.classList.contains('is-on') ? cs(e).backgroundColor : '', e.classList.contains('is-on') ? cs(e).boxShadow : '', e.classList.contains('is-on') ? cs(e).color : cs(e).fontWeight]),
     dot: [box(dot)[2], cs(dot).borderRadius, cs(dot).backgroundColor, Math.round(dot.getBoundingClientRect().x - row.getBoundingClientRect().x)],
-    pages2: pagesEls.map(e => [e.textContent.trim(), Math.round(e.getBoundingClientRect().height), [...e.children].map(c => Math.round(c.getBoundingClientRect().x - e.getBoundingClientRect().x))]),
+    /* 第 98 轮：页面项改成「卡 + 行」结构，量卡高与行内三件的相对位 */
+    pages2: pagesEls.map(e => { const r = e.querySelector('.ud-tree-row'); const rb = r.getBoundingClientRect();
+      return [r.querySelector('.ud-page-t').textContent.trim(), Math.round(e.getBoundingClientRect().height),
+        [...r.children].map(c => Math.round(c.getBoundingClientRect().x - rb.x))]; }),
     board: [box(board), cs(board).width, cs(board).height, cs(board).borderRadius, cs(board).boxShadow, cs(board).transformOrigin],
     name: [name.textContent.trim(), box(name)[3], cs(name).fontSize, cs(name).lineHeight, cs(name).color],
     wrapBox: box(wrap),
@@ -63,13 +66,13 @@ ok('A3 画布底色仍是 #F5F5F5', A.grid[2] === 'rgb(245, 245, 245)', A.grid[2
 ok('B1 左列 240 定宽、在流内（第 97 轮改成贴边列）', A.pages[0][2] === 240 && A.pages[1] === 'relative', JSON.stringify([A.pages[0], A.pages[1]]));
 ok('B2 左列与画布左上贴齐、上下拉通', A.pages[0][0] === A.canvasBox[0] && A.pages[0][1] === A.canvasBox[1] && A.pages[0][3] === A.canvasBox[3], JSON.stringify([A.pages[0], A.canvasBox]));
 ok('B3 浮层底 #F7F7F7 + 右侧 1px #E5E5E5', A.pages[2] === 'rgb(247, 247, 247)' && /rgb\(229, 229, 229\) -1px 0px 0px 0px inset/.test(A.pages[3]), JSON.stringify([A.pages[2], A.pages[3]]));
-ok('B4 头 12/8/0/16 内距（32 折叠键要占位）', A.head[1] === '12px 8px 0px 16px', A.head[1]);
+ok('B4 头 13/5/8/19 内距（标题 19、28 折叠键右 5）', A.head[1] === '13px 5px 8px 19px', A.head[1]);
 ok('B5 标题「页面层级和状态」14/22、正文色', A.title[0] === '页面层级和状态' && A.title[1] === '14px' && A.title[2] === '400' && A.title[3] === 'rgb(31, 31, 31)' && A.title[4] === '22px', JSON.stringify(A.title));
-ok('B6 折叠键 32×32（稿 4068:57550），默认提示「折叠」', A.fold[0][2] === 32 && A.fold[0][3] === 32 && A.fold[1] === '折叠' && A.fold[2] === 'true', JSON.stringify(A.fold));
+ok('B6 展开态折叠键 28×28（图标 14），默认提示「折叠」', A.fold[0][2] === 28 && A.fold[0][3] === 28 && A.fold[1] === '折叠' && A.fold[2] === 'true', JSON.stringify(A.fold));
 
 /* ---------- 分组卡 / 状态行 / 页面项 ---------- */
-ok('C1 分组卡 216 宽、白底、1px #EEEEEE、圆角 6', A.tree[0][2] === 216 && A.tree[1] === 'rgb(255, 255, 255)'
-  && /rgb\(238, 238, 238\) 0px 0px 0px 1px inset/.test(A.tree[2]) && A.tree[3] === '6px', JSON.stringify([A.tree[0][2], A.tree[1], A.tree[2], A.tree[3]]));
+ok('C1 分组卡 216 宽、白底、1px #EEEEEE、圆角 4', A.tree[0][2] === 216 && A.tree[1] === 'rgb(255, 255, 255)'
+  && /rgb\(238, 238, 238\) 0px 0px 0px 1px inset/.test(A.tree[2]) && A.tree[3] === '4px', JSON.stringify([A.tree[0][2], A.tree[1], A.tree[2], A.tree[3]]));
 ok('C2 分组行 28 高，内距 8', A.row[0][3] === 28 && A.row[1] === '8px', JSON.stringify([A.row[0][3], A.row[1]]));
 ok('C3 行内间距 4（相对行首：箭头 8 / 文档 26 / 文字 44 → 相对卡片 16/34/52）', A.row[2] === '4px' && A.row[3][0] === 8 && A.row[3][1] === 26 && A.row[3][2] === 44, JSON.stringify(A.row[3]));
 ok('C4 分组名「账密登录」500 中粗', A.row[4] === '500' && A.row[5] === '账密登录', JSON.stringify([A.row[4], A.row[5]]));
@@ -78,7 +81,7 @@ ok('C6 状态文案与稿一致', A.states.map(s => s[0]).join('/') === '默认/
 ok('C7 选中行「默认」浅蓝底 + 1px #DAE4FE + 主色 500', A.states[0][3] === 'rgb(245, 248, 255)'
   && /rgb\(218, 228, 254\) 0px 0px 0px 1px inset/.test(A.states[0][4]) && A.states[0][5] === 'rgb(55, 112, 247)', JSON.stringify(A.states[0]));
 ok('C8 圆点 6×6、距行左 32、选中为主色', A.dot[0] === 6 && A.dot[1] === '50%' && A.dot[2] === 'rgb(55, 112, 247)' && A.dot[3] === 32, JSON.stringify(A.dot));
-ok('C9 下方两个页面项 44 高，箭头 16 / 文档 34 / 文字 52（与分组头同缩进）', A.pages2.length === 2 && A.pages2.every(v => v[1] === 44 && v[2][0] === 16 && v[2][1] === 34 && v[2][2] === 52), JSON.stringify(A.pages2));
+ok('C9 下方两个页面卡 44 高，行内箭头 8 / 文档 26 / 文字 44（与分组头同缩进）', A.pages2.length === 2 && A.pages2.every(v => v[1] === 44 && v[2][0] === 8 && v[2][1] === 26 && v[2][2] === 44), JSON.stringify(A.pages2));
 ok('C10 页面项文案：Gmail 邮箱登录 / 账号恢复页', A.pages2[0][0] === 'Gmail 邮箱登录' && A.pages2[1][0] === '账号恢复页', JSON.stringify(A.pages2.map(v => v[0])));
 
 /* ---------- ③ 画板 ---------- */

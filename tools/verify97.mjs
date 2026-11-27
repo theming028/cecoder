@@ -29,13 +29,15 @@ const A = await p.evaluate(() => {
   const cs = e => getComputedStyle(e);
   const box = e => { const r = e.getBoundingClientRect(); return [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)]; };
   const canvas = q('.ud-canvas'), pages = q('.ud-pages'), head = q('.ud-pages-head');
-  const fold = q('#udFold'), ico = fold.querySelector('svg'), path = ico.querySelector('path');
+  const fold = q('#udFold'), ico = fold.querySelector('.ico-fold'), path = ico.querySelector('path');
+  const icoExpand = cs(fold.querySelector('.ico-expand')).display;
   return {
     canvas: box(canvas),
     pages: [box(pages), cs(pages).position, cs(pages).width, cs(pages).height, cs(pages).backgroundColor, cs(pages).boxShadow, cs(pages).order],
     head: cs(head).padding,
     fold: [box(fold), cs(fold).backgroundColor, cs(fold).borderRadius, cs(fold).boxShadow],
     ico: [box(ico), ico.getAttribute('viewBox')],
+    icoExpand: icoExpand,
     d: (path.getAttribute('d') || '').slice(0, 16),
     canvasDisplay: cs(canvas).display,
     scrollW: q('.ud-scroll').clientWidth,
@@ -47,15 +49,16 @@ ok('A1 左列 240 宽、在流内（相对定位）', A.pages[0][2] === 240 && A
 ok('A2 左列与画布左上贴齐、上下拉通（高度 = 画布高）', A.pages[0][0] === A.canvas[0] && A.pages[0][1] === A.canvas[1] && A.pages[0][3] === A.canvas[3], JSON.stringify([A.pages[0], A.canvas]));
 ok('A3 画布是 flex 行容器，左列 order -1 排在最前', A.canvasDisplay === 'flex' && A.pages[6] === '-1', JSON.stringify([A.canvasDisplay, A.pages[6]]));
 ok('A4 左列底 #F7F7F7 + 右侧 1px #E5E5E5 贴边线', A.pages[4] === 'rgb(247, 247, 247)' && /rgb\(229, 229, 229\) -1px 0px 0px 0px inset/.test(A.pages[5]), JSON.stringify([A.pages[4], A.pages[5]]));
-ok('A5 头部内距 12/8/0/16（右侧留给 32 折叠键）', A.head === '12px 8px 0px 16px', A.head);
+ok('A5 头部内距 13/5/8/19（标题 19、28 折叠键右 5）', A.head === '13px 5px 8px 19px', A.head);
 ok('A6 滚动区 = 画布宽 − 240', A.scrollW === A.canvas[2] - 240, A.scrollW + ' / ' + A.canvas[2]);
 
 /* ---------- ② 折叠键用稿内图标 ---------- */
-ok('B1 折叠键 32×32、白底、r4', A.fold[0][2] === 32 && A.fold[0][3] === 32 && A.fold[1] === 'rgb(255, 255, 255)' && A.fold[2] === '4px', JSON.stringify(A.fold.slice(0, 3)));
-ok('B2 折叠键 inset 1px #E5E5E5 + 0 1px 8px 投影（稿 4068:57550）',
-  /rgb\(229, 229, 229\) 0px 0px 0px 1px inset/.test(A.fold[3]) && /rgba\(0, 0, 0, 0\.06\) 0px 1px 8px/.test(A.fold[3]), A.fold[3]);
-ok('B3 图标 16×16、viewBox 0 0 16 16', A.ico[0][2] === 16 && A.ico[0][3] === 16 && A.ico[1] === '0 0 16 16', JSON.stringify(A.ico));
-ok('B4 图标是稿内画框矢量（路径以 M13.333333 起）', A.d === 'M13.333333,14.66', A.d);
+/* 第 98 轮：展开态是 14 的 direction/to-left（无底色），折叠态才是 32×32 白框面板键 */
+ok('B1 展开态折叠键 28×28 热区、透明底', A.fold[0][2] === 28 && A.fold[0][3] === 28 && A.fold[1] === 'rgba(0, 0, 0, 0)', JSON.stringify(A.fold.slice(0, 3)));
+ok('B2 展开态不带白框投影', A.fold[3] === 'none', A.fold[3]);
+ok('B3 展开态图标 14×14、viewBox 0 0 14 14', A.ico[0][2] === 14 && A.ico[0][3] === 14 && A.ico[1] === '0 0 14 14', JSON.stringify(A.ico));
+ok('B4 展开态图标是「竖杠 + 左箭头」（stroke 路径起 M3.1 2.9）', A.d.indexOf('M3.1 2.9') === 0, A.d);
+ok('B5 面板图标那只 svg 在展开态隐藏', A.icoExpand === 'none', A.icoExpand);
 
 /* 折叠 */
 await p.click('#udFold'); await wait(320);
@@ -67,7 +70,9 @@ const F = await p.evaluate(() => {
   return {
     canvas: box(cv), pages: [box(pg), cs(pg).position], body: cs(q('.ud-pages-body')).display,
     scrollW: sc.clientWidth, zoom: q('#udZoomVal').textContent, tip: q('#udFold').getAttribute('data-tip'),
-    tf: q('#udFold').getAttribute('aria-expanded')
+    tf: q('#udFold').getAttribute('aria-expanded'),
+    btn: [box(q('#udFold')), cs(q('#udFold')).backgroundColor, cs(q('#udFold')).boxShadow,
+      cs(q('#udFold').querySelector('.ico-fold')).display, cs(q('#udFold').querySelector('.ico-expand')).display]
   };
 });
 ok('C1 折叠后整列脱离文档流、收成 32×32', F.pages[1] === 'absolute' && F.pages[0][2] === 32 && F.pages[0][3] === 32, JSON.stringify(F.pages));
@@ -76,6 +81,10 @@ ok('C3 收起后内容体不显示', F.body === 'none', F.body);
 ok('C4 收起后画布吃满整幅宽度', F.scrollW === F.canvas[2], F.scrollW + ' / ' + F.canvas[2]);
 ok('C5 收起后自适应重算（654−48 → 42%）', F.zoom === '42%', F.zoom);
 ok('C6 收起后提示改「展开」、aria-expanded=false', F.tip === '展开' && F.tf === 'false', F.tip + ' / ' + F.tf);
+ok('C9 收起后折叠键变 32×32 白底 + 1px #E5E5E5 + 0 1px 8px', F.btn[0][2] === 32 && F.btn[0][3] === 32
+  && F.btn[1] === 'rgb(255, 255, 255)' && /rgb\(229, 229, 229\) 0px 0px 0px 1px inset/.test(F.btn[2])
+  && /rgba\(0, 0, 0, 0\.06\) 0px 1px 8px/.test(F.btn[2]), JSON.stringify(F.btn));
+ok('C10 收起后换面板图标（ico-fold 隐藏 / ico-expand 显示）', F.btn[3] === 'none' && F.btn[4] === 'block', F.btn[3] + ' / ' + F.btn[4]);
 
 await p.click('#udFold'); await wait(320);
 const U = await p.evaluate(() => {

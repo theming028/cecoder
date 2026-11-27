@@ -4478,6 +4478,8 @@ body[data-page="ui"] .ui-blank.is-gen {
   box-shadow: inset 1px 0 0 0 #EBECED, inset 0 -1px 0 0 #E5E5E5;
 }
 .ud-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+/* 第 98 轮：自定义分辨率 + 缩放组挪到「批注」左侧，夹在两根竖线中间 */
+.ud-mid { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
 /* 两颗下拉：白底 + 1px #E5E5E5，圆角 4，内距 8；文字 13/400/22 */
 .ud-sel {
   flex: 0 0 auto; height: 28px; padding: 0 8px; border-radius: 4px;
@@ -4522,10 +4524,15 @@ body[data-page="ui"] .ui-blank.is-gen {
 .ud-zbtn:hover { background: var(--cds-surface-subtle); }
 .ud-zval {
   /* 定宽 43：缩放值是 25~200 的三/四字符（autofit 还会出现 46%），内距 4 才放得下「100%」不撑宽组 */
-  min-width: 43px; box-sizing: border-box; text-align: center;
-  padding: 0 4px; font-size: 13px; line-height: 20px; color: var(--cds-text-primary);
-  white-space: nowrap; font-variant-numeric: tabular-nums;
+  min-width: 43px; height: 20px; box-sizing: border-box; text-align: center;
+  padding: 0 4px; border: 0; border-radius: 4px; background: none;
+  font-family: inherit; font-size: 13px; line-height: 20px; color: var(--cds-text-primary);
+  white-space: nowrap; font-variant-numeric: tabular-nums; cursor: pointer;
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
+/* 第 98 轮：点缩放值直接回到 100% */
+.ud-zval:hover { background: var(--cds-surface-subtle); }
+.ud-zval:active { background: var(--cds-surface-inset); }
 
 /* 画板名绝对居中于工具条（稿 @541，1133/2 = 566.5） */
 .ud-title {
@@ -4611,30 +4618,36 @@ body.ud-dragging { cursor: grabbing; -webkit-user-select: none; user-select: non
   order: -1; position: relative; flex: 0 0 240px;
   width: 240px; height: 100%; box-sizing: border-box;
   display: flex; flex-direction: column; overflow: hidden;
-  background: #F7F7F7; box-shadow: inset -1px 0 0 0 #E5E5E5;
+  background: #F7F7F7;
+  /* 第 98 轮：左边那根 1px 竖线（贴画布左缘，之前被白底吃掉过）+ 右边 1px 线 + 向右投影，把前景从灰底网格里托起来 */
+  box-shadow: inset 1px 0 0 0 #EBECED, inset -1px 0 0 0 #E5E5E5, 2px 0 10px 0 rgba(0, 0, 0, .08);
 }
 .ud-pages-head {
   flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
-  padding: 12px 8px 0 16px;
+  /* 稿 4068:65598：标题距左 19、距上 16；折叠图标 14 右边距 12 → 28×28 热区，右内距 5 让图标落在 221 */
+  padding: 13px 5px 8px 19px;
 }
 .ud-pages-t {
   flex: 1 1 auto; min-width: 0;
   font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-/* 折叠键（稿 4068:57550）：32×32 白底 r4、inset 1px #E5E5E5、0 1px 8px rgba(0,0,0,.06)，内嵌 16 图标 */
+/* 折叠键（第 98 轮，两种外观）：
+   展开态 = 稿 4068:65598 的 direction/to-left（9×8 的竖杠 + 左箭头），14 图标居中在 28 热区里，无底色
+   折叠态 = 稿 4068:57550 的 32×32 白底面板键（见下方 .ud-canvas.is-folded 规则） */
 .ud-pages-fold {
-  flex: 0 0 auto; width: 32px; height: 32px; border-radius: 4px;
+  flex: 0 0 auto; width: 28px; height: 28px; border-radius: 4px;
   display: inline-flex; align-items: center; justify-content: center;
-  color: var(--cds-text-primary); background: #FFFFFF;
-  box-shadow: inset 0 0 0 1px #E5E5E5, 0 1px 8px 0 rgba(0, 0, 0, .06);
+  color: #6B6B6B; background: none;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.ud-pages-fold svg { width: 16px; height: 16px; }
-.ud-pages-fold:hover { background: #FAFAFA; }
+.ud-pages-fold .ico-fold { width: 14px; height: 14px; }
+.ud-pages-fold .ico-expand { display: none; width: 16px; height: 16px; }
+.ud-pages-fold:hover { background: #EDEDED; color: var(--cds-text-primary); }
 .ud-pages-body {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin;
-  padding: 12px 12px 12px; display: flex; flex-direction: column; gap: 8px;
+  /* 稿 4068:65598：卡片顶到 y=50（头 13+28=41 + 9），左右 12；卡片之间 4 */
+  padding: 9px 12px 12px; display: flex; flex-direction: column; gap: 4px;
 }
 .ud-pages-body::-webkit-scrollbar { width: 6px; }
 .ud-pages-body::-webkit-scrollbar-thumb { background: #DCDFE5; border-radius: 3px; }
@@ -4647,17 +4660,30 @@ body.ud-dragging { cursor: grabbing; -webkit-user-select: none; user-select: non
 .ud-canvas.is-folded .ud-pages-head { padding: 0; gap: 0; }
 .ud-canvas.is-folded .ud-pages-t,
 .ud-canvas.is-folded .ud-pages-body { display: none; }
+/* 折叠态换成稿 4068:57550 的 32×32 白底面板键 */
+.ud-canvas.is-folded .ud-pages-fold {
+  width: 32px; height: 32px; color: var(--cds-text-primary); background: #FFFFFF;
+  box-shadow: inset 0 0 0 1px #E5E5E5, 0 1px 8px 0 rgba(0, 0, 0, .06);
+}
+.ud-canvas.is-folded .ud-pages-fold .ico-fold { display: none; }
+.ud-canvas.is-folded .ud-pages-fold .ico-expand { display: block; }
 
 .ud-tree, .ud-page {
   flex: 0 0 auto; width: 100%; box-sizing: border-box; text-align: left;
-  background: #FFFFFF; border-radius: 6px; box-shadow: inset 0 0 0 1px #EEEEEE;
+  background: #FFFFFF; border-radius: 4px; box-shadow: inset 0 0 0 1px #EEEEEE;
 }
 .ud-tree { padding: 8px; }
-.ud-tree-row, .ud-page, .ud-state {
+/* 页面组（第 98 轮）：与「账密登录」同构的卡，行 28 + 可选状态列表，卡内距 8 */
+.ud-page { padding: 8px; }
+.ud-tree-row, .ud-state {
   display: flex; align-items: center; gap: 4px; border-radius: 4px;
   font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
 }
-.ud-tree-row { width: 100%; box-sizing: border-box; height: 28px; padding: 0 8px; }
+.ud-tree-row {
+  width: 100%; box-sizing: border-box; height: 28px; padding: 0 8px;
+  /* button 自带 text-align:center，会把 flex:1 的文字盒里的字居中；这里拉回左对齐 */
+  text-align: left; justify-content: flex-start;
+}
 .ud-tree-t { flex: 1 1 auto; min-width: 0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ud-chev, .ud-doc { flex: 0 0 auto; width: 14px; height: 14px; }
 .ud-chev { color: #868686; }
@@ -4665,13 +4691,17 @@ body.ud-dragging { cursor: grabbing; -webkit-user-select: none; user-select: non
 .ud-doc { color: #1F1F1F; }
 .ud-tree-row.is-fold .ud-chev-d { transform: rotate(-90deg); }
 .ud-states { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
-.ud-state { height: 28px; padding: 0 8px 0 32px; }
+.ud-state { height: 28px; padding: 0 8px 0 32px; gap: 6px; }
 .ud-state.is-on { background: #F5F8FF; box-shadow: inset 0 0 0 1px #DAE4FE; color: var(--cds-color-primary); font-weight: 500; }
-.ud-dot { flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: var(--cds-color-primary); }
+/* 圆点 6×6 + 1px 白描边（稿里 dot 是 6 带 inset 1 白边） */
+.ud-dot { flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: var(--cds-color-primary);
+  box-shadow: inset 0 0 0 1px #FFFFFF; }
 .ud-dot.is-idle { background: #C9C9C9; }
-.ud-page { height: 44px; padding: 0 16px; }
-.ud-page-t { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ud-page:hover, .ud-tree-row:hover { background: #FAFAFA; }
+.ud-page-t { flex: 1 1 auto; min-width: 0; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ud-tree-row:hover { background: #FAFAFA; }
+/* 页面组的折叠箭头：收起朝右，展开转 90° 朝下 */
+.ud-chev-r { transition: transform var(--cds-motion-duration) var(--cds-motion-ease); }
+.ud-tree-row[aria-expanded="true"] .ud-chev-r { transform: rotate(90deg); }
 
 /* 左列折叠后 .ud-scroll 自动吃满整幅宽度（左列已脱离文档流），无需再让内距 */
 
