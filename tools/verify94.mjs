@@ -75,7 +75,7 @@ const tipA = await p.evaluate(() => {
 });
 ok('A16 悬停第一个工具键出 tooltip「批注」', tipA && tipA[1] && tipA[0] === '批注', JSON.stringify(tipA));
 ok('A17 tooltip 高 28（12/20 + 4 内距）', tipA && tipA[3] === 28, tipA && tipA[3]);
-ok('A19 tooltip 向下弹（不盖页签条）', tipA && tipA[4] > A.barBottom && tipA[4] - A.barBottom <= 4, tipA && tipA[4] + ' / barBottom ' + A.barBottom);
+ok('A19 tooltip 显示在按钮上方', tipA && tipA[4] + 28 <= A.barBox[1], tipA && tipA[4] + ' / barTop ' + A.barBox[1]);
 
 /* 下拉开合 + 选择 */
 await p.click('#udVer');

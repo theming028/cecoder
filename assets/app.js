@@ -2044,8 +2044,7 @@
       tip.classList.remove('is-above', 'is-below');
       tip.style.left = '0px'; tip.style.top = '0px';
       var tw = tip.offsetWidth, th = tip.offsetHeight;
-      /* data-tip-below：工具条这类贴顶的控件强制往下弹，别盖住上面的页签 */
-      var above = !el.hasAttribute('data-tip-below') && r.top - th - 10 >= 8;
+      var above = r.top - th - 10 >= 8;
       var x = Math.max(8, Math.min(r.left + r.width / 2 - tw / 2, window.innerWidth - tw - 8));
       var y = above ? r.top - th - 10 : r.bottom + 10;
       tip.style.left = x + 'px';
@@ -3835,17 +3834,25 @@
   var stopBtn = document.getElementById('ugStop');
   if (stopBtn) {
     var genView = document.getElementById('ugGen');
-    var doneTimer = null;
+    var doneTimer = null, tickTimer = null;
+    /* 第 95 轮：按钮上带 10s 倒计时，两位补零（10→09→…），宽度不随秒数跳 */
+    var setStopLabel = function (left) {
+      var s = Math.max(0, Math.ceil(left / 1000));
+      stopBtn.textContent = '停止生成（' + String(s).padStart(2, '0') + 's）';
+    };
     var startGen = function () {
       if (genView) genView.hidden = false;
       stopBtn.hidden = false;
-      clearTimeout(doneTimer);
+      clearTimeout(doneTimer); clearInterval(tickTimer);
+      var endAt = Date.now() + GEN_MS;
+      setStopLabel(GEN_MS);
+      tickTimer = setInterval(function () { setStopLabel(endAt - Date.now()); }, 1000);
       doneTimer = setTimeout(function () { location.href = 'cecoder-uidone.html'; }, GEN_MS);
     };
     startGen();
     window.addEventListener('pageshow', function (e) { if (e.persisted) startGen(); });
     stopBtn.addEventListener('click', function () {
-      clearTimeout(doneTimer);
+      clearTimeout(doneTimer); clearInterval(tickTimer);
       location.href = 'cecoder-ui.html';
     });
   }
@@ -3877,6 +3884,12 @@
       if (t.classList.contains('ud-sel')) t.setAttribute('aria-expanded', t.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
     });
   }
+
+  /* 第 95 轮：生成完成页底栏 —— 重新生成回生成中页，完成工序进任务页（工序 4） */
+  var udRegen = document.getElementById('udRegen');
+  if (udRegen) udRegen.addEventListener('click', function () { location.href = 'cecoder-uigen.html'; });
+  var udDone = document.getElementById('udDone');
+  if (udDone) udDone.addEventListener('click', function () { location.href = 'cecoder-task.html?id=0'; });
 
   var sys = document.getElementById('ugSys');
   if (!sys) return;
@@ -3990,7 +4003,8 @@
     dsd.classList.add('is-open');
     dsd.setAttribute('aria-hidden', 'false');
     var x = dsd.querySelector('.dsd-x');
-    if (x) x.focus();
+    /* .panel 是 overflow:hidden 但仍可被 focus 滚动：不 preventScroll 会把整窗滚出去再弹回（剧烈闪动） */
+    if (x) x.focus({ preventScroll: true });
   }
   function closeDs() {
     if (!dsd) return;

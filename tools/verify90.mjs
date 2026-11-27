@@ -66,8 +66,8 @@ ok('B4 内容块 308 宽、距卡顶 80（稿 @46,80）', g.inW === 308 && g.inT
 ok('B5 图标 72×72、水平居中', g.ico[2] === 72 && g.ico[3] === 72 && Math.abs((g.ico[0] + 36) - (g.inBox[0] + 154)) <= 1, JSON.stringify(g.ico));
 ok('B6 标题「UI 界面生成中」20/500/28 #1F1F1F，距图标 32', g.t[1] === '20px/500/28px' && g.t[2] === 'rgb(31, 31, 31)' && g.t[0][1] - (g.ico[1] + 72) === 32, JSON.stringify(g.t));
 ok('B7 副文 14/22 #6B6B6B、固定两行、距标题 12', g.d[1] === '14px/22px' && g.d[2] === 'rgb(107, 107, 107)' && g.dLines === 2 && g.d[0][1] - (g.t[0][1] + 28) === 12, JSON.stringify(g.d) + ' lines=' + g.dLines);
-ok('B8 底栏次要按钮「停止生成」184×36、白底 + 1px #E5E5E5、正文色', g.stop[0] === '停止生成' && g.stop[1][2] === 184 && g.stop[1][3] === 36 && g.stop[2] === 'rgb(255, 255, 255)' && /rgb\(229, 229, 229\) 0px 0px 0px 1px inset/.test(g.stop[3]) && g.stop[4] === 'rgb(31, 31, 31)', JSON.stringify(g.stop));
-ok('B9 底栏 56 高、按钮居中', g.foot[3] === 56 && Math.abs((g.stop[1][0] + 92) - (g.foot[0] + g.foot[2] / 2)) <= 1, JSON.stringify(g.foot));
+ok('B8 底栏次要按钮「停止生成（10s）」36 高、白底 + 1px #E5E5E5、正文色', /^停止生成（10s）$/.test(g.stop[0]) && g.stop[1][3] === 36 && g.stop[2] === 'rgb(255, 255, 255)' && /rgb\(229, 229, 229\) 0px 0px 0px 1px inset/.test(g.stop[3]) && g.stop[4] === 'rgb(31, 31, 31)', JSON.stringify(g.stop));
+ok('B9 底栏 56 高、按钮居中', g.foot[3] === 56 && Math.abs((g.stop[1][0] + g.stop[1][2] / 2) - (g.foot[0] + g.foot[2] / 2)) <= 1, JSON.stringify(g.foot));
 ok('B10 1920 收左栏：无横向溢出', g.over <= 0, g.over);
 ok('B11 底栏顶线两端断开、左右各留 20（左侧竖线仍在）', g.footBefore === '20px/20px/1px/rgb(235, 236, 237)', g.footBefore);
 ok('B12 图标中间镂空：黑圆用 mask 挖掉调色板（透出渐变底）', g.icoMask.mask === 'url(#ugIcoMask)' && g.icoMask.holeFill === '#000' && g.icoMask.ringFill === '#DAE4FE', JSON.stringify(g.icoMask));

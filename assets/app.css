@@ -4458,6 +4458,8 @@ body[data-page="ui"] .ui-blank.is-gen {
   transition: background var(--cds-motion-duration) var(--cds-motion-ease);
 }
 .tp-sec:hover { background: #FAFAFA; }
+/* 生成中页「停止生成（10s）」：等宽数字，秒数递减时按钮宽度不变 */
+#ugStop { font-variant-numeric: tabular-nums; }
 .tp-sec:active { background: var(--cds-surface-inset); }
 
 /* ============================================================
@@ -4550,8 +4552,16 @@ body[data-page="ui"] .ui-blank.is-gen {
 }
 .ud-link:hover { background: var(--cds-surface-subtle); }
 
-/* 画布区（等稿）：占满工具条以下 */
-.ud-canvas { flex: 1 1 auto; min-height: 0; overflow: auto; }
+/* 画布区（第 95 轮）：灰底 + 田字网格（16px 方格 / 1px 淡线），占满工具条以下 */
+.ud-canvas {
+  flex: 1 1 auto; min-height: 0; overflow: auto;
+  background-color: #F5F5F5;
+  background-image:
+    linear-gradient(to right, rgba(31, 31, 31, .08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(31, 31, 31, .08) 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-position: 0 0;
+}
 
 /* 页签（稿 4068:64861）：未选中 正文色 + 中粗 500（font_73:3621 Medium）；内距 8 / 选中 12
    选中态：白底 + 1px #B4C9FC + 主色图标与文字 */
