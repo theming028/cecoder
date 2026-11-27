@@ -3900,7 +3900,8 @@
     var udSel = function (on) {
       if (!udBoardEl) return;
       udBoardEl.classList.toggle('is-sel', on);
-      udBoardEl.setAttribute('aria-pressed', on ? 'true' : 'false');
+      /* 第 100 轮：画板从 button 改成 div 容器，选中态不再用 aria-pressed（那是按钮的属性），改写 data-sel */
+      udBoardEl.setAttribute('data-sel', on ? 'true' : 'false');
     };
     /* 拖动（第 97 轮）：pointerdown 记起点，move 时给 .ud-board-wrap 加 translate；
        没挪动（<3px）才算点击 → 切选中态。拖动时保证至少 80px 露在可视区内，别拖丢 */

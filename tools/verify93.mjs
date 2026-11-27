@@ -70,7 +70,7 @@ ok('B3 版本下拉 129×28：白底 + 1px #E5E5E5、内距 8、13/22', g.sels[0
 ok('B4「版本：」#6B6B6B +「当前设计」#1F1F1F', g.selsk === 'rgb(107, 107, 107)' && g.selv === 'rgb(31, 31, 31)', g.selsk + ' / ' + g.selv);
 ok('B5 分辨率下拉 134×28（14 图标 + 4 + 文字 + 8 + 14 箭头）', g.sels[1][0][2] === 134 && g.sels[1][0][3] === 28, JSON.stringify(g.sels[1][0]));
 ok('B6 缩放组 107×28：20 减 / 43 数值 / 20 加，图标 14', g.zoom[0][2] === 107 && g.zoom[0][3] === 28 && g.zval[0][2] === 43, JSON.stringify(g.zoom[0]) + ' ' + JSON.stringify(g.zval));
-ok('B7 画板名「账密登录」52×20、13/500/20、水平居中于工具条', g.titleBox[2] === 52 && g.titleBox[3] === 20 && g.titleF === '13px/500/20px' && Math.abs((g.titleBox[0] + 26) - (g.bar[0] + g.bar[2] / 2)) <= 1, JSON.stringify(g.titleBox) + ' ' + g.titleF);
+ok('B7 画板名「智能客服管理系统 · 默认」高 20、13/500/20、水平居中于工具条', g.titleBox[2] > 52 && g.titleBox[3] === 20 && g.titleF === '13px/500/20px' && Math.abs((g.titleBox[0] + g.titleBox[2] / 2) - (g.bar[0] + g.bar[2] / 2)) <= 1, JSON.stringify(g.titleBox) + ' ' + g.titleF);
 ok('B8 右侧 5 个 28×28 工具键、间距 4', g.tools.length === 5 && g.tools.every(t => t[2] === 28 && t[3] === 28) && g.toolsGap === 4, JSON.stringify(g.tools) + ' gap=' + g.toolsGap);
 ok('B9 竖线 1×16 #E5E5E5 +「批注 (2)」63×28、内距 8、13/22', g.vsep[0][2] === 1 && g.vsep[0][3] === 16 && g.vsep[1] === 'rgb(229, 229, 229)' && g.link[0][2] === 63 && g.link[0][3] === 28 && g.link[1] === '批注 (2)' && g.link[2] === '8px' && g.link[3] === '13px/22px', JSON.stringify(g.vsep) + ' ' + JSON.stringify(g.link));
 ok('B10 右侧组靠右（右内距 20）', Math.abs((g.bar[2] - 20) - (g.rightRel[0] + g.rightW)) <= 1, g.rightRel[0] + '+' + g.rightW + ' vs ' + (g.bar[2] - 20));

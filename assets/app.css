@@ -4594,14 +4594,17 @@ body[data-page="ui"] .ui-blank.is-gen {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .ud-board {
-  position: absolute; left: 0; top: 28px; padding: 0; display: block;
+  /* 第 100 轮：从 <button> 改成容器 <div>（里面要装真页面，button 里不能有块级内容） */
+  position: absolute; left: 0; top: 28px; display: block;
   width: 1440px; height: 900px; border-radius: 4px; background: #FFFFFF;
   cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none;
   transform: scale(var(--ud-s)); transform-origin: 0 0;
-  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, .04), inset 0 0 0 1px #E5E5E5;
+  /* 画板里是不透明的页面，会把 inset 描边盖掉（老坑第 5 次）→ 描边画到外面；圆角裁切交给 .ud-board-doc，
+     这样四角的手柄不会被 overflow 裁掉 */
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, .04), 0 0 0 1px #E5E5E5;
   transition: box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
 }
-.ud-board.is-sel { box-shadow: 0 8px 16px 0 rgba(0, 0, 0, .04), inset 0 0 0 1.6px var(--cds-color-primary); }
+.ud-board.is-sel { box-shadow: 0 8px 16px 0 rgba(0, 0, 0, .04), 0 0 0 1.6px var(--cds-color-primary); }
 /* 拖动画板时别把光标变成文本/收缩手 */
 .ud-board.is-drag, body.ud-dragging .ud-board { cursor: grabbing; }
 body.ud-dragging { cursor: grabbing; -webkit-user-select: none; user-select: none; }
@@ -4616,6 +4619,164 @@ body.ud-dragging { cursor: grabbing; -webkit-user-select: none; user-select: non
 .ud-h-tr { left: 100%; top: 0; }
 .ud-h-bl { left: 0; top: 100%; }
 .ud-h-br { left: 100%; top: 100%; }
+
+/* ============================================================
+   第 100 轮：画板里的生成页 —— 智能客服管理系统（1440×900 示例稿）
+   作用域：全部挂在 .ud-board-doc 内，子元素类名 kb-* 前缀，避免被 app.css 的通用规则污染；
+   后续「批注 / 框选」就命中这些 kb-* 元素。四栏：导航 56 / 会话 296 / 对话 flex / 客户 316
+   ============================================================ */
+.ud-board-doc {
+  position: relative; width: 100%; height: 100%; border-radius: 4px; overflow: hidden;
+  display: flex; background: #F5F6F8;
+  font-size: 13px; line-height: 20px; color: #1F1F1F; text-align: left;
+}
+.ud-board-doc * { box-sizing: border-box; }
+
+/* ---- 左侧导航 ---- */
+.kb-rail {
+  flex: 0 0 56px; width: 56px; height: 100%; display: flex; flex-direction: column; align-items: center;
+  gap: 4px; padding: 14px 0 12px; background: #FFFFFF; box-shadow: inset -1px 0 0 0 #EBECED;
+}
+.kb-logo {
+  width: 32px; height: 32px; border-radius: 9px; margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; letter-spacing: .3px; color: #FFFFFF;
+  background: linear-gradient(135deg, #3770F7 0%, #5B58FF 100%);
+}
+.kb-nav { display: flex; flex-direction: column; gap: 4px; }
+.kb-nav-i {
+  width: 40px; height: 40px; border-radius: 8px; color: #6B6B6B;
+  display: flex; align-items: center; justify-content: center;
+}
+.kb-nav-i svg { width: 20px; height: 20px; }
+.kb-nav-i.is-on { color: #3770F7; background: #EDF2FE; }
+.kb-rail-foot { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+/* ---- 会话列表 ---- */
+.kb-list {
+  flex: 0 0 296px; width: 296px; height: 100%; display: flex; flex-direction: column;
+  background: #FFFFFF; box-shadow: inset -1px 0 0 0 #EBECED;
+}
+.kb-list-head { display: flex; align-items: baseline; gap: 8px; padding: 16px 16px 10px; }
+.kb-h1 { font-size: 15px; line-height: 24px; font-weight: 600; }
+.kb-h-sub { font-size: 12px; line-height: 18px; color: #868686; }
+.kb-plus {
+  margin-left: auto; align-self: center; width: 24px; height: 24px; border-radius: 6px;
+  background: #F5F6F8; color: #6B6B6B; font-size: 15px; line-height: 24px; text-align: center;
+}
+.kb-search {
+  margin: 0 16px 10px; height: 32px; padding: 0 10px; border-radius: 8px; background: #F5F6F8;
+  display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #9A9A9A;
+}
+.kb-search svg { width: 14px; height: 14px; flex: 0 0 auto; }
+.kb-tabs { display: flex; align-items: center; gap: 20px; height: 32px; padding: 0 16px; }
+.kb-tab { display: flex; align-items: center; height: 32px; font-size: 12.5px; color: #6B6B6B; }
+.kb-tab b { font-weight: 400; margin-left: 2px; }
+.kb-tab.is-on { color: #3770F7; font-weight: 500; box-shadow: inset 0 -2px 0 0 #3770F7; }
+.kb-items { flex: 1 1 auto; min-height: 0; overflow: hidden; padding: 4px 8px 8px; display: flex; flex-direction: column; gap: 2px; }
+.kb-item { display: flex; gap: 10px; padding: 10px 8px; border-radius: 8px; }
+.kb-item.is-on { background: #F2F6FF; box-shadow: inset 3px 0 0 0 #3770F7; }
+.kb-item-main { flex: 1 1 auto; min-width: 0; }
+.kb-item-top { display: flex; align-items: center; gap: 6px; }
+.kb-item-n {
+  flex: 1 1 auto; min-width: 0; font-size: 13px; line-height: 20px; font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kb-item-t { flex: 0 0 auto; font-size: 11px; line-height: 16px; color: #9A9A9A; }
+.kb-item-x {
+  margin-top: 2px; font-size: 12px; line-height: 18px; color: #6B6B6B;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.kb-badge {
+  flex: 0 0 auto; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px;
+  background: #F5483B; color: #FFFFFF; font-size: 10.5px; line-height: 16px; text-align: center;
+}
+.kb-ava {
+  flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; color: #FFFFFF;
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+  background: linear-gradient(135deg, #6E8DF5, #8EAEFA);
+}
+.kb-ava.is-b { background: linear-gradient(135deg, #F0A05A, #F7C382); }
+.kb-ava.is-c { background: linear-gradient(135deg, #4FB3A5, #86D2C8); }
+.kb-ava.is-d { background: linear-gradient(135deg, #8E8BE8, #B9B7F2); }
+
+/* ---- 对话区 ---- */
+.kb-chat { flex: 1 1 auto; min-width: 0; height: 100%; display: flex; flex-direction: column; background: #FFFFFF; }
+.kb-chat-head { flex: 0 0 60px; height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 20px; box-shadow: inset 0 -1px 0 0 #EBECED; }
+.kb-chat-head .kb-ava { width: 32px; height: 32px; font-size: 12px; background: linear-gradient(135deg, #3770F7, #6E8DF5); }
+.kb-chat-who { flex: 1 1 auto; min-width: 0; }
+.kb-chat-name { display: flex; align-items: center; gap: 6px; font-size: 14px; line-height: 20px; font-weight: 600; }
+.kb-chat-sub { font-size: 12px; line-height: 18px; color: #868686; }
+.kb-chat-acts { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
+.kb-tag {
+  flex: 0 0 auto; height: 18px; padding: 0 5px; border-radius: 4px; font-size: 11px; line-height: 18px;
+  background: #F5F6F8; color: #6B6B6B;
+}
+.kb-tag.is-vip { background: #FFF3E0; color: #B96A00; }
+.kb-tag.is-warn { background: #FFF1F0; color: #D4380D; }
+.kb-btn {
+  display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 6px;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5; font-size: 12px; color: #1F1F1F;
+}
+.kb-btn.is-primary { background: #3770F7; color: #FFFFFF; box-shadow: none; }
+.kb-icon-btn {
+  width: 28px; height: 28px; border-radius: 6px; color: #6B6B6B;
+  display: flex; align-items: center; justify-content: center; font-size: 15px; line-height: 1;
+}
+.kb-msgs {
+  flex: 1 1 auto; min-height: 0; overflow: hidden; background: #F7F8FA;
+  padding: 16px 20px; display: flex; flex-direction: column; gap: 12px;
+}
+.kb-sys { align-self: center; font-size: 11.5px; line-height: 18px; color: #9A9A9A; }
+.kb-msg { display: flex; align-items: flex-start; gap: 8px; }
+.kb-msg .kb-ava { width: 28px; height: 28px; font-size: 11px; }
+.kb-msg .kb-ava.is-agent { background: linear-gradient(135deg, #3770F7, #5B58FF); }
+.kb-msg.is-out { justify-content: flex-end; }
+.kb-bubble {
+  max-width: 430px; padding: 9px 12px; border-radius: 8px; background: #FFFFFF;
+  box-shadow: inset 0 0 0 1px #E9EAEC; font-size: 13px; line-height: 21px;
+}
+.kb-msg.is-in .kb-bubble { border-top-left-radius: 2px; }
+.kb-msg.is-out .kb-bubble { background: #3770F7; color: #FFFFFF; box-shadow: none; border-top-right-radius: 2px; }
+.kb-ai {
+  margin-left: 36px; padding: 10px 12px; border-radius: 8px; background: #FFFFFF;
+  box-shadow: inset 0 0 0 1px #DAE4FE, inset 3px 0 0 0 #3770F7;
+}
+.kb-ai-head { display: flex; align-items: center; gap: 5px; font-size: 11.5px; line-height: 18px; font-weight: 500; color: #3770F7; }
+.kb-ai-head svg { width: 13px; height: 13px; }
+.kb-ai-body { margin-top: 4px; font-size: 13px; line-height: 21px; }
+.kb-ai-foot { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
+.kb-compose { flex: 0 0 auto; padding: 10px 20px 14px; background: #FFFFFF; box-shadow: inset 0 1px 0 0 #EBECED; }
+.kb-draft {
+  display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border-radius: 6px;
+  background: #F5F8FF; font-size: 11.5px; color: #3770F7;
+}
+.kb-draft svg { width: 12px; height: 12px; }
+.kb-draft-a { margin-left: auto; color: #6B6B6B; }
+.kb-input { margin-top: 6px; min-height: 42px; font-size: 13px; line-height: 21px; }
+.kb-tools { display: flex; align-items: center; gap: 8px; }
+.kb-chip { height: 24px; padding: 0 8px; border-radius: 6px; background: #F5F6F8; font-size: 11.5px; line-height: 24px; color: #6B6B6B; }
+.kb-send { margin-left: auto; height: 30px; padding: 0 14px; border-radius: 6px; background: #3770F7; color: #FFFFFF; font-size: 12px; line-height: 30px; }
+
+/* ---- 右侧客户栏 ---- */
+.kb-side {
+  flex: 0 0 316px; width: 316px; height: 100%; overflow: hidden;
+  display: flex; flex-direction: column; gap: 16px; padding: 16px;
+  background: #FFFFFF; box-shadow: inset 1px 0 0 0 #EBECED;
+}
+.kb-cust { display: flex; align-items: center; gap: 10px; }
+.kb-cust .kb-ava { width: 40px; height: 40px; font-size: 14px; background: linear-gradient(135deg, #6E8DF5, #8EAEFA); }
+.kb-cust-main { flex: 1 1 auto; min-width: 0; }
+.kb-cust-name { font-size: 14px; line-height: 20px; font-weight: 600; }
+.kb-cust-sub { font-size: 12px; line-height: 18px; color: #868686; }
+.kb-sec { display: flex; flex-direction: column; gap: 8px; }
+.kb-sec-t { font-size: 12px; line-height: 18px; color: #868686; }
+.kb-kv { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12.5px; line-height: 24px; }
+.kb-kv span { flex: 0 0 auto; color: #868686; }
+.kb-kv b { font-weight: 400; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kb-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.kb-doc { padding: 8px 10px; border-radius: 6px; background: #FAFBFC; box-shadow: inset 0 0 0 1px #EEF0F3; font-size: 12px; line-height: 18px; }
+.kb-doc i { display: block; font-style: normal; font-size: 11.5px; color: #9A9A9A; }
 
 /* ---------- 左列「页面层级和状态」（稿 4068:65598）：240 定宽、上下拉通、与画布贴边 ---------- */
 .ud-pages {

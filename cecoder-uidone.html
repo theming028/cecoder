@@ -616,7 +616,7 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
           </div>
         </div>
 
-        <div class="ud-title" id="udBoardName">账密登录</div>
+        <div class="ud-title" id="udBoardName">智能客服管理系统 · 默认</div>
 
         <div class="ud-right">
           <div class="ud-tools">
@@ -669,13 +669,244 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
         <div class="ud-scroll" id="udScroll">
           <div class="ud-stage" id="udStage">
             <div class="ud-board-wrap" id="udBoardWrap" style="--ud-s:1">
-              <div class="ud-board-name">账密登录 · 默认</div>
-              <button class="ud-board" type="button" id="udBoard" aria-pressed="false" aria-label="画板：账密登录 · 默认">
+              <div class="ud-board-name">智能客服管理系统 · 默认</div>
+              <!-- 第 100 轮：画板改成容器 div（原 <button> 塞不了块级页面），里面是生成结果「智能客服管理系统」；
+                   四栏：导航 56 / 会话 296 / 对话 flex / 客户 316，全部挂在 .ud-board-doc 作用域下，类名 kb-* -->
+              <div class="ud-board" id="udBoard" role="group" tabindex="0" data-sel="false" aria-label="画板：智能客服管理系统 · 默认">
+                <div class="ud-board-doc">
+                  <aside class="kb-rail">
+                    <div class="kb-logo">CS</div>
+                    <nav class="kb-nav">
+                      <div class="kb-nav-i is-on" title="工作台"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5.6a2 2 0 0 1-2 2H9l-3.4 2.6v-2.6H6a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+                      <div class="kb-nav-i" title="客户"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="7.2" r="3.2" stroke="currentColor" stroke-width="1.4"/><path d="M4.2 16.4c.7-2.5 3-4 5.8-4s5.1 1.5 5.8 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+                      <div class="kb-nav-i" title="知识库"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="3.8" y="3.6" width="12.4" height="12.8" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M6.8 7.2h6.4M6.8 10.2h6.4M6.8 13.2h3.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+                      <div class="kb-nav-i" title="数据"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4.4 16V9.6M10 16V4.4M15.6 16v-3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                      <div class="kb-nav-i" title="质检"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="3.6" y="3.6" width="12.8" height="12.8" rx="2.4" stroke="currentColor" stroke-width="1.4"/><path d="M7 10.4l2.2 2.2 3.9-4.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    </nav>
+                    <div class="kb-rail-foot">
+                      <div class="kb-nav-i" title="设置"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 7.2h12M4 12.8h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="7.2" r="2" fill="#FFF" stroke="currentColor" stroke-width="1.4"/><circle cx="13" cy="12.8" r="2" fill="#FFF" stroke="currentColor" stroke-width="1.4"/></svg></div>
+                      <div class="kb-ava is-d" style="width:28px;height:28px;font-size:11px">邵</div>
+                    </div>
+                  </aside>
+
+                  <section class="kb-list">
+                    <div class="kb-list-head">
+                      <span class="kb-h1">会话</span>
+                      <span class="kb-h-sub">12 个进行中</span>
+                      <div class="kb-plus">＋</div>
+                    </div>
+                    <div class="kb-search"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.8" cy="8.8" r="4.6" stroke="currentColor" stroke-width="1.4"/><path d="M12.3 12.3l3.4 3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>搜索会话、客户、工单</span></div>
+                    <div class="kb-tabs">
+                      <div class="kb-tab is-on">全部</div>
+                      <div class="kb-tab">待处理 <b>3</b></div>
+                      <div class="kb-tab">我的</div>
+                    </div>
+                    <div class="kb-items">
+                    <div class="kb-item is-on">
+                      <div class="kb-ava">王</div>
+                      <div class="kb-item-main">
+                        <div class="kb-item-top"><span class="kb-item-n">王雨桐</span><span class="kb-item-t">14:26</span><span class="kb-badge">2</span></div>
+                        <div class="kb-item-x">订单一直显示待发货，你们是不是漏发了</div>
+                      </div>
+                    </div>
+                    <div class="kb-item">
+                      <div class="kb-ava is-b">陈</div>
+                      <div class="kb-item-main">
+                        <div class="kb-item-top"><span class="kb-item-n">陈嘉禾</span><span class="kb-item-t">14:19</span><span class="kb-badge">1</span></div>
+                        <div class="kb-item-x">退款大概多久能到账？</div>
+                      </div>
+                    </div>
+                    <div class="kb-item is-on">
+                      <div class="kb-ava is-c">李</div>
+                      <div class="kb-item-main">
+                        <div class="kb-item-top"><span class="kb-item-n">李泽宇</span><span class="kb-item-t">13:58</span></div>
+                        <div class="kb-item-x">优惠券用不了，提示「已过期」</div>
+                      </div>
+                    </div>
+                    <div class="kb-item">
+                      <div class="kb-ava is-d">周</div>
+                      <div class="kb-item-main">
+                        <div class="kb-item-top"><span class="kb-item-n">周颖</span><span class="kb-item-t">13:40</span></div>
+                        <div class="kb-item-x">想改一下收货地址，还能改吗</div>
+                      </div>
+                    </div>
+                    <div class="kb-item">
+                      <div class="kb-ava">孙</div>
+                      <div class="kb-item-main">
+                        <div class="kb-item-top"><span class="kb-item-n">孙浩然</span><span class="kb-item-t">12:54</span></div>
+                        <div class="kb-item-x">发票怎么开？需要专票</div>
+                      </div>
+                    </div>
+                    <div class="kb-item">
+                      <div class="kb-ava is-b">吴</div>
+                      <div class="kb-item-main">
+                        <div class="kb-item-top"><span class="kb-item-n">吴敏</span><span class="kb-item-t">12:31</span></div>
+                        <div class="kb-item-x">感谢！问题解决了</div>
+                      </div>
+                    </div>
+
+                    <div class="kb-item">
+                      <div class="kb-ava is-c">郑</div>
+                      <div class="kb-item-main">
+                        <div class="kb-item-top"><span class="kb-item-n">郑一鸣</span><span class="kb-item-t">11:58</span></div>
+                        <div class="kb-item-x">什么时候能看到物流信息</div>
+                      </div>
+                    </div>
+                    <div class="kb-item">
+                      <div class="kb-ava is-d">何</div>
+                      <div class="kb-item-main">
+                        <div class="kb-item-top"><span class="kb-item-n">何静</span><span class="kb-item-t">11:32</span><span class="kb-badge">3</span></div>
+                        <div class="kb-item-x">想投诉快递员的派送态度</div>
+                      </div>
+                    </div>
+                    <div class="kb-item">
+                      <div class="kb-ava">林</div>
+                      <div class="kb-item-main">
+                        <div class="kb-item-top"><span class="kb-item-n">林沐</span><span class="kb-item-t">11:05</span></div>
+                        <div class="kb-item-x">会员等级怎么升级？差多少积分</div>
+                      </div>
+                    </div>
+                    <div class="kb-item">
+                      <div class="kb-ava is-b">赵</div>
+                      <div class="kb-item-main">
+                        <div class="kb-item-top"><span class="kb-item-n">赵星</span><span class="kb-item-t">10:47</span></div>
+                        <div class="kb-item-x">订单能指定送达时间吗</div>
+                      </div>
+                    </div>
+                    <div class="kb-item">
+                      <div class="kb-ava is-c">徐</div>
+                      <div class="kb-item-main">
+                        <div class="kb-item-top"><span class="kb-item-n">徐蕾</span><span class="kb-item-t">10:20</span></div>
+                        <div class="kb-item-x">已经收到货了，谢谢</div>
+                      </div>
+                    </div>
+                    </div>
+                  </section>
+
+                  <section class="kb-chat">
+                    <header class="kb-chat-head">
+                      <div class="kb-ava">王</div>
+                      <div class="kb-chat-who">
+                        <div class="kb-chat-name">王雨桐 <span class="kb-tag is-vip">VIP 3</span></div>
+                        <div class="kb-chat-sub">微信小程序 · 会话 CS-20817 · 已排队 2 分钟</div>
+                      </div>
+                      <div class="kb-chat-acts">
+                        <div class="kb-btn">转接</div>
+                        <div class="kb-btn">结束会话</div>
+                        <div class="kb-icon-btn">⋯</div>
+                      </div>
+                    </header>
+
+                    <div class="kb-msgs">
+                      <div class="kb-sys">2026-11-26 20:14</div>
+                      <div class="kb-msg is-in">
+                        <div class="kb-ava">王</div>
+                        <div class="kb-bubble">你好，在吗？我有个订单想咨询一下物流。</div>
+                      </div>
+                      <div class="kb-msg is-out">
+                        <div class="kb-bubble">在的，麻烦您提供一下订单号，我这边帮您查。</div>
+                        <div class="kb-ava is-agent">艾</div>
+                      </div>
+                      <div class="kb-msg is-in">
+                        <div class="kb-ava">王</div>
+                        <div class="kb-bubble">CS20261120088，前两天下的单。</div>
+                      </div>
+                      <div class="kb-msg is-out">
+                        <div class="kb-bubble">收到，包裹已从杭州仓发出。我先把状态同步到最新，稍等一下。</div>
+                        <div class="kb-ava is-agent">艾</div>
+                      </div>
+                      <div class="kb-sys">会话已由 AI 助手接管 · 14:02</div>
+                      <div class="kb-msg is-in">
+                        <div class="kb-ava">王</div>
+                        <div class="kb-bubble">你好，我 11 月 20 号下的单，到现在物流一直没更新，订单号 CS20261120088。</div>
+                      </div>
+                      <div class="kb-msg is-out">
+                        <div class="kb-bubble">已为您查到订单，包裹目前滞留在「杭州转运中心」3 天，我已提交催件工单，预计 24 小时内更新物流。</div>
+                        <div class="kb-ava is-agent">艾</div>
+                      </div>
+                      <div class="kb-msg is-in">
+                        <div class="kb-ava">王</div>
+                        <div class="kb-bubble">那如果明天还是没动静呢？我这单是送人的，已经晚了两天。</div>
+                      </div>
+                      <div class="kb-ai">
+                        <div class="kb-ai-head"><svg viewBox="0 0 13 13" fill="none" aria-hidden="true"><path fill="currentColor" d="M6.5 1.2l1.2 3.1 3.1 1.2-3.1 1.2-1.2 3.1-1.2-3.1L2.2 5.5l3.1-1.2z"/><path fill="currentColor" d="M10.4 8.4l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z"/></svg>AI 建议 · 置信度 92%</div>
+                        <div class="kb-ai-body">明天 14:00 前物流仍未更新，我直接帮您办理补发，并同步按平台规则补偿 10 元无门槛券，您看可以吗？</div>
+                        <div class="kb-ai-foot">
+                          <div class="kb-btn is-primary">采纳并发送</div>
+                          <div class="kb-btn">换一条</div>
+                          <div class="kb-icon-btn" style="width:auto;padding:0 4px;font-size:12px">编辑</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="kb-compose">
+                      <div class="kb-draft"><svg viewBox="0 0 13 13" fill="none" aria-hidden="true"><path fill="currentColor" d="M6.5 1.2l1.2 3.1 3.1 1.2-3.1 1.2-1.2 3.1-1.2-3.1L2.2 5.5l3.1-1.2z"/><path fill="currentColor" d="M10.4 8.4l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z"/></svg><span>AI 已根据工单 CS-20817 生成草稿</span><span class="kb-draft-a">重新生成</span></div>
+                      <div class="kb-input">明天 14:00 前物流仍未更新，我直接帮您办理补发，并同步补偿 10 元无门槛券……</div>
+                      <div class="kb-tools">
+                        <div class="kb-chip">快捷回复</div>
+                        <div class="kb-chip">表情</div>
+                        <div class="kb-chip">附件</div>
+                        <div class="kb-chip">引用知识库</div>
+                        <div class="kb-send">发送</div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <aside class="kb-side">
+                    <div class="kb-cust">
+                      <div class="kb-ava">王</div>
+                      <div class="kb-cust-main">
+                        <div class="kb-cust-name">王雨桐</div>
+                        <div class="kb-cust-sub">138****6721 · 杭州</div>
+                      </div>
+                      <span class="kb-tag is-vip">VIP 3</span>
+                    </div>
+
+                    <div class="kb-sec">
+                      <div class="kb-sec-t">客户信息</div>
+                      <div class="kb-kv"><span>客户来源</span><b>微信小程序</b></div>
+                      <div class="kb-kv"><span>注册时间</span><b>2024-03-18</b></div>
+                      <div class="kb-kv"><span>最近订单</span><b>CS20261120088</b></div>
+                      <div class="kb-kv"><span>历史工单</span><b>6 单 · 2 次催件</b></div>
+                      <div class="kb-kv"><span>累计消费</span><b>¥ 12,480</b></div>
+                    </div>
+
+                    <div class="kb-sec">
+                      <div class="kb-sec-t">标签</div>
+                      <div class="kb-chips">
+                        <span class="kb-tag">高价值</span>
+                        <span class="kb-tag">物流敏感</span>
+                        <span class="kb-tag is-warn">2 次催件</span>
+                      </div>
+                    </div>
+
+                    <div class="kb-sec">
+                      <div class="kb-sec-t">最近工单</div>
+                      <div class="kb-doc">CS-20817 · 物流滞留催件<i>处理中 · 14:05 提交</i></div>
+                      <div class="kb-doc">CS-19642 · 换货申请<i>已完成 · 11-02</i></div>
+                      <div class="kb-doc">CS-18330 · 发票补开<i>已完成 · 10-18</i></div>
+                    </div>
+
+                    <div class="kb-sec">
+                      <div class="kb-sec-t">关联知识</div>
+                      <div class="kb-doc">物流滞留超 72 小时的补偿口径<i>知识库 · 客服规范 v3</i></div>
+                      <div class="kb-doc">补发流程与审批节点<i>知识库 · 售后流程</i></div>
+                    </div>
+
+                    <div class="kb-sec">
+                      <div class="kb-sec-t">快捷操作</div>
+                      <div class="kb-tools">
+                        <div class="kb-btn">发起补发</div>
+                        <div class="kb-btn">发放补偿券</div>
+                      </div>
+                    </div>
+                  </aside>
+                </div>
                 <span class="ud-handle ud-h-tl" aria-hidden="true"></span>
                 <span class="ud-handle ud-h-tr" aria-hidden="true"></span>
                 <span class="ud-handle ud-h-bl" aria-hidden="true"></span>
                 <span class="ud-handle ud-h-br" aria-hidden="true"></span>
-              </button>
+              </div>
             </div>
           </div>
         </div>

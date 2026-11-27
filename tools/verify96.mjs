@@ -86,9 +86,9 @@ ok('C10 页面项文案：Gmail 邮箱登录 / 账号恢复页', A.pages2[0][0] 
 
 /* ---------- ③ 画板 ---------- */
 ok('D1 画板原生 1440×900', A.board[1] === '1440px' && A.board[2] === '900px', JSON.stringify([A.board[1], A.board[2]]));
-ok('D2 画板白底圆角 4 + 1px #E5E5E5 + 0/8/16 阴影', A.board[3] === '4px'
-  && /rgb\(229, 229, 229\) 0px 0px 0px 1px inset/.test(A.board[4]) && /rgba\(0, 0, 0, 0\.04\) 0px 8px 16px 0px/.test(A.board[4]), A.board[4]);
-ok('D3 画板名 12/20 #868686「账密登录 · 默认」', A.name[2] === '12px' && A.name[3] === '20px' && A.name[4] === 'rgb(134, 134, 134)' && A.name[0] === '账密登录 · 默认', JSON.stringify(A.name));
+ok('D2 画板白底圆角 4 + 外描边 1px #E5E5E5 + 0/8/16 阴影（第 100 轮：内容不透明，inset 会被吞）', A.board[3] === '4px'
+  && /rgb\(229, 229, 229\) 0px 0px 0px 1px/.test(A.board[4]) && /rgba\(0, 0, 0, 0\.04\) 0px 8px 16px 0px/.test(A.board[4]), A.board[4]);
+ok('D3 画板名 12/20 #868686「智能客服管理系统 · 默认」', A.name[2] === '12px' && A.name[3] === '20px' && A.name[4] === 'rgb(134, 134, 134)' && A.name[0] === '智能客服管理系统 · 默认', JSON.stringify(A.name));
 ok('D4 标签 20 高、与画板间距 8（画板顶 28）', A.name[1] === 20, A.name[1]);
 ok('D5 默认按可用区域自适应：25%（1440 下中栏 654 − 左列 240 = 414）', A.zoom === '25%' && A.s === '0.25', A.zoom + ' / ' + A.s);
 ok('D6 缩放写在 --ud-s 上（画板用 transform 缩放，不改 800/400）', !!A.s, A.s);
@@ -101,12 +101,12 @@ const S = await p.evaluate(() => {
   const b = document.querySelector('#udBoard'); const cs = getComputedStyle(b);
   const h = document.querySelector('.ud-h-tl'); const hs = getComputedStyle(h);
   const r = b.getBoundingClientRect(); const hr = h.getBoundingClientRect();
-  return { cls: b.classList.contains('is-sel'), sh: cs.boxShadow, pressed: b.getAttribute('aria-pressed'),
+  return { cls: b.classList.contains('is-sel'), sh: cs.boxShadow, pressed: b.getAttribute('data-sel'),
     disp: hs.display, size: [Math.round(hr.width), Math.round(hr.height)], ring: hs.boxShadow,
     dx: Math.round(hr.x + hr.width / 2 - r.x), dy: Math.round(hr.y + hr.height / 2 - r.y) };
 });
-ok('D9 点画板 → is-sel + aria-pressed', S.cls === true && S.pressed === 'true', JSON.stringify([S.cls, S.pressed]));
-ok('D10 选中态 1.6px 主色描边', /rgb\(55, 112, 247\) 0px 0px 0px 1\.(?:59|6)\d*px inset/.test(S.sh), S.sh);
+ok('D9 点画板 → is-sel + data-sel', S.cls === true && S.pressed === 'true', JSON.stringify([S.cls, S.pressed]));
+ok('D10 选中态 1.6px 主色描边（外描边）', /rgb\(55, 112, 247\) 0px 0px 0px 1\.(?:59|6)\d*px/.test(S.sh), S.sh);
 ok('D11 四角手柄 8×8、白底 + 1.6px 主色环', S.disp === 'block' && S.size[0] === 8 && S.size[1] === 8 && /rgb\(55, 112, 247\) 0px 0px 0px 1\.(?:59|6)\d*px/.test(S.ring), JSON.stringify(S));
 ok('D12 手柄中心正好落在画板左上角', S.dx === 0 && S.dy === 0, JSON.stringify([S.dx, S.dy]));
 
