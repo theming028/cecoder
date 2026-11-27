@@ -52,6 +52,10 @@ const g = await p.evaluate(() => {
     footBefore: (() => { const b = getComputedStyle(foot, '::before'); return b.left + '/' + b.right + '/' + b.height + '/' + b.backgroundColor; })(),
     icoMask: (() => { const c = ico.querySelector('circle'); const m = c && c.getAttribute('mask'); const mp = m && document.querySelector(m.slice(4, -1) + ' path'); return { mask: m, holeFill: mp ? mp.getAttribute('fill') : null, ringFill: ico.querySelector(':scope > path').getAttribute('fill') }; })(),
     arcAnim: (() => { const a = ico.querySelector('.ug-gen-arc'); const c2 = cs(a); return c2.animationName + '/' + c2.animationDuration + '/' + c2.animationIterationCount + '/' + c2.transformOrigin; })(),
+    blankDot: (() => {
+      const bl = q('.ui-blank'), c2 = cs(bl);
+      return { cls: bl.className, bg: c2.backgroundImage, size: c2.backgroundSize, color: c2.backgroundColor, h: Math.round(bl.getBoundingClientRect().height) };
+    })(),
     over: document.documentElement.scrollWidth - innerWidth,
   };
 });
@@ -68,11 +72,14 @@ ok('B10 1920 收左栏：无横向溢出', g.over <= 0, g.over);
 ok('B11 底栏顶线两端断开、左右各留 20（左侧竖线仍在）', g.footBefore === '20px/20px/1px/rgb(235, 236, 237)', g.footBefore);
 ok('B12 图标中间镂空：黑圆用 mask 挖掉调色板（透出渐变底）', g.icoMask.mask === 'url(#ugIcoMask)' && g.icoMask.holeFill === '#000' && g.icoMask.ringFill === '#DAE4FE', JSON.stringify(g.icoMask));
 ok('B13 蓝环持续旋转（ug-gen-spin / 1.4s / infinite / 绕 36,36）', /ug-gen-spin/.test(g.arcAnim) && /1\.4s/.test(g.arcAnim) && /infinite/.test(g.arcAnim) && g.arcAnim.indexOf('36px 36px') > 0, g.arcAnim);
+ok('B14 中栏点阵底：.ui-blank.is-gen + 16px 间距 1px 点、底色仍白（内容区高 681）', g.blankDot.cls === 'ui-blank is-gen' && /radial-gradient/.test(g.blankDot.bg) && g.blankDot.size === '16px 16px' && g.blankDot.color === 'rgb(255, 255, 255)' && g.blankDot.h > 600, JSON.stringify(g.blankDot));
 
 /* ---------- C 停止生成 → 回上一页 ---------- */
 await p.click('#ugStop');
 await wait(700);
 ok('C1 点「停止生成」回到 UI设计页（第 1 步内容在）', /cecoder-ui\.html/.test(p.url()) && !!(await p.$('.ug-wrap')), p.url().split('/').pop());
+const plain = await p.evaluate(() => ({ gen: !!document.querySelector('.ui-blank.is-gen'), bg: getComputedStyle(document.querySelector('.ui-blank')).backgroundImage }));
+ok('C2 UI设计页中栏不带点阵底（is-gen 只在生成中页）', !plain.gen && plain.bg === 'none', JSON.stringify(plain));
 
 /* ---------- D 停留约 5s 自动进入生成完成（先留空） ---------- */
 await p.goto('file:///' + BASE + '/cecoder-uigen.html', { waitUntil: 'load' });
@@ -89,10 +96,12 @@ const done = await p.evaluate(() => {
     stopHidden: stop.hidden && cs(stop).display === 'none',
     footH: Math.round(foot.getBoundingClientRect().height),
     blankH: Math.round(document.querySelector('.ui-blank').getBoundingClientRect().height),
+    blankBg: getComputedStyle(document.querySelector('.ui-blank')).backgroundImage.slice(0, 40),
   };
 });
 ok('D2 约 5s 后自动进入生成完成：中栏留空（插图卡隐藏）、底栏按钮收起', done.genHidden && done.stopHidden && done.footH === 56, JSON.stringify(done) + ' ' + (Date.now() - t0) + 'ms');
 ok('D3 生成完成态中栏只余底栏（内容区仍占满）', done.blankH > 600, done.blankH);
+ok('D4 生成完成（留空）态点阵底不跳变', /radial-gradient/.test(done.blankBg), done.blankBg);
 
 /* ---------- E 响应式 ---------- */
 const resp = [];
