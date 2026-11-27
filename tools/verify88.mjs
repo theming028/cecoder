@@ -67,7 +67,7 @@ ok('A1 中栏 1134 时内容列宽 1024（稿面宽）', g.colW === 1024, g.colW
 ok('A2 顶部行 640×32 靠右、标题 20/500/28', g.top[2] === 640 && g.top[3] === 32 && g.titleFs === '20px/500/28px' && Math.abs((g.colX + 1024) - (g.top[0] + 640)) < 1, JSON.stringify(g.top) + ' ' + g.titleFs);
 ok('A3 「退出引导，返回一页式」172×32、白底 1px #E5E5E5', g.exit[2] === 172 && g.exit[3] === 32 && /rgb\(229, 229, 229\) 0px 0px 0px 1px inset/.test(g.exitSh), JSON.stringify(g.exit) + ' ' + g.exitSh);
 ok('A4 主卡 1024×478、白底 1px #E5E5E5', g.card[2] === 1024 && g.card[3] === 478, JSON.stringify(g.card));
-ok('A5 卡头 78 高、#F7F7F7 底、底边 1px #E5E5E5', g.ch[3] === 78 && g.chBg === 'rgb(247, 247, 247)' && /rgb\(229, 229, 229\) 0px -1px 0px 0px inset/.test(g.chSh), g.ch[3] + ' ' + g.chBg);
+ok('A5 卡头 78 高、#F7F7F7 底、左右上与底边各 1px #E5E5E5（稿矩形 569 自带三边描边）', g.ch[3] === 78 && g.chBg === 'rgb(247, 247, 247)' && /rgb\(229, 229, 229\) 1px 0px 0px 0px inset/.test(g.chSh) && /rgb\(229, 229, 229\) -1px 0px 0px 0px inset/.test(g.chSh) && /rgb\(229, 229, 229\) 0px 1px 0px 0px inset/.test(g.chSh) && /rgb\(229, 229, 229\) 0px -1px 0px 0px inset/.test(g.chSh), g.ch[3] + ' ' + g.chBg + ' ' + g.chSh);
 ok('A6 卡头标题 16/500、副标题 12/400 #6B6B6B', g.ct === '16px/500' && g.cs_ === '12px/rgb(107, 107, 107)', g.ct + ' ' + g.cs_);
 ok('A7 「第 1 / 2 步」90×28 药丸（radius 32、白底 1px #E5E5E5）', g.step[2] === 90 && g.step[3] === 28 && g.stepR === '32px' && g.stepBg === 'rgb(255, 255, 255)', JSON.stringify(g.step) + ' ' + g.stepR);
 
@@ -75,13 +75,22 @@ ok('A7 「第 1 / 2 步」90×28 药丸（radius 32、白底 1px #E5E5E5）', g.
 ok('B1 五张卡 234×112，位置 (0,0)(250,0)(500,0)(750,0)(0,128)', g.cards.length === 5 && g.cards.every(c => c.box[0] === 234 && c.box[1] === 112) && JSON.stringify(g.cards.map(c => c.rel)) === JSON.stringify([[0, 0], [250, 0], [500, 0], [750, 0], [0, 128]]), JSON.stringify(g.cards.map(c => c.rel)));
 ok('B2 卡片顺序 Cecoder / Arco / Ant / TDesign / Semi（稿面第 2 行只放 Semi）', JSON.stringify(g.cards.map(c => c.name)) === JSON.stringify(['Cecoder 设计系统', 'Arco Design', 'Ant Design', 'TDesign', 'Semi Design']), JSON.stringify(g.cards.map(c => c.name)));
 const on = g.cards[0], off = g.cards[1];
-ok('B3 选中卡：#F5F8FF 底 + 1.6px #1F1F1F 描边，名称主色、描述 #1F1F1F', on.on && on.bg === 'rgb(245, 248, 255)' && /rgb\(31, 31, 31\) 0px 0px 0px 1.6px inset/.test(on.sh) && on.nCol === 'rgb(55, 112, 247)' && on.dCol === 'rgb(31, 31, 31)', on.bg + ' ' + on.sh);
+ok('B3 选中卡：#F5F8FF 底 + 1.6px 主色 #3770F7 描边（稿矩形 581），名称主色、描述 #1F1F1F', on.on && on.bg === 'rgb(245, 248, 255)' && /rgb\(55, 112, 247\) 0px 0px 0px 1.6px inset/.test(on.sh) && on.nCol === 'rgb(55, 112, 247)' && on.dCol === 'rgb(31, 31, 31)', on.bg + ' ' + on.sh);
 ok('B4 未选中卡：白底 1px #EEEEEE、名称 #1F1F1F、描述 #868686 12/16', !off.on && off.bg === 'rgb(255, 255, 255)' && /rgb\(238, 238, 238\) 0px 0px 0px 1px inset/.test(off.sh) && off.nCol === 'rgb(31, 31, 31)' && off.dCol === 'rgb(134, 134, 134)' && off.dFs === '12px/16px', off.sh);
 ok('B5 选中卡按钮「已选」68×28 蓝字 + 1px #DAE4FE、「预览」50×28', on.acts[0].t.replace(/\s/g, '') === '已选' && on.acts[0].w === 68 && on.acts[0].h === 28 && on.acts[0].col === 'rgb(55, 112, 247)' && /rgb\(218, 228, 254\)/.test(on.acts[0].sh) && on.acts[1].t === '预览' && on.acts[1].w === 50, JSON.stringify(on.acts));
 ok('B6 未选中卡「选用」50×28 + 1px #E5E5E5', off.acts[0].t === '选用' && off.acts[0].w === 50 && /rgb\(229, 229, 229\)/.test(off.acts[0].sh), JSON.stringify(off.acts));
 ok('B7 图标 40×40 radius 4，五张底色 白/#F1EAFF/#F7EDD9/#D6EBFF/#D5F7DB',
   JSON.stringify(g.cards.map(c => c.icoBg)) === JSON.stringify(['rgb(255, 255, 255)', 'rgb(241, 234, 255)', 'rgb(214, 235, 255)', 'rgb(213, 247, 219)', 'rgb(247, 237, 217)']) && g.cards.every(c => c.ico[0] === 40 && c.ico[1] === 40 && c.icoR === '4px'),
   JSON.stringify(g.cards.map(c => c.icoBg)));
+
+await p.hover('.ug-scard:nth-child(2)');
+await wait(320);
+const hov = await p.evaluate(() => {
+  const c = document.querySelectorAll('.ug-scard')[1];
+  return { bg: getComputedStyle(c).backgroundColor, on: c.classList.contains('is-on') };
+});
+ok('B8 未选中卡 hover 浅灰底 #FAFAFA（选中卡不受影响）', !hov.on && hov.bg === 'rgb(250, 250, 250)', JSON.stringify(hov));
+await p.mouse.move(0, 0); await wait(200);
 
 /* ---------- C 生成设置 ---------- */
 ok('C1 分隔线 1px #EEEEEE 位于卡体 362', g.sep[0] === 1 && g.sep[1] === 362 && g.sep[2] === 'rgb(238, 238, 238)', JSON.stringify(g.sep));
@@ -91,7 +100,7 @@ ok('C4 复选框「网页端」选中（蓝底）、「手机端」未选（白�
 ok('C5 单选「1440px」选中（蓝圈）、「1920px」未选（文字完整，宽 60~70）', g.rd[0].on && /rgb\(55, 112, 247\)/.test(g.rd[0].sh) && !g.rd[1].on && g.rd[0].w >= 60 && g.rd[0].w <= 70, JSON.stringify(g.rd));
 
 /* ---------- D 底栏 tp-foot ---------- */
-ok('D1 tp-foot 56 高、白底、顶部 1px #EBECED、满中栏宽', g.foot[0] === 56 && g.foot[2] === 1134 && g.foot[4] === 'rgb(255, 255, 255)' && /rgb\(235, 236, 237\) 0px 1px 0px 0px inset/.test(g.foot[3]), JSON.stringify(g.foot));
+ok('D1 tp-foot 56 高、白底、顶部与左侧各 1px #EBECED（左线不断）、满中栏宽', g.foot[0] === 56 && g.foot[2] === 1134 && g.foot[4] === 'rgb(255, 255, 255)' && /rgb\(235, 236, 237\) 0px 1px 0px 0px inset/.test(g.foot[3]) && /rgb\(235, 236, 237\) 1px 0px 0px 0px inset/.test(g.foot[3]), JSON.stringify(g.foot));
 ok('D2 主键「下一步，输入设计资产」36 高、主色、居中', g.prim.t === '下一步，输入设计资产' && g.prim.h === 36 && g.prim.bg === 'rgb(55, 112, 247)' && Math.abs(g.prim.cx - g.prim.footCx) <= 1, JSON.stringify(g.prim));
 
 /* ---------- E 交互 ---------- */

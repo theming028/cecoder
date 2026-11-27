@@ -4272,6 +4272,9 @@ a.cg-step:hover { background: #FFFFFF; }
    位于 task-tabs 下方，中栏 = 可滚动内容列（max 1024）+ 底栏 tp-foot
    ============================================================ */
 .ui-blank { display: flex; flex-direction: column; container-type: inline-size; }
+/* 底栏 tp-foot 白底同样会盖掉 .ui-blank 的 inset 左描边，这里补回那 1px（与左栏外阴影同色），
+   否则中栏左侧那条分隔线到底栏这 56 高就断了 */
+body[data-page="ui"] .ui-blank > .tp-foot { box-shadow: inset 1px 0 0 0 #EBECED, inset 0 1px 0 0 #EBECED; }
 .ug-wrap {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden;
   padding: 20px 20px 24px; display: flex; justify-content: center;
@@ -4301,7 +4304,10 @@ a.cg-step:hover { background: #FFFFFF; }
 .ug-ch {
   height: 78px; box-sizing: border-box; padding: 16px 20px; border-radius: 4px 4px 0 0;
   display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
-  background: #F7F7F7; box-shadow: inset 0 -1px 0 0 #E5E5E5;
+  background: #F7F7F7;
+  /* 稿 4068:70536 卡头矩形自带左右上三边 1px #E5E5E5（#F7F7F7 底色会盖掉父级 inset 描边），底边是与卡体的分隔线 */
+  box-shadow: inset 1px 0 0 0 #E5E5E5, inset -1px 0 0 0 #E5E5E5,
+              inset 0 1px 0 0 #E5E5E5, inset 0 -1px 0 0 #E5E5E5;
 }
 .ug-chl { min-width: 0; }
 .ug-ct { margin: 0; font-size: 16px; line-height: 24px; font-weight: 500; color: #1F1F1F; }
@@ -4323,8 +4329,10 @@ a.cg-step:hover { background: #FFFFFF; }
   transition: background var(--cds-motion-duration) var(--cds-motion-ease),
               box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
 }
-/* 选中：浅蓝底 #F5F8FF + 1.6px #1F1F1F 描边（稿 4068:70554） */
-.ug-scard.is-on { background: #F5F8FF; box-shadow: inset 0 0 0 1.6px #1F1F1F; }
+/* 选中：浅蓝底 #F5F8FF + 1.6px 主色 #3770F7 描边（稿 矩形 581：strokeColor=paint_1204:23101 主色，1.6px） */
+.ug-scard.is-on { background: #F5F8FF; box-shadow: inset 0 0 0 1.6px var(--cds-color-primary); }
+/* 未选中卡 hover 浅灰底（全站次级 hover 统一 #FAFAFA） */
+.ug-scard:not(.is-on):hover { background: #FAFAFA; }
 .ug-sico {
   position: absolute; left: 16px; top: 16px; width: 40px; height: 40px; border-radius: 4px;
   display: inline-flex; align-items: center; justify-content: center; background: #FFFFFF;
