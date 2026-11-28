@@ -5536,6 +5536,23 @@ body[data-page="home"] .scene {
 /* 容器变透之后，里面的纯白小卡改成极淡的蓝白描边才分得开 */
 body[data-page="home"] .wb-opt,
 body[data-page="home"] .qf-step { background: rgba(255, 255, 255, .72); }
+
+/* 第 122 轮：首页这两组的选中态太弱 —— 上面那条把「选择子项」的浅蓝底换成了白 72%，
+   只剩一道 #C7D7FC 的浅边，选中跟没选差不多。改成品牌色描边 + 同色字：
+   工作台子项用蓝（#3770F7），推荐工序的步骤用语义紫（#5B58FF）；
+   工序 chip 本身没有 border（靠 0 1px 2px 投影立起来），所以用 inset 阴影补 1px 边，不改尺寸。 */
+body[data-page="home"] .wb-opt.is-active {
+  border-color: #3770F7;
+  color: #3770F7;
+  background: rgba(245, 248, 255, .92);
+}
+body[data-page="home"] .wb-opt.is-active:hover { border-color: #2E5FD9; color: #2E5FD9; }
+body[data-page="home"] .qf-step.is-active {
+  color: var(--cds-ai-purple);
+  box-shadow: inset 0 0 0 1px var(--cds-ai-purple), 0 1px 2px 0 rgba(0, 0, 0, .08);
+}
+/* 序号原来固定三级灰，选中时跟着一起变紫，否则「01 澄清」只有名字变色 */
+body[data-page="home"] .qf-step.is-active .qf-no { color: var(--cds-ai-purple); }
 body[data-page="home"] .scene-add { background: rgba(255, 255, 255, .72); }
 /* 边框在半透明底上会发灰，统一提亮 */
 body[data-page="home"] .wb-bar,
