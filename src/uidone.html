@@ -133,11 +133,36 @@
           <span class="ud-vsep" aria-hidden="true"></span>
           <!-- 第 98 轮：自定义分辨率 + 缩放组挪到「批注」左侧，两侧各一根竖线 -->
           <div class="ud-mid">
+            <!-- 第 105 轮：自定义分辨率下拉（稿 4168:56988，256×614）-->
+            <div class="ud-res-wrap" id="udResWrap">
             <button class="ud-sel" type="button" id="udRes" aria-haspopup="listbox" aria-expanded="false">
               <svg class="ud-desktop" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path fill="#6B6B6B" d="M4,9C4,7.34315,5.34314,6,7,6C7,6,41,6,41,6C42.656898,6,44,7.34314,44,9C44,9,44,31,44,31C44,32.6569,42.656898,34,41,34C41,34,26,34,26,34C26,34,26,38,26,38C26,38,33,38,33,38C33,38,33,42,33,42C33,42,15,42,15,42C15,42,15,38,15,38C15,38,22,38,22,38C22,38,22,34,22,34C22,34,7,34,7,34C5.34315,34,4,32.6569,4,31C4,31,4,9,4,9C4,9,4,9,4,9ZM8,10C8,10,8,30,8,30C8,30,40,30,40,30C40,30,40,10,40,10C40,10,8,10,8,10C8,10,8,10,8,10Z"/></svg>
               <span class="ud-sel-v">自定义分辨率</span>
               <svg class="ud-caret" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path fill="#868686" d="M23.363409,26.727129 36.090742,14 39.727047,17.636334 23.363409,34 7,17.636334 10.636333,14Z"/></svg>
             </button>
+            <div class="ud-res-pop" id="udResPop" role="listbox" aria-label="分辨率" hidden>
+              <div class="ud-res-h">自定义</div>
+              <div class="ud-res-row is-on" role="option" aria-selected="true" data-res="1440x900"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">自定义分辨率</span><span class="ud-res-v">1440x900</span></div>
+              <div class="ud-res-grp"><span class="ud-res-g">桌面</span>
+              <div class="ud-res-row" role="option" aria-selected="false" data-res="1440x1024"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">PC</span><span class="ud-res-v">1440x1024</span></div>
+              <div class="ud-res-row" role="option" aria-selected="false" data-res="1280x720"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">iMac</span><span class="ud-res-v">1280x720</span></div>
+              </div>
+              <div class="ud-res-grp"><span class="ud-res-g">笔记本</span>
+              <div class="ud-res-row" role="option" aria-selected="false" data-res="1280x832"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">MacBook Air</span><span class="ud-res-v">1280x832</span></div>
+              <div class="ud-res-row" role="option" aria-selected="false" data-res="1152x700"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">MacBook</span><span class="ud-res-v">1152x700</span></div>
+              <div class="ud-res-row" role="option" aria-selected="false" data-res="1536x960"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">MacBook Air 15</span><span class="ud-res-v">1536x960</span></div>
+              <div class="ud-res-row" role="option" aria-selected="false" data-res="1512x982"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">MacBook Air 14</span><span class="ud-res-v">1512x982</span></div>
+              <div class="ud-res-row" role="option" aria-selected="false" data-res="1440x900"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">MacBook Pro</span><span class="ud-res-v">1440x900</span></div>
+              </div>
+              <div class="ud-res-grp"><span class="ud-res-g">手机</span>
+              <div class="ud-res-row" role="option" aria-selected="false" data-res="440x956"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">iPhone 16 Pro Max</span><span class="ud-res-v">440x956</span></div>
+              <div class="ud-res-row" role="option" aria-selected="false" data-res="430x932"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">iPhone 16 Plus</span><span class="ud-res-v">430x932</span></div>
+              <div class="ud-res-row" role="option" aria-selected="false" data-res="430x932"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">iPhone 14 &amp; 15 Pro</span><span class="ud-res-v">430x932</span></div>
+              <div class="ud-res-row" role="option" aria-selected="false" data-res="428x926"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">iPhone 13 Pro Max</span><span class="ud-res-v">428x926</span></div>
+              <div class="ud-res-row" role="option" aria-selected="false" data-res="414x736"><svg class="ud-res-ico" viewBox="0 0 48 48" fill="none" aria-hidden="true"><use href="#udIcoMonitor"/></svg><span class="ud-res-k">iPhone 8 Plus</span><span class="ud-res-v">414x736</span></div>
+              </div>
+            </div>
+            </div>
             <div class="ud-zoom" role="group" aria-label="缩放">
               <button class="ud-zbtn" type="button" id="udZoomOut" aria-label="缩小" data-tip="缩小"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path fill="#6B6B6B" d="M41.986729,26C36.603271,26,11.396727,26,6.0132705,26C5.4609863,26,5,25.532981,5,24.980696C5,24.379304,5,23.620696,5,23.019304C5,22.467019,5.4609863,22,6.0132711,22C11.396729,22,36.603273,22,41.986729,22C42.539017,22,42.999996,22.467019,42.999996,23.019304C43,23.620696,43,24.379304,43,24.980696C42.999996,25.532981,42.539017,26,41.986732,26Z"/></svg></button>
               <button class="ud-zval" type="button" id="udZoomVal" data-tip="恢复到 100%">50%</button>
@@ -160,6 +185,7 @@
         <svg class="ud-sprite" aria-hidden="true" focusable="false"><defs>
           <symbol id="udIcoDoc" viewBox="0 0 48 48"><path fill="currentColor" d="M43,6L43,42Q43,43.656876,41.828438,44.828438Q40.656876,46,39,46L11,46Q9.3431487,46,8.1715795,44.828442Q7,43.656876,7,42L7,6Q7,4.3431454,8.1715724,3.1715729Q9.343145100000001,2,11,2L39,2Q40.656876,2.00000011920929,41.828445,3.1715798Q43,4.3431456,43,6ZM39,6L11,6L11,42L39,42L39,6Z"/><path fill="currentColor" d="M17,32L31,32C32.104568,32,33,31.1045694,33,30C33,28.89543045,32.104568,28,31,28L17,28C15.89543045,28,15,28.89543045,15,30C15,31.1045694,15.89543045,32,17,32Z"/><path fill="currentColor" d="M17,38L24,38C25.104568999999998,38,26,37.1045694,26,36C26,34.89543045,25.104568999999998,34,24,34L17,34C15.89543045,34,15,34.89543045,15,36C15,37.1045694,15.89543045,38,17,38Z"/><path fill="currentColor" d="M15,12L15,22C15,23.104568999999998,15.89543045,24,17,24L31,24C32.104568,24,33,23.104568999999998,33,22L33,12C33,10.89543045,32.104568,10,31,10L17,10C15.89543045,10,15,10.89543045,15,12ZM19,20L19,14L29,14L29,20L19,20Z"/></symbol>
           <symbol id="udIcoChevR" viewBox="0 0 48 48"><path fill="currentColor" d="M26.727348,23.363676L14,10.6363521L17.636377799999998,7L34,23.363676L17.636377799999998,39.727142L14,36.090816000000004L26.727348,23.363676Z"/></symbol>
+          <symbol id="udIcoMonitor" viewBox="0 0 48 48"><path fill="currentColor" d="M4,9C4,7.34315,5.34314,6,7,6C7,6,41,6,41,6C42.656898,6,44,7.34314,44,9C44,9,44,31,44,31C44,32.6569,42.656898,34,41,34C41,34,26,34,26,34C26,34,26,38,26,38C26,38,33,38,33,38C33,38,33,42,33,42C33,42,15,42,15,42C15,42,15,38,15,38C15,38,22,38,22,38C22,38,22,34,22,34C22,34,7,34,7,34C5.34315,34,4,32.6569,4,31C4,31,4,9,4,9C4,9,4,9,4,9ZM8,10C8,10,8,30,8,30C8,30,40,30,40,30C40,30,40,10,40,10C40,10,8,10,8,10C8,10,8,10,8,10Z"/></symbol>
           <symbol id="udIcoChevD" viewBox="0 0 48 48"><path fill="currentColor" d="M23.363409,26.727128999999998L36.090742,14L39.727047,17.6363342L23.363409,34L7,17.6363342L10.6363328,14L23.363409,26.727128999999998Z"/></symbol>
         </defs></svg>
 
@@ -405,6 +431,9 @@
                 </div>
                 <!-- 第 104 轮：DOM 悬停/选中框（稿 4068:59031 虚线 / 4068:59030 实线）+ 位置批注序号点 -->
                 <div class="ud-dom-layer" id="udDomLayer">
+                  <!-- 第 105 轮：选中框（实线、常驻）与悬停框（虚线、跟随鼠标）分两块；
+                       悬停到别处时选中态不会丢 -->
+                  <div class="ud-dom is-sel" id="udDomSel" hidden><span class="ud-dom-tag" id="udDomSelTag"></span></div>
                   <div class="ud-dom" id="udDomBox" hidden><span class="ud-dom-tag" id="udDomTag"></span></div>
                 </div>
                 <span class="ud-handle ud-h-tl" aria-hidden="true"></span>

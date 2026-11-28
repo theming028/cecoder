@@ -66,7 +66,9 @@ const B1s = await p.evaluate(() => {
 ok('B1 面板 256 宽、白 80% + blur15、左线+左投影', B1s.w === '256px' && /rgba\(255, 255, 255, 0\.8\)/.test(B1s.bg) && /blur\(15px\)/.test(B1s.blur) && /rgb\(235, 236, 237\) 1px 0px 0px 0px inset/.test(B1s.shadow), JSON.stringify([B1s.w, B1s.bg, B1s.blur, B1s.shadow]));
 ok('B2 键 is-on + aria-pressed', B1s.editOn, B1s.editOn);
 ok('B3 编辑模式折叠左列（画布 is-folded，退出还原）', /is-edit/.test(B1s.folded) && /is-folded/.test(B1s.folded), B1s.folded);
-ok('B4 画布内容区右缩 256（面板落 padding 区，不压画板）', B1s.cvPad === '256px' && B1.ep[0] >= B1.scroll[0] + B1.scroll[2] - 2, JSON.stringify([B1s.cvPad, B1.ep, B1.scroll]));
+ok('B4 面板是浮层：画布不再右缩（padding 0），面板贴画布右缘', B1s.cvPad === '0px'
+  && Math.abs((B1.ep[0] + B1.ep[2]) - (B1.canvas[0] + B1.canvas[2])) <= 1
+  && Math.abs(B1.ep[2] - 256) <= 1, JSON.stringify([B1s.cvPad, B1.canvas, B1.ep]));
 ok('B5 面板整体不遮画板（panel.left ≥ board.right）', B1.ep[0] >= B1.board[0] + B1.board[2] - 1, JSON.stringify([B1.ep, B1.board]));
 ok('B6 结构尺寸：头 22 / 编辑对象 44 / 文案 64 / 色块行 28 / 数字行 28', B1s.hHead === 22 && B1s.hObj === 44 && B1s.hTa === 64 && B1s.hColor === 28 && B1s.hNum === 28, JSON.stringify([B1s.hHead, B1s.hObj, B1s.hTa, B1s.hColor, B1s.hNum]));
 ok('B7 五组标签齐（文案/文字颜色/背景颜色/字号/圆角度）', B1s.labels.join(',') === '文案,文字颜色,背景颜色,字号,圆角度', B1s.labels.join(','));
@@ -87,7 +89,8 @@ ok('C3 标签主色底（稿 4068:59031）', /rgb\(55, 112, 247\)/.test(C1.tagBg
 /* 点选 → 实线 + 灌面板 */
 await p.mouse.click(pt.x, pt.y); await wait(350);
 const C2 = await p.evaluate(() => {
-  const d = document.getElementById('udDomBox');
+  /* 第 105 轮：选中态从 hover 框拆出来，落在 #udDomSel 上（实线、常驻） */
+  const d = document.getElementById('udDomSel');
   const cs = getComputedStyle(d);
   return { style: cs.borderTopStyle, sel: d.classList.contains('is-sel'),
     tag: document.getElementById('udEpTag').textContent,
@@ -96,9 +99,11 @@ const C2 = await p.evaluate(() => {
     size: document.getElementById('udEpSize').value,
     radius: document.getElementById('udEpRadius').value,
     taDisabled: document.getElementById('udEpText').disabled,
+    visible: !d.hidden,
     hoverStyle: cs.borderTopStyle === 'solid' };
 });
 ok('C4 点选改实线（稿 4068:59030）', C2.style === 'solid' && C2.sel, JSON.stringify([C2.style, C2.sel]));
+ok('C4b 选中框可见（不是 hidden）', C2.visible, C2.visible);
 ok('C5 面板灌入选中元素名', C2.tag === C1.tag, C2.tag + ' vs ' + C1.tag);
 ok('C6 灌入真实文字色 / 背景色 / 字号 / 圆角', /^#[0-9A-F]{6}$/.test(C2.fg) && (/^#[0-9A-F]{6}$/.test(C2.bg) || C2.bg === 'transparent') && /^\d+$/.test(C2.size) && /^\d+$/.test(C2.radius), JSON.stringify([C2.fg, C2.bg, C2.size, C2.radius]));
 ok('C7 容器上没有直接文本时文案框禁用（防止 textContent 冲掉子结构）', C2.taDisabled === true, C2.taDisabled);
@@ -140,13 +145,13 @@ const after = await p.evaluate(() => {
 ok('C8 改字号 → 元素 fontSize 20px', after && after.fs === '20px', JSON.stringify(after));
 ok('C9 改圆角度 → 元素 borderRadius 12px', after && after.r === '12px', JSON.stringify(after));
 ok('C10 改文字颜色 → 元素 color #F44A3F', after && /244, 74, 63|#F44A3F/i.test(after.color.replace('rgb(244, 74, 63)', '#F44A3F')), JSON.stringify(after));
-ok('C11 改样式后选中框还在', (await p.evaluate(() => !document.getElementById('udDomBox').hidden)) === true, '');
+ok('C11 改样式后选中框还在', (await p.evaluate(() => !document.getElementById('udDomSel').hidden)) === true, '');
 
 /* 退出编辑 */
 await p.click('#udEdit'); await wait(350);
 const C4 = await p.evaluate(() => {
   const cv = document.getElementById('udCanvas');
-  return { epHidden: document.getElementById('udEp').hidden, boxHidden: document.getElementById('udDomBox').hidden,
+  return { epHidden: document.getElementById('udEp').hidden, boxHidden: document.getElementById('udDomSel').hidden,
     cls: cv.className, pad: getComputedStyle(cv).paddingRight,
     pages: document.getElementById('udPages').className };
 });

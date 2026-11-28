@@ -41,8 +41,8 @@ const A = await p.evaluate(() => {
 });
 ok('B1 .ud-right 顺序 = 工具组 / 竖线 / 中间组 / 竖线 / 批注',
   A.rightKids.join('>') === 'tools>vsep>mid>vsep>link', A.rightKids.join('>'));
-ok('B2 中间组里是「自定义分辨率 + 缩放组」，间距 8',
-  A.midKids.join('>') === 'udRes>ud-zoom' && A.midGap === '8px', JSON.stringify([A.midKids, A.midGap]));
+ok('B2 中间组里是「自定义分辨率 + 缩放组」，间距 8（第 105 轮：分辨率键外面包了 .ud-res-wrap 放下拉）',
+  A.midKids.join('>') === 'udResWrap>ud-zoom' && A.midGap === '8px', JSON.stringify([A.midKids, A.midGap]));
 ok('B3 两根竖线都在（1×16、#E5E5E5）', A.vseps.length === 2 && A.vseps.every(v => v[0][2] === 1 && v[0][3] === 16 && v[1] === 'rgb(229, 229, 229)'), JSON.stringify(A.vseps));
 ok('B4 顺序落地：工具组 < 竖线 < 分辨率 < 缩放 < 竖线 < 批注',
   A.res[0] < A.zoom[0] && A.zoom[0] + A.zoom[2] < A.note[0], JSON.stringify([A.res, A.zoom, A.note]));

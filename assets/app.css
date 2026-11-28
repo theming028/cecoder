@@ -4912,10 +4912,10 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
   display: flex; align-items: center; gap: 4px; border-radius: 4px;
   font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
 }
-.ud-tree-row {
-  width: 100%; box-sizing: border-box; height: 28px; padding: 0 8px;
-  /* button 自带 text-align:center，会把 flex:1 的文字盒里的字居中；这里拉回左对齐 */
-  text-align: left; justify-content: flex-start;
+.ud-tree-row {
+  width: 100%; box-sizing: border-box; height: 28px; padding: 0 8px;
+  /* button 自带 text-align:center，会把 flex:1 的文字盒里的字居中；这里拉回左对齐 */
+  text-align: left; justify-content: flex-start;
 }
 .ud-tree-t { flex: 1 1 auto; min-width: 0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ud-chev, .ud-doc { flex: 0 0 auto; width: 14px; height: 14px; }
@@ -5143,7 +5143,8 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
   box-shadow: inset 0 0 0 1px #E5E5E5; resize: none; outline: none;
   font-family: inherit; font-size: 14px; line-height: 22px; color: #1F1F1F;
 }
-.ud-ep-ta:focus { box-shadow: inset 0 0 0 1px var(--cds-color-primary); }
+/* 第 105 轮：焦点态跟搜索框一致 —— 蓝色粗描边（1.6px） */
+.ud-ep-ta:focus { box-shadow: inset 0 0 0 1.6px var(--cds-color-primary); }
 .ud-ep-ta:disabled { color: #A9A9A9; background: #FAFAFA; cursor: not-allowed; }
 .ud-ep-ta::placeholder { color: #A9A9A9; }
 .ud-ep-row { flex: 0 0 auto; display: flex; gap: 12px; margin-top: 16px; }
@@ -5169,8 +5170,13 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 }
 .ud-ep-num i { font-style: normal; font-size: 12px; line-height: 20px; color: #868686; }
 .ud-canvas.is-edit .ud-board { cursor: default; }
-/* 面板 256 落在 padding 区，内容区（左列 + 画布）自动右缩，画板不被盖 */
-.ud-canvas.is-edit { padding-right: 256px; }
+/* 第 105 轮：面板是浮层（与「页面层级和状态」同一层语义），盖在画布右侧，不再挤压内容区；
+   点中栏空白即向右收回 */
+/* 面板浮在右侧 256 宽，画板要让出这块：给 stage 补右内距，画板居中到「可见区」里，
+   再配合下面的 fit 扣掉 256，画板不会被面板挡住 */
+.ud-canvas.is-edit .ud-stage { padding-right: 280px; }
+.ud-ep.is-out { animation: udEpOut 180ms var(--cds-motion-ease) forwards; pointer-events: none; }
+@keyframes udEpOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(100%); } }
 
 /* ---------- DOM 悬停（虚线）/ 选中（实线）框 ---------- */
 .ud-dom-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; border-radius: 4px; }
@@ -5223,7 +5229,7 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
   height: 40px; padding: 10px 12px; box-sizing: border-box; margin-bottom: 16px;
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
   background: #F7F7F7; border-radius: 4px; box-shadow: inset 0 0 0 1px #E5E5E5;
-  font-size: 12px; line-height: 20px; color: #868686;
+  font-size: 12px; line-height: 20px; color: #1F1F1F;
 }
 .ud-pop-lb { display: block; margin-bottom: 8px; font-size: 12px; line-height: 20px; color: #6B6B6B; }
 .ud-pop-ta {
@@ -5233,7 +5239,7 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
   font-family: inherit; font-size: 14px; line-height: 22px; color: #1F1F1F;
 }
 .ud-pop-ta::placeholder { color: #A9A9A9; }
-.ud-pop-ta:focus { box-shadow: inset 0 0 0 1px var(--cds-color-primary); }
+.ud-pop-ta:focus { box-shadow: inset 0 0 0 1.6px var(--cds-color-primary); }
 .ud-pop-hint { margin: 12px 0 0; font-size: 12px; line-height: 20px; color: #868686; }
 .ud-pop-foot { margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px; }
 .ud-pop-btn {
@@ -5247,3 +5253,38 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 
 /* 发到右栏的消息里那行位置说明 */
 .ud-msg-note { margin: 4px 0 0; text-align: right; font-size: 12px; line-height: 20px; color: #868686; }
+
+/* ============================================================
+   第 105 轮：自定义分辨率下拉（稿 4168:56988）
+   256×614：白 90% + blur15 + r8 + 0/8/32 投影，内距 12/8/8；
+   232 行高 32、r4，选中行 #F5F8FF + inset 1px #DAE4FE、文字主色
+   ============================================================ */
+.ud-res-wrap { position: relative; flex: 0 0 auto; display: inline-flex; }
+.ud-res-pop {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 21;
+  width: 256px; box-sizing: border-box; padding: 12px 8px 8px;
+  border-radius: 8px; background: rgba(255, 255, 255, .9);
+  -webkit-backdrop-filter: blur(15px); backdrop-filter: blur(15px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, .12), inset 0 0 0 1px #E5E5E5;
+  max-height: calc(100vh - 70px); overflow-y: auto; overflow-x: hidden;
+  animation: udResIn 140ms var(--cds-motion-ease);
+}
+@keyframes udResIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.ud-res-h { height: 20px; margin: 0 8px 8px; font-size: 12px; line-height: 20px; font-weight: 500; color: #1F1F1F; }
+.ud-res-grp { margin-top: 16px; }
+.ud-res-g { display: block; height: 20px; margin: 0 8px 8px; font-size: 12px; line-height: 20px; color: #6B6B6B; }
+.ud-res-row {
+  display: flex; align-items: center; gap: 4px; height: 32px; padding: 0 12px;
+  border-radius: 4px; cursor: pointer; color: #6B6B6B;
+}
+.ud-res-row + .ud-res-row { margin-top: 2px; }
+.ud-res-row:hover { background: #F2F2F2; }
+.ud-res-ico { flex: 0 0 auto; width: 14px; height: 14px; }
+.ud-res-k {
+  flex: 1 1 auto; min-width: 0; font-size: 14px; line-height: 22px; color: #1F1F1F;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ud-res-v { flex: 0 0 auto; font-size: 12px; line-height: 20px; color: #868686; }
+.ud-res-row.is-on { background: #F5F8FF; box-shadow: inset 0 0 0 1px #DAE4FE; color: var(--cds-color-primary); }
+.ud-res-row.is-on .ud-res-k { color: var(--cds-color-primary); }
+.ud-res-row.is-on .ud-res-v { color: #6B6B6B; }
