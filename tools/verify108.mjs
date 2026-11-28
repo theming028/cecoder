@@ -98,31 +98,32 @@ const H0 = await h.evaluate(() => {
     grid: cs.backgroundImage.split('linear-gradient').length - 1,
     gridSize: cs.backgroundSize,
     isolation: cs.isolation,
-    before: { name: bs.animationName, dur: bs.animationDuration, iter: bs.animationIterationCount, dir: bs.animationDirection, z: bs.zIndex, inset: [bs.top, bs.left], pos: bs.position },
-    after: { name: as.animationName, dur: as.animationDuration, dir: as.animationDirection },
-    layers: bs.backgroundImage.split('radial-gradient').length - 1
+    /* 第 109 轮：静态两团蓝光改画在 .panel-main 自己身上，动的那层只剩 ::after */
+    glows: cs.backgroundImage.split('radial-gradient').length - 1,
+    before: { name: bs.animationName },
+    after: { name: as.animationName, dur: as.animationDuration, iter: as.animationIterationCount, dir: as.animationDirection, z: as.zIndex, pos: as.position }
   };
 });
 ok('D1 只在首页生效（body[data-page=home]）', H0.page === 'home', H0.page);
 ok('D2 底色是极淡主色（蓝通道 > 红通道，且几乎白）', H0.rgb[2] > H0.rgb[0] && H0.rgb[2] - H0.rgb[0] >= 3 && H0.rgb[0] > 235, JSON.stringify(H0.rgb));
 ok('D3 44×44 细网格两层 linear-gradient', H0.grid === 2 && /44px 44px/.test(H0.gridSize), JSON.stringify([H0.grid, H0.gridSize]));
-ok('D4 光层自成层（isolation + absolute + z-index:-1）', H0.isolation === 'isolate' && H0.before.pos === 'absolute' && H0.before.z === '-1', JSON.stringify(H0.before));
-ok('D5 ::before = 两团径向蓝光，32s 往复漂移', H0.before.name === 'pmAmbientDrift' && H0.before.dur === '32s' && H0.before.iter === 'infinite' && H0.before.dir === 'alternate' && H0.layers === 2, JSON.stringify([H0.before, H0.layers]));
-ok('D6 ::after = 斜向高光带 + 第三团光，24s 往复', H0.after.name === 'pmAmbientRibbon' && H0.after.dur === '24s' && H0.after.dir === 'alternate', JSON.stringify(H0.after));
+ok('D4 静态两团蓝光画在 panel-main 背景上（isolation + 2 个 radial）', H0.isolation === 'isolate' && H0.glows === 2, JSON.stringify([H0.isolation, H0.glows]));
+ok('D5 唯一会动的一层是 ::after，44s 往复漂移', H0.before.name === 'none' && H0.after.name === 'pmGlowDrift' && H0.after.dur === '44s' && H0.after.iter === 'infinite' && H0.after.dir === 'alternate', JSON.stringify([H0.before, H0.after]));
+ok('D6 动层自成层（absolute + z-index:-1）', H0.after.pos === 'absolute' && H0.after.z === '-1', JSON.stringify(H0.after));
 
-/* 动效真的在动（两层 transform 2.4s 后都变了） */
-const t1 = await h.evaluate(() => [getComputedStyle(document.getElementById('panelMain'), '::before').transform, getComputedStyle(document.getElementById('panelMain'), '::after').transform, getComputedStyle(document.getElementById('panelMain'), '::after').opacity]);
+/* 动效真的在动（动层 transform 2.4s 后变了） */
+const t1 = await h.evaluate(() => getComputedStyle(document.getElementById('panelMain'), '::after').transform);
 await wait(2400);
-const t2 = await h.evaluate(() => [getComputedStyle(document.getElementById('panelMain'), '::before').transform, getComputedStyle(document.getElementById('panelMain'), '::after').transform, getComputedStyle(document.getElementById('panelMain'), '::after').opacity]);
-ok('D7 两层都在动（漂移 + 高光带）', t1[0] !== t2[0] && (t1[1] !== t2[1] || t1[2] !== t2[2]), JSON.stringify([t1, t2]));
+const t2 = await h.evaluate(() => getComputedStyle(document.getElementById('panelMain'), '::after').transform);
+ok('D7 动层在动（柔光沿对角漂移）', t1 !== t2, JSON.stringify([t1, t2]));
 
 /* reduced-motion 下停住 */
 await h.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
 const H3 = await h.evaluate(() => {
-  const bs = getComputedStyle(document.getElementById('panelMain'), '::before');
-  return [bs.animationName, bs.transform];
+  const as = getComputedStyle(document.getElementById('panelMain'), '::after');
+  return [as.animationName, as.transform];
 });
-ok('D8 prefers-reduced-motion：两层动画停掉', H3[0] === 'none', JSON.stringify(H3));
+ok('D8 prefers-reduced-motion：动层动画停掉', H3[0] === 'none', JSON.stringify(H3));
 await h.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
 
 /* 内容仍然压在光层之上（标题可读、不被盖住） */

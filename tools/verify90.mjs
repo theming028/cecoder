@@ -61,7 +61,8 @@ const g = await p.evaluate(() => {
 });
 ok('B1 独立页：data-page=ui、标题「Cecoder · UI生成中」、无第 1 步内容', g.page === 'ui' && /UI生成中/.test(g.title) && !g.hasStep1, g.page + ' ' + g.title);
 ok('B2 保留工序资产页签条（与 UI设计页同壳）', g.tabs && g.tabsBox[2] === 1134 && g.tabsBox[3] === 40, JSON.stringify(g.tabsBox));
-ok('B3 插图卡 400×435（比例 400/435）、铺满背景图、水平居中', g.card[2] === 400 && g.card[3] === 435 && g.ratio === 0.9195 && /ui-gen\.png/.test(g.cardBg) && Math.abs((g.card[0] + 200) - (g.gen[0] + g.gen[2] / 2)) <= 1, JSON.stringify(g.card) + ' ' + g.cardBg);
+/* 第 109 轮：静态背景图 ui-gen.png 换成会流动的色团（::before / ::after），卡片尺寸与居中不变 */
+ok('B3 插图卡 400×435（比例 400/435）、动态色团底、水平居中', g.card[2] === 400 && g.card[3] === 435 && g.ratio === 0.9195 && !/url\(/.test(g.cardBg) && Math.abs((g.card[0] + 200) - (g.gen[0] + g.gen[2] / 2)) <= 1, JSON.stringify(g.card) + ' ' + g.cardBg.slice(0, 40));
 ok('B4 内容块 308 宽、距卡顶 80（稿 @46,80）', g.inW === 308 && g.inTop === 80, g.inW + ' @' + g.inTop);
 ok('B5 图标 72×72、水平居中', g.ico[2] === 72 && g.ico[3] === 72 && Math.abs((g.ico[0] + 36) - (g.inBox[0] + 154)) <= 1, JSON.stringify(g.ico));
 ok('B6 标题「UI 界面生成中」20/500/28 #1F1F1F，距图标 32', g.t[1] === '20px/500/28px' && g.t[2] === 'rgb(31, 31, 31)' && g.t[0][1] - (g.ico[1] + 72) === 32, JSON.stringify(g.t));

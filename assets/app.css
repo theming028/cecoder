@@ -4349,6 +4349,8 @@ body[data-page="ui"] .ui-blank > .tp-foot::before {
 .ug-scard {
   position: relative; width: 234px; height: 112px; border-radius: 4px;
   background: #FFFFFF; box-shadow: inset 0 0 0 1px #EEEEEE;
+  /* 第 109 轮：整卡可点选中，给手型 */
+  cursor: pointer;
   transition: background var(--cds-motion-duration) var(--cds-motion-ease),
               box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
 }
@@ -4450,12 +4452,44 @@ body[data-page="ui"] .ui-blank.is-gen {
   flex: 1 1 auto; min-height: 0; overflow: auto; padding: 20px;
   display: flex; align-items: center; justify-content: center;
 }
+/* 第 109 轮：卡底原来是静态图 ui-gen.png（蓝 / 桃两团柔光），换成两层会呼吸的色团：
+   只动 transform + opacity（小图层，合成器搬运），保证「彩色底在流动」但不掉帧 */
 .ug-gen-card {
   position: relative; flex: 0 0 auto;
   width: min(400px, 100%); aspect-ratio: 400 / 435;
-  background: url(images/ui-gen.png) center / 100% 100% no-repeat;
+  background: var(--cds-bg-container);
+  isolation: isolate; overflow: hidden;
 }
-.ug-gen-in { position: absolute; left: 50%; top: 18.3908%; width: 77%; transform: translateX(-50%); text-align: center; }
+.ug-gen-card::before,
+.ug-gen-card::after {
+  content: ''; position: absolute; inset: -12%; z-index: 0; pointer-events: none;
+  will-change: transform, opacity;
+}
+.ug-gen-card::before {
+  background:
+    radial-gradient(ellipse 44% 38% at 32% 24%, color-mix(in srgb, var(--cds-color-primary) 42%, transparent), transparent 72%),
+    radial-gradient(ellipse 26% 22% at 22% 58%, color-mix(in srgb, var(--cds-color-primary) 24%, transparent), transparent 76%),
+    radial-gradient(ellipse 22% 18% at 52% 62%, color-mix(in srgb, var(--cds-color-success) 14%, transparent), transparent 76%);
+  animation: ugGenBlobA 18s ease-in-out infinite alternate;
+}
+.ug-gen-card::after {
+  background:
+    radial-gradient(ellipse 34% 30% at 60% 64%, color-mix(in srgb, var(--cds-color-warning) 36%, transparent), transparent 74%),
+    radial-gradient(ellipse 24% 20% at 76% 50%, color-mix(in srgb, var(--cds-color-warning) 20%, transparent), transparent 78%);
+  animation: ugGenBlobB 23s ease-in-out infinite alternate;
+}
+@keyframes ugGenBlobA {
+  from { transform: translate3d(-4%, -3%, 0) scale(1); opacity: .88; }
+  to   { transform: translate3d(7%, 5%, 0) scale(1.06); opacity: 1; }
+}
+@keyframes ugGenBlobB {
+  from { transform: translate3d(5%, 3%, 0) scale(1.04); opacity: 1; }
+  to   { transform: translate3d(-6%, -4%, 0) scale(.97); opacity: .84; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ug-gen-card::before, .ug-gen-card::after { animation: none; }
+}
+.ug-gen-in { position: absolute; left: 50%; top: 18.3908%; width: 77%; z-index: 1; transform: translateX(-50%); text-align: center; }
 .ug-gen-ico { display: block; width: 72px; height: 72px; margin: 0 auto; }
 /* 稿里那段 90° 主色弧是持续旋转的加载环（绕圆心 36,36） */
 .ug-gen-arc { transform-box: view-box; transform-origin: 36px 36px; animation: ug-gen-spin 1.4s linear infinite; }
@@ -5350,9 +5384,10 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 }
 .ud-rel-line.is-hot { stroke: var(--cds-color-primary); stroke-width: 1.6; }
 .ud-rel-line.is-dim { opacity: .22; }
-.ud-rel-dot { fill: #B7C6E4; transition: fill var(--cds-motion-duration) var(--cds-motion-ease), opacity var(--cds-motion-duration) var(--cds-motion-ease); }
-.ud-rel-dot.is-hot { fill: var(--cds-color-primary); }
-.ud-rel-dot.is-dim { opacity: .22; }
+/* 第 109 轮：连线末端由 3px 圆点换成三角箭头（多边形，JS 按末段方向算三个点） */
+.ud-rel-arrow { fill: #B7C6E4; transition: fill var(--cds-motion-duration) var(--cds-motion-ease), opacity var(--cds-motion-duration) var(--cds-motion-ease); }
+.ud-rel-arrow.is-hot { fill: var(--cds-color-primary); }
+.ud-rel-arrow.is-dim { opacity: .22; }
 
 /* 页面卡：白底 1px #E5E5E5、内距 20（标题 14/500/22 + 路由 12/400/16，间隔 4 → 82 高） */
 .ud-rel-card {
@@ -5361,12 +5396,16 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
   background: #FFFFFF; border-radius: 4px;
   box-shadow: 0 0 0 1px #E5E5E5;
   cursor: pointer; -webkit-user-select: none; user-select: none;
+  /* 第 109 轮：卡片可拖动（pointer 事件接管，禁掉触摸滚动抢手势） */
+  touch-action: none;
   transition: box-shadow var(--cds-motion-duration) var(--cds-motion-ease),
     opacity var(--cds-motion-duration) var(--cds-motion-ease);
 }
 .ud-rel-card:hover { box-shadow: 0 0 0 1px #B4C9FC, 0 2px 8px 0 rgba(0, 0, 0, .04); }
 .ud-rel-card.is-on { box-shadow: 0 0 0 1.6px var(--cds-color-primary), 0 0 12px 0 rgba(55, 112, 247, .2); }
 .ud-rel-card.is-dim { opacity: .38; }
+/* 拖动中：抬起来，压在连线之上 */
+.ud-rel-card.is-drag { cursor: grabbing; z-index: 3; box-shadow: 0 6px 16px 0 rgba(0, 0, 0, .14), 0 0 0 1px #B4C9FC; }
 .ud-rel-t { font-size: 14px; line-height: 22px; font-weight: 500; color: #1F1F1F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ud-rel-p { font-size: 12px; line-height: 16px; color: #868686; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ud-rel-card.is-dim .ud-rel-t { color: #1F1F1F; }
@@ -5383,51 +5422,40 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 .ud-canvas.is-prev .ud-handle { display: none !important; }
 
 /* ============================================================
-   第 108 轮：首页 panel-main 的「浅蓝环境光」——移植自 index(37) 的品牌 ambient 背景
-   底座：极淡主色底 + 44×44 细网格（静态）
-   ::before：右上蓝光 + 左下深蓝光，32s 缓慢漂移放大（对应 cecoderAmbientDrift）
-   ::after ：一条斜向高光带 + 第三团蓝光，24s 反向摆动（对应 cecoderAmbientRibbon）
-   两层都是 inset:-16%，漂移时不会在面板四周拉出白边（.panel 已经 overflow:hidden）
+   第 108 轮 / 第 109 轮性能重做：首页 panel-main 的「浅蓝环境光」
+   —— 移植自 index(37) 的 brand ambient，但换成「一次画完 + 只动一层」的低开销版：
+   1) 两团蓝光 + 44×44 网格直接画在 .panel-main 自己的背景上 —— 静态，栅格一次，永不重画；
+   2) 只有 ::after 一层小色块（62%×62%，约 36 万 CSS 像素，是原来全尺寸双层 1458×1125 的 1/9）
+      做纯 translate 的慢漂移，合成器搬运，不触发重绘；
+   3) 没有 scale / rotate / opacity 动画 —— 这三种都会让 Chrome 反复重栅格化大图层（Retina 上最贵）。
    ============================================================ */
 body[data-page="home"] .panel-main {
   isolation: isolate;
   background-color: color-mix(in srgb, var(--cds-color-primary) 6%, var(--cds-bg-container));
   background-image:
+    radial-gradient(ellipse 62% 58% at 88% 12%, color-mix(in srgb, var(--cds-color-primary) 24%, transparent), transparent 72%),
+    radial-gradient(ellipse 58% 54% at 8% 84%, color-mix(in srgb, var(--cds-color-primary) 18%, transparent), transparent 74%),
     linear-gradient(to right, color-mix(in srgb, var(--cds-color-primary) 5%, transparent) 1px, transparent 1px),
     linear-gradient(to bottom, color-mix(in srgb, var(--cds-color-primary) 5%, transparent) 1px, transparent 1px);
-  background-size: 44px 44px, 44px 44px;
-  background-position: 0 0, 0 0;
+  background-repeat: no-repeat, no-repeat, repeat, repeat;
+  background-size: 100% 100%, 100% 100%, 44px 44px, 44px 44px;
+  background-position: 0 0, 0 0, 0 0, 0 0;
 }
-body[data-page="home"] .panel-main::before,
+/* 唯一会动的一层：一团柔光沿对角慢慢游走，回程由 alternate 负责 */
 body[data-page="home"] .panel-main::after {
-  content: ''; position: absolute; inset: -16%; z-index: -1; pointer-events: none;
-  transform-origin: center center;
-}
-body[data-page="home"] .panel-main::before {
-  opacity: .88;
+  content: ''; position: absolute; left: -6%; top: -8%; width: 62%; height: 62%;
+  z-index: -1; pointer-events: none;
   background:
-    radial-gradient(ellipse at 88% 12%, color-mix(in srgb, var(--cds-color-primary) 25%, transparent), transparent 52%),
-    radial-gradient(ellipse at 8% 84%, color-mix(in srgb, var(--cds-color-primary) 19%, transparent), transparent 54%),
-    linear-gradient(128deg, color-mix(in srgb, var(--cds-color-primary) 2%, transparent) 16%, transparent 52%, color-mix(in srgb, var(--cds-color-primary) 4%, transparent) 90%);
-  animation: pmAmbientDrift var(--pm-cycle, 32s) ease-in-out infinite alternate;
+    radial-gradient(closest-side at 50% 50%, color-mix(in srgb, var(--cds-color-primary) 15%, transparent), transparent 76%),
+    radial-gradient(closest-side at 74% 34%, color-mix(in srgb, var(--cds-color-primary) 9%, transparent), transparent 80%);
+  will-change: transform;
+  animation: pmGlowDrift 44s ease-in-out infinite alternate;
 }
-body[data-page="home"] .panel-main::after {
-  opacity: .5;
-  background:
-    linear-gradient(118deg, transparent 30%, color-mix(in srgb, var(--cds-bg-container) 80%, transparent) 42%, transparent 54%),
-    radial-gradient(ellipse at 74% 70%, color-mix(in srgb, var(--cds-color-primary) 12%, transparent), transparent 44%);
-  animation: pmAmbientRibbon 24s ease-in-out infinite alternate;
-}
-@keyframes pmAmbientDrift {
-  from { transform: translate3d(-3%, -2%, 0) scale(1); }
-  to   { transform: translate3d(4%, 3%, 0) scale(1.06); }
-}
-@keyframes pmAmbientRibbon {
-  from { transform: translate3d(5%, -3%, 0) rotate(-5deg); opacity: .3; }
-  to   { transform: translate3d(-5%, 4%, 0) rotate(5deg); opacity: .62; }
+@keyframes pmGlowDrift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(88%, 104%, 0); }
 }
 @media (prefers-reduced-motion: reduce) {
-  body[data-page="home"] .panel-main::before,
   body[data-page="home"] .panel-main::after { animation: none; transform: none; }
-  body[data-page="home"] .panel-main::after { opacity: .3; }
+}
 }

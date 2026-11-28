@@ -23,4 +23,5 @@ tools/layers/*.txt
 tools/crop*.mjs
 tools/dump7*.mjs
 tools/probe*.mjs
+tools/perf*.mjs
 tools/shot*.mjs

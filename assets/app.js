@@ -4847,20 +4847,29 @@
         path.setAttribute('data-a', e.a);
         path.setAttribute('data-b', e.b);
         svg.appendChild(path);
-        /* 目标端一颗 3px 小圆点，给方向感 */
-        var dot = document.createElementNS(NS, 'circle');
-        dot.setAttribute('class', 'ud-rel-dot');
-        dot.setAttribute('cx', B[0]);
-        dot.setAttribute('cy', B[1]);
-        dot.setAttribute('r', 3);
-        dot.setAttribute('data-a', e.a);
-        dot.setAttribute('data-b', e.b);
-        svg.appendChild(dot);
+        /* 第 109 轮：末端改成三角箭头（指着目标卡片的接入边）——
+           直线走横/竖，S 形曲线的末端切线是竖直的，所以方向只取这两个轴 */
+        var dir = sameY ? [B[0] - A[0], 0] : [0, B[1] - A[1]];
+        var dl = Math.sqrt(dir[0] * dir[0] + dir[1] * dir[1]) || 1;
+        var ux = dir[0] / dl, uy = dir[1] / dl;
+        var tipX = B[0], tipY = B[1], alen = 8, half = 4.4;
+        var bx = tipX - ux * alen, by = tipY - uy * alen;
+        var px = -uy * half, py = ux * half;
+        var tri = document.createElementNS(NS, 'polygon');
+        tri.setAttribute('class', 'ud-rel-arrow');
+        tri.setAttribute('points',
+          [[tipX, tipY], [bx + px, by + py], [bx - px, by - py]]
+            .map(function (pt) { return pt[0].toFixed(2) + ',' + pt[1].toFixed(2); }).join(' '));
+        tri.setAttribute('data-a', e.a);
+        tri.setAttribute('data-b', e.b);
+        svg.appendChild(tri);
       });
     };
     /* 点卡 = 选中：本卡亮、有关联的卡亮、其余卡与线暗掉 */
+    var udRelSel = null;
     var udRelPick = function (id) {
       if (!udRelMap) return;
+      udRelSel = id || null;
       var nb = {};
       udRelEdges.forEach(function (e) { if (e.a === id) nb[e.b] = 1; if (e.b === id) nb[e.a] = 1; });
       Array.prototype.forEach.call(udRelMap.querySelectorAll('.ud-rel-card'), function (c) {
@@ -4870,11 +4879,52 @@
         c.setAttribute('aria-selected', !id || cid === id ? 'true' : 'false');
       });
       if (!udRelLines) return;
-      Array.prototype.forEach.call(udRelLines.querySelectorAll('.ud-rel-line, .ud-rel-dot'), function (n) {
+      Array.prototype.forEach.call(udRelLines.querySelectorAll('.ud-rel-line, .ud-rel-arrow'), function (n) {
         var hot = !!id && (n.getAttribute('data-a') === id || n.getAttribute('data-b') === id);
         n.classList.toggle('is-hot', hot);
         n.classList.toggle('is-dim', !!id && !hot);
       });
+    };
+    /* 第 109 轮：卡片可以随手拖，拖的时候每帧重算一次连线（一张图 10 个节点，很便宜） */
+    var udRelRaf = 0;
+    var udRelRedraw = function () {
+      if (udRelRaf) return;
+      udRelRaf = requestAnimationFrame(function () {
+        udRelRaf = 0;
+        udRelBuild();
+        if (udRelSel) udRelPick(udRelSel);
+      });
+    };
+    var udRelDrag = null;
+    var udRelCardStart = function (e) {
+      var card = e.target.closest ? e.target.closest('.ud-rel-card') : null;
+      if (!card || e.button !== 0) return;
+      udRelDrag = {
+        card: card, id: e.pointerId, sx: e.clientX, sy: e.clientY,
+        ox: parseFloat(card.style.left) || 0, oy: parseFloat(card.style.top) || 0, moved: false
+      };
+      try { card.setPointerCapture(e.pointerId); } catch (err) {}
+      e.preventDefault();
+    };
+    var udRelCardMove = function (e) {
+      if (!udRelDrag || e.pointerId !== udRelDrag.id) return;
+      var card = udRelDrag.card;
+      var k = (udRelMap.offsetWidth || 592) / 592;   /* 地图可能被 --ud-rel-s 缩过，位移要除回去 */
+      var dx = (e.clientX - udRelDrag.sx) / k, dy = (e.clientY - udRelDrag.sy) / k;
+      if (!udRelDrag.moved && Math.abs(dx) + Math.abs(dy) < 3) return;
+      if (!udRelDrag.moved) { udRelDrag.moved = true; card.classList.add('is-drag'); }
+      var w = card.offsetWidth, h = card.offsetHeight;
+      var nx = Math.min(Math.max(0, udRelDrag.ox + dx), 592 - w);
+      var ny = Math.min(Math.max(0, udRelDrag.oy + dy), 271 - h);
+      card.style.left = nx + 'px';
+      card.style.top = ny + 'px';
+      udRelRedraw();
+    };
+    var udRelCardEnd = function (e) {
+      if (!udRelDrag || (e && e.pointerId !== udRelDrag.id)) return;
+      udRelDrag.card.classList.remove('is-drag');
+      udRelDrag = null;
+      udRelRedraw();
     };
     var udRelFit = function () {
       if (!udRel || !udRelMap) return;
@@ -4906,6 +4956,10 @@
       });
     }
     if (udRelMap) {
+      udRelMap.addEventListener('pointerdown', udRelCardStart);
+      udRelMap.addEventListener('pointermove', udRelCardMove);
+      udRelMap.addEventListener('pointerup', udRelCardEnd);
+      udRelMap.addEventListener('pointercancel', udRelCardEnd);
       udRelMap.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter' && e.key !== ' ') return;
         var card = e.target.closest('.ud-rel-card');
@@ -5083,16 +5137,9 @@
     });
   }
 
-  sys.addEventListener('click', function (e) {
-    var pv = e.target.closest('[data-preview]');
-    if (pv) {
-      openDs(pv.closest('.ug-scard'));
-      return;
-    }
-    var pick = e.target.closest('[data-pick]');
-    if (!pick) return;
-    var card = pick.closest('.ug-scard');
-    if (card.classList.contains('is-on')) return;   /* 单选：已选再点不取消 */
+  /* 第 109 轮：选中逻辑抽出来 —— 「选用」按钮和卡片本体都走这一份 */
+  function pickCard(card) {
+    if (!card || card.classList.contains('is-on')) return;   /* 单选：已选再点不取消 */
     sys.querySelectorAll('.ug-scard').forEach(function (c) {
       var on = c === card;
       c.classList.toggle('is-on', on);
@@ -5101,6 +5148,14 @@
       b.innerHTML = on ? CHECK + '已选' : '选用';
     });
     tip('已选用「' + card.querySelector('.ug-sname').textContent + '」');
+  }
+  sys.addEventListener('click', function (e) {
+    var pv = e.target.closest('[data-preview]');
+    if (pv) {
+      openDs(pv.closest('.ug-scard'));
+      return;
+    }
+    pickCard(e.target.closest('.ug-scard'));
   });
 
   var exit = document.getElementById('ugExit');
