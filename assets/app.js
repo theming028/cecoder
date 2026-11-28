@@ -4898,11 +4898,14 @@
       if (v === 'board') udApplyZoom();
       if (v === 'rel') { udRelBuild(); udRelFit(); udRelPick(null); }
     };
-    if (udRelMap) {
-      udRelMap.addEventListener('click', function (e) {
+    /* 第 108 轮：点关系图里任意空白处（含 592×271 地图之外的留白）都取消选中 */
+    if (udRel) {
+      udRel.addEventListener('click', function (e) {
         var card = e.target.closest('.ud-rel-card');
         udRelPick(card ? card.getAttribute('data-id') : null);
       });
+    }
+    if (udRelMap) {
       udRelMap.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter' && e.key !== ' ') return;
         var card = e.target.closest('.ud-rel-card');

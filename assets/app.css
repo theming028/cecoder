@@ -5371,12 +5371,63 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 .ud-rel-p { font-size: 12px; line-height: 16px; color: #868686; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ud-rel-card.is-dim .ud-rel-t { color: #1F1F1F; }
 
-/* 页面关系 / 页面预览：中栏只留视图本身（左列「页面层级和状态」与画板滚动区都收起来） */
-.ud-canvas.is-rel .ud-pages, .ud-canvas.is-prev .ud-pages { display: none; }
-/* 页面关系：画板滚动区让位给关系图；页面预览反过来 —— 只有画板 */
+/* 页面关系：中栏只留关系图（左列「页面层级和状态」与画板滚动区都收起来）
+   第 108 轮：页面预览要保留左列（方便切换页面 / 状态），所以只对 is-rel 收 */
+.ud-canvas.is-rel .ud-pages { display: none; }
 .ud-canvas.is-rel .ud-scroll { display: none; }
+/* 页面预览：左列（页面层级和状态）照常留着，方便切换页面 / 状态 —— 只收四角手柄 */
 /* 页面预览：网格 + 只有画布，工具条上的标注类键与「批注 (n)」全收（纯预览，不支持任何标注） */
 .ud-blank.is-prev .ud-tools,
 .ud-blank.is-prev .ud-link { display: none; }
 /* 纯预览也不给画板四角手柄 */
 .ud-canvas.is-prev .ud-handle { display: none !important; }
+
+/* ============================================================
+   第 108 轮：首页 panel-main 的「浅蓝环境光」——移植自 index(37) 的品牌 ambient 背景
+   底座：极淡主色底 + 44×44 细网格（静态）
+   ::before：右上蓝光 + 左下深蓝光，32s 缓慢漂移放大（对应 cecoderAmbientDrift）
+   ::after ：一条斜向高光带 + 第三团蓝光，24s 反向摆动（对应 cecoderAmbientRibbon）
+   两层都是 inset:-16%，漂移时不会在面板四周拉出白边（.panel 已经 overflow:hidden）
+   ============================================================ */
+body[data-page="home"] .panel-main {
+  isolation: isolate;
+  background-color: color-mix(in srgb, var(--cds-color-primary) 6%, var(--cds-bg-container));
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--cds-color-primary) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--cds-color-primary) 5%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px, 44px 44px;
+  background-position: 0 0, 0 0;
+}
+body[data-page="home"] .panel-main::before,
+body[data-page="home"] .panel-main::after {
+  content: ''; position: absolute; inset: -16%; z-index: -1; pointer-events: none;
+  transform-origin: center center;
+}
+body[data-page="home"] .panel-main::before {
+  opacity: .88;
+  background:
+    radial-gradient(ellipse at 88% 12%, color-mix(in srgb, var(--cds-color-primary) 25%, transparent), transparent 52%),
+    radial-gradient(ellipse at 8% 84%, color-mix(in srgb, var(--cds-color-primary) 19%, transparent), transparent 54%),
+    linear-gradient(128deg, color-mix(in srgb, var(--cds-color-primary) 2%, transparent) 16%, transparent 52%, color-mix(in srgb, var(--cds-color-primary) 4%, transparent) 90%);
+  animation: pmAmbientDrift var(--pm-cycle, 32s) ease-in-out infinite alternate;
+}
+body[data-page="home"] .panel-main::after {
+  opacity: .5;
+  background:
+    linear-gradient(118deg, transparent 30%, color-mix(in srgb, var(--cds-bg-container) 80%, transparent) 42%, transparent 54%),
+    radial-gradient(ellipse at 74% 70%, color-mix(in srgb, var(--cds-color-primary) 12%, transparent), transparent 44%);
+  animation: pmAmbientRibbon 24s ease-in-out infinite alternate;
+}
+@keyframes pmAmbientDrift {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to   { transform: translate3d(4%, 3%, 0) scale(1.06); }
+}
+@keyframes pmAmbientRibbon {
+  from { transform: translate3d(5%, -3%, 0) rotate(-5deg); opacity: .3; }
+  to   { transform: translate3d(-5%, 4%, 0) rotate(5deg); opacity: .62; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-page="home"] .panel-main::before,
+  body[data-page="home"] .panel-main::after { animation: none; transform: none; }
+  body[data-page="home"] .panel-main::after { opacity: .3; }
+}

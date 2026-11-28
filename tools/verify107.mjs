@@ -139,7 +139,8 @@ const V0 = await p.evaluate(() => {
     handles: getComputedStyle(document.querySelector('.ud-handle')).display
   };
 });
-ok('C1 切到页面预览：画布 is-prev、左列收起、关系图隐藏', /is-prev/.test(V0.cls) && V0.pages === 'none' && V0.rel === true, JSON.stringify([V0.cls, V0.pages, V0.rel]));
+/* 第 108 轮：页面预览要保留左列「页面层级和状态」，pages 不再收 */
+ok('C1 切到页面预览：画布 is-prev、左列保留、关系图隐藏', /is-prev/.test(V0.cls) && V0.pages !== 'none' && V0.rel === true, JSON.stringify([V0.cls, V0.pages, V0.rel]));
 ok('C2 灰底 + 网格保留', /rgb\(245, 245, 245\)/.test(V0.bg) && V0.grid, V0.bg);
 ok('C3 只剩 html 画布（画板可见）', V0.boardW > 200, V0.boardW);
 ok('C4 标注类工具键与「批注 (n)」全收起', V0.tools === 'none' && V0.note === 'none', JSON.stringify([V0.tools, V0.note]));
