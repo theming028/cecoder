@@ -251,10 +251,16 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
      同级会把它整块白底压掉，菜单键就点不到了 */
   position: absolute; left: 7px; top: 7px; width: 28px; height: 28px; z-index: 10;
   display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 4px; color: var(--cds-text-primary); background: transparent;
+  /* 第 123→124 轮：先按顶栏那套磨砂白做了一版，用户看过之后要求「去掉透明度、圆角回 4px」——
+     于是底色改成不透明纯白（毛玻璃一并去掉，不透明就不需要背景模糊），
+     描边保留 1px #C5D7F0，圆角回到 4px。尺寸/位置照旧 28×28 @(7,7)，图标仍是 14。 */
+  border-radius: 4px; color: var(--cds-tb-ink);
+  background: #FFFFFF; border: 1px solid var(--cds-glass-line);
   transition: background var(--cds-motion-duration) var(--cds-motion-ease),
+              border-color var(--cds-motion-duration) var(--cds-motion-ease),
               opacity .18s var(--cds-motion-ease), transform .26s cubic-bezier(.2, .8, .2, 1);
 }
+/* 实底之后 hover 没有提亮空间，改成一档浅灰（与 .tb-btn 同源的灰底语言） */
 .menu-btn:hover { background: var(--cds-fill); }
 /* 抽屉展开时由抽屉头部的「收起」接管，这里淡出避让（否则会被 320 宽抽屉压住） */
 .menu-btn[aria-expanded="true"] { opacity: 0; transform: translateX(8px); pointer-events: none; }
@@ -5542,17 +5548,14 @@ body[data-page="home"] .qf-step { background: rgba(255, 255, 255, .72); }
    工作台子项用蓝（#3770F7），推荐工序的步骤用语义紫（#5B58FF）；
    工序 chip 本身没有 border（靠 0 1px 2px 投影立起来），所以用 inset 阴影补 1px 边，不改尺寸。 */
 body[data-page="home"] .wb-opt.is-active {
-  border-color: #3770F7;
+  /* 第 124 轮：描边降到 50% 透明度（实色一处太抢，压过里面的蓝字） */
+  border-color: rgba(55, 112, 247, .5);
   color: #3770F7;
   background: rgba(245, 248, 255, .92);
 }
-body[data-page="home"] .wb-opt.is-active:hover { border-color: #2E5FD9; color: #2E5FD9; }
-body[data-page="home"] .qf-step.is-active {
-  color: var(--cds-ai-purple);
-  box-shadow: inset 0 0 0 1px var(--cds-ai-purple), 0 1px 2px 0 rgba(0, 0, 0, .08);
-}
-/* 序号原来固定三级灰，选中时跟着一起变紫，否则「01 澄清」只有名字变色 */
-body[data-page="home"] .qf-step.is-active .qf-no { color: var(--cds-ai-purple); }
+body[data-page="home"] .wb-opt.is-active:hover { border-color: rgba(46, 95, 217, .5); color: #2E5FD9; }
+/* 第 124 轮：快速任务那条是「推荐工序」地图，不是可选项 ——
+   第 122 轮加的紫边紫字已撤掉，选中只保留字色转正文（.qf-step.is-active 的全局规则） */
 body[data-page="home"] .scene-add { background: rgba(255, 255, 255, .72); }
 /* 边框在半透明底上会发灰，统一提亮 */
 body[data-page="home"] .wb-bar,
