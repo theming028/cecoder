@@ -117,7 +117,7 @@ const C = await h.evaluate(() => {
     plateW: Math.round(r.width), cardW: Math.round(card.width), tail: Math.round(foot.bottom - card.bottom)
   };
 });
-ok('C1 背板回到中性灰 #F2F2F2', C.bg === 'rgb(242, 242, 242)', C.bg);
+ok('C1 背板是中性灰（第 127 轮改 #EBEDF1）', C.bg === 'rgb(235, 237, 241)', C.bg);
 ok('C2 背板不挂毛玻璃', C.bf === 'none', C.bf);
 ok('C3 背板没有额外内描边/投影', C.sh === 'none', C.sh);
 ok('C4 背板仍是 8px 圆角、比白卡窄 24、下方留 28 的次级行位置', C.radius === '8px' && Math.abs(C.cardW - C.plateW) === 24 && C.tail >= 28, JSON.stringify([C.radius, C.cardW, C.plateW, C.tail]));

@@ -616,14 +616,15 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .sc-metric {
   flex: 1 1 0; min-width: 0; height: 88px; padding: 8px 20px;
   background: #FFFFFF; border-radius: 8px; display: flex; flex-direction: column; align-items: flex-start;
-  /* 稿：effect_6:097 · shadow-special = 0 1px 2px 0 rgba(0,0,0,.08) */
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .08);
+  /* 第 127 轮：去掉 0 1px 2px 的投影，换成 1px 极淡描边（border-box 下卡面尺寸不变） */
+  border: 1px solid #E9ECF1;
 }
 .sc-metric-k { font-size: 12px; line-height: 20px; color: var(--cds-text-secondary); white-space: nowrap; }
 .sc-metric-v { margin-top: 2px; font-size: 20px; line-height: 28px; font-weight: 600; color: var(--cds-text-primary); }
 .sc-metric-v.is-risk { color: var(--cds-danger-6); }
 .sc-metric-s { margin-top: 2px; font-size: 12px; line-height: 20px; color: var(--cds-text-tertiary); white-space: nowrap; }
-.sc-chart { position: relative; flex: 0 0 200px; width: 200px; height: 88px; background: #FFFFFF; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .08); }
+/* 第 127 轮：与四张指标卡同款 —— 去投影、换 1px #E9ECF1 描边 */
+.sc-chart { position: relative; flex: 0 0 200px; width: 200px; height: 88px; background: #FFFFFF; border-radius: 8px; overflow: hidden; border: 1px solid #E9ECF1; }
 .sc-chart > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .sc-chart-k { position: absolute; left: 20px; top: 8px; font-size: 12px; line-height: 20px; color: var(--cds-text-secondary); }
 
@@ -1047,12 +1048,13 @@ body[data-page="home"] .toolbar .tb-div { margin: 0 12px; }
 }
 .c-plate {
   position: absolute; left: 12px; right: 12px; top: 0; height: 100%;
-  background: var(--cds-surface-inset); border-radius: 8px;
+  /* 第 127 轮：背板底色改 #EBEDF1（比 #F2F2F2 更冷一档，和白卡 + 新描边同一套灰） */
+  background: #EBEDF1; border-radius: 8px;
 }
 .c-card {
   position: absolute; left: 0; right: 0; top: 0; height: calc(var(--ci-h, 46px) + 82px + var(--c-tag-h, 0px));
-  /* 第 112 轮：描边改纯黑 12%（原来 #E5E5E5 在白卡上偏灰、压不住彩色流光） */
-  background: var(--cds-bg-container); border: 1px solid rgba(0, 0, 0, .12);
+  /* 第 127 轮：描边由纯黑 12% 改成 #dde2e7（比纯黑半透更干净，也不跟卡片投影打架） */
+  background: var(--cds-bg-container); border: 1px solid #DDE2E7;
   border-radius: 8px; box-shadow: var(--cds-shadow-1);
   transition: border-color var(--cds-motion-duration) var(--cds-motion-ease);
 }

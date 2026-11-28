@@ -20,7 +20,8 @@ const A = await h.evaluate(() => {
   const cs = getComputedStyle(document.querySelector('.c-card'));
   return { color: cs.borderTopColor, w: cs.borderTopWidth, style: cs.borderTopStyle };
 });
-ok('A1 .c-card 描边 = 黑 12%', A.color === 'rgba(0, 0, 0, 0.12)', JSON.stringify(A.color));
+/* 第 127 轮：描边由纯黑 12% 改成 #DDE2E7 */
+ok('A1 .c-card 描边 = #DDE2E7', A.color === 'rgb(221, 226, 231)', JSON.stringify(A.color));
 ok('A2 仍是 1px 实线（尺寸不变）', A.w === '1px' && A.style === 'solid', A.w + ' ' + A.style);
 
 /* ---------- B 任务总结页烟花 ---------- */

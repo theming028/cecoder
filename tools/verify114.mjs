@@ -84,7 +84,8 @@ const C = await h.evaluate(() => {
 });
 ok('C1 卡高 = 输入高 + 82', C.card.h === Math.round(C.ci + 82), JSON.stringify([C.card.h, C.ci]));
 ok('C2 环境行在卡下沿之外', C.foot.t >= C.card.b, JSON.stringify([C.card, C.foot]));
-ok('C3 环境行整条坐在 #F2F2F2 灰背板上', C.plateBg === 'rgb(242, 242, 242)' && C.plate.t <= C.foot.t && C.plate.b >= C.foot.b, JSON.stringify([C.plate, C.foot, C.plateBg]));
+/* 第 127 轮：背板底色 #F2F2F2 → #EBEDF1 */
+ok('C3 环境行整条坐在 #EBEDF1 灰背板上', C.plateBg === 'rgb(235, 237, 241)' && C.plate.t <= C.foot.t && C.plate.b >= C.foot.b, JSON.stringify([C.plate, C.foot, C.plateBg]));
 ok('C4 卡片白底，灰底只露卡下那一条', C.cardBg === 'rgb(255, 255, 255)', C.cardBg);
 ok('C5 环境行下沿离背板底 4~10px', C.plate.b - C.foot.b >= 4 && C.plate.b - C.foot.b <= 10, String(C.plate.b - C.foot.b));
 
