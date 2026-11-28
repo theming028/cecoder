@@ -5496,29 +5496,28 @@ body[data-page="home"] .scene[data-state="idle"]:focus-within { background: rgba
 .sum-fw { position: absolute; inset: 0; z-index: 9; pointer-events: none; display: block; }
 
 /* ============================================================
-   第 113 轮：首页信息层级整理（用户点名的 8 条里涉及布局的 5 条）
+   第 113 / 114 轮：首页信息层级整理
    1) 垂直居中：原来是一个 flex:1 的 .stage-spacer 把整组顶到上下两端，
       标题悬在高处、输入卡贴着底边，中间断成两截。改成 stage 自己居中，
       内容超出时 safe center 自动退化成顶部对齐（不会裁掉标题）。
-   2) 工具行（工作台 / 快速任务 chips）移到输入卡下方 —— 它承担的是配置，
-      却被摆在卡正上方、还比卡宽，抢了主操作（输入区）的焦点。
-   5) 卡外那条环境行（本地 / 工作目录 / Enter 提示）收进输入卡内部，
-      卡片变成「输入 → 操作行 → 环境行」一体结构，不再有第二条悬在卡外的工具条
-      压在彩色流光边上。
+   第 114 轮：用户点名回退其中两条 ——
+   2) 工具行（工作台 / 快速任务 chips）与两条展开栏回到输入卡「之上」：
+      它们是「先选类型、再写需求」的前置选择，压在卡下面等于先写后选。
+   5) 卡外那条环境行（本地 / 工作目录 / Enter 提示）回到卡外 #F2F2F2 背板上，
+      灰底那版观感更清楚；卡高随之回到 ci + 82。
    ============================================================ */
-body[data-page="home"] .stage { top: 0; justify-content: safe center; }
+body[data-page="home"] .stage {
+  top: 0; justify-content: safe center;
+  /* 第 114 轮：底部留 24 给版本号（它脱流贴底，居中组不许压上去） */
+  padding-bottom: 24px;
+}
 body[data-page="home"] .stage > .stage-spacer { display: none; }
-body[data-page="home"] .stage > .composer { order: 4; margin-top: 16px; }
-body[data-page="home"] .stage > .toolbar { order: 5; margin-top: 12px; }
-body[data-page="home"] .stage > .wb-slot { order: 6; }
-body[data-page="home"] .stage > .qf-slot { order: 7; }
-body[data-page="home"] .stage > .version { order: 8; margin-top: 16px; }
-
-/* 输入卡：环境行并进卡内（卡高 ci + 118，环境行占 ci+84 ~ ci+112，下留 6） */
-body[data-page="home"] .composer { height: calc(var(--ci-h, 46px) + 118px + var(--c-tag-h, 0px)); }
-body[data-page="home"] .c-card { height: calc(var(--ci-h, 46px) + 118px + var(--c-tag-h, 0px)); }
-body[data-page="home"] .c-foot { top: calc(var(--ci-h, 46px) + 84px + var(--c-tag-h, 0px)); }
-body[data-page="home"] .c-beam { height: calc(var(--ci-h, 46px) + 120px + var(--c-tag-h, 0px)); }
+/* 第 114 轮：版本号回到「固定在屏幕底部」—— 脱出 flex 流、贴 stage 底居中，
+   不再跟着居中组上下浮动；工具行与两条展开栏按 DOM 原序留在卡上方 */
+body[data-page="home"] .stage > .version {
+  position: absolute; left: 50%; bottom: 0; margin: 0;
+  transform: translateX(-50%);
+}
 
 /* 7) 键盘焦点：chip 撤掉描边后，键盘操作时完全看不出落在哪个 chip 上 */
 .chip:focus-visible {

@@ -21,53 +21,64 @@ await wait(900);
 const A = await h.evaluate(() => {
   const R = s => { const e = document.querySelector(s); const r = e.getBoundingClientRect(); return { t: r.top, b: r.bottom, l: r.left, r: r.right, w: r.width, h: r.height }; };
   const stage = R('.stage'), hero = R('.hero'), ver = R('.version'), pm = R('#panelMain');
+  const comp = R('.composer');
   const sp = document.querySelector('.stage-spacer');
+  /* 第 114 轮：版本号脱流贴底后不再参与居中，居中组的下边界是 composer 底；
+     stage 的 padding-bottom(24) 是给版本号预留的，判居中时要减掉 */
+  const padB = parseFloat(getComputedStyle(document.querySelector('.stage')).paddingBottom) || 0;
   return {
     stageTop: Math.round(stage.t - pm.t),
     topGap: Math.round(hero.t - stage.t),
-    botGap: Math.round(stage.b - ver.b),
+    botGap: Math.round(stage.b - padB - comp.b),
     spacer: sp ? sp.getBoundingClientRect().height : -1,
     overflow: stage.b > pm.b + 1 || stage.t < pm.t - 1
   };
 });
 ok('A1 stage 顶到 panel 顶（不再靠 22vh 压低）', Math.abs(A.stageTop) <= 1, String(A.stageTop));
-ok('A2 整组在 stage 内垂直居中（上下留白差 ≤ 8）', Math.abs(A.topGap - A.botGap) <= 8, JSON.stringify([A.topGap, A.botGap]));
+ok('A2 整组在 stage 内垂直居中（上下留白差 ≤ 8，版本号已脱流）', Math.abs(A.topGap - A.botGap) <= 8, JSON.stringify([A.topGap, A.botGap]));
 ok('A3 .stage-spacer 已不占位', A.spacer === 0, String(A.spacer));
 ok('A4 stage 不越出 panel', !A.overflow, JSON.stringify(A));
 
-/* ---------- B 工具行下移到卡下方 ---------- */
+/* ---------- B 工具行回到输入卡「之上」（第 114 轮回退） ---------- */
 const B = await h.evaluate(() => {
   const R = s => { const e = document.querySelector(s); const r = e.getBoundingClientRect(); return { t: Math.round(r.top), b: Math.round(r.bottom), h: Math.round(r.height) }; };
-  return { card: R('.c-card'), toolbar: R('.toolbar'), wb: R('.wb-slot'), qf: R('.qf-slot'), ver: R('.version') };
+  return {
+    card: R('.c-card'), composer: R('.composer'), toolbar: R('.toolbar'), wb: R('.wb-slot'), qf: R('.qf-slot'),
+    ver: R('.version'), stage: R('.stage'),
+    verPos: getComputedStyle(document.querySelector('.version')).position
+  };
 });
-ok('B1 输入卡在工具行之上', B.card.b <= B.toolbar.t, JSON.stringify([B.card.b, B.toolbar.t]));
-ok('B2 工具行与卡底留 12px', Math.abs(B.toolbar.t - B.card.b - 12) <= 2, JSON.stringify([B.card.b, B.toolbar.t]));
-ok('B3 子项栏容器排在工具行下方', B.wb.t >= B.toolbar.b - 1 && B.qf.t >= B.toolbar.b - 1, JSON.stringify([B.toolbar, B.wb, B.qf]));
-ok('B4 版本号在最后（工具行之下）', B.ver.t >= B.toolbar.b, JSON.stringify([B.toolbar.b, B.ver.t]));
+ok('B1 工具行在输入卡之上', B.toolbar.b <= B.card.t, JSON.stringify([B.toolbar.b, B.card.t]));
+ok('B2 工具行与卡顶留 12px', Math.abs(B.card.t - B.toolbar.b - 12) <= 2, JSON.stringify([B.toolbar.b, B.card.t]));
+ok('B3 子项栏 / 工序栏排在工具行之下、卡之上', B.wb.t >= B.toolbar.b - 1 && B.qf.t >= B.toolbar.b - 1 && B.composer.t >= B.toolbar.b - 1, JSON.stringify([B.toolbar, B.wb, B.qf, B.composer]));
+ok('B4 版本号脱流贴 stage 底（固定，不跟内容排序）', B.verPos === 'absolute' && Math.abs(B.ver.b - B.stage.b) <= 1, JSON.stringify([B.verPos, B.ver.b, B.stage.b]));
 
-/* 子项栏 / 推荐工序栏展开后仍排在工具行下方，不压卡 */
+/* 子项栏 / 推荐工序栏展开后仍夹在工具行与卡之间，不压卡 */
 await h.click('.chip[data-wb="通用"]');
 await wait(480);
 const B2 = await h.evaluate(() => {
   const R = s => { const e = document.querySelector(s); const r = e.getBoundingClientRect(); return { t: Math.round(r.top), b: Math.round(r.bottom), h: Math.round(r.height) }; };
   return { card: R('.c-card'), toolbar: R('.toolbar'), wb: R('.wb-slot'), ver: R('.version') };
 });
-ok('B5 展开「选择子项」后子项栏在工具行下方', B2.wb.h >= 60 && B2.wb.t >= B2.toolbar.b - 1, JSON.stringify(B2));
-ok('B6 展开后版本号仍在其下方、无叠压', B2.ver.t >= B2.wb.b - 1, JSON.stringify([B2.wb.b, B2.ver.t]));
+ok('B5 展开「选择子项」后子项栏夹在工具行与卡之间', B2.wb.h >= 60 && B2.wb.t >= B2.toolbar.b - 1 && B2.card.t >= B2.wb.b - 1, JSON.stringify(B2));
+ok('B6 展开后版本号位置不动（仍贴 stage 底）', B2.ver.t === B.ver.t, JSON.stringify([B.ver.t, B2.ver.t]));
 await h.click('.chip[data-wb="通用"]');
 await wait(360);
 
-/* ---------- C 环境行收进卡内 ---------- */
+/* ---------- C 环境行回到卡外 #F2F2F2 背板（第 114 轮回退） ---------- */
 const C = await h.evaluate(() => {
   const R = s => { const e = document.querySelector(s); const r = e.getBoundingClientRect(); return { t: Math.round(r.top), b: Math.round(r.bottom), h: Math.round(r.height) }; };
-  const card = document.querySelector('.c-card'), foot = document.querySelector('.c-foot');
+  const card = document.querySelector('.c-card');
   const ci = parseFloat(getComputedStyle(document.querySelector('.composer')).getPropertyValue('--ci-h')) || 46;
-  return { card: R('.c-card'), foot: R('.c-foot'), row: R('.c-row'), ci, cs: getComputedStyle(card).height };
+  return {
+    card: R('.c-card'), foot: R('.c-foot'), plate: R('.c-plate'), ci,
+    plateBg: getComputedStyle(document.querySelector('.c-plate')).backgroundColor
+  };
 });
-ok('C1 卡高 = 输入高 + 118', C.card.h === Math.round(C.ci + 118), JSON.stringify([C.card.h, C.ci]));
-ok('C2 环境行落在卡内（不再悬在卡外）', C.foot.t > C.card.t && C.foot.b <= C.card.b, JSON.stringify([C.card, C.foot]));
-ok('C3 环境行与操作行不重叠', C.foot.t >= C.row.b - 1, JSON.stringify([C.row.b, C.foot.t]));
-ok('C4 环境行下沿离卡底 4~10px', C.card.b - C.foot.b >= 4 && C.card.b - C.foot.b <= 10, String(C.card.b - C.foot.b));
+ok('C1 卡高回到 输入高 + 82', C.card.h === Math.round(C.ci + 82), JSON.stringify([C.card.h, C.ci]));
+ok('C2 环境行回到卡外（在卡下沿之下）', C.foot.t >= C.card.b, JSON.stringify([C.card, C.foot]));
+ok('C3 环境行坐在 #F2F2F2 灰背板上', C.plateBg === 'rgb(242, 242, 242)' && C.plate.t <= C.foot.t && C.plate.b >= C.foot.b, JSON.stringify([C.plate, C.foot, C.plateBg]));
+ok('C4 环境行下沿离背板底 4~10px', C.plate.b - C.foot.b >= 4 && C.plate.b - C.foot.b <= 10, String(C.plate.b - C.foot.b));
 
 /* ---------- D 分组标签与分隔线 ---------- */
 const D = await h.evaluate(() => {
@@ -140,8 +151,8 @@ const I = await h.evaluate(() => {
   const R = s => { const e = document.querySelector(s); const r = e.getBoundingClientRect(); return { t: Math.round(r.top), b: Math.round(r.bottom), h: Math.round(r.height) }; };
   return { card: R('.c-card'), toolbar: R('.toolbar'), ver: R('.version'), stage: R('.stage'), pm: R('#panelMain') };
 });
-ok('I1 1180 下工具行换行后仍不压卡', I.toolbar.t >= I.card.b, JSON.stringify([I.card.b, I.toolbar.t]));
-ok('I2 1180 下版本号在工具行之下不叠压', I.ver.t >= I.toolbar.b - 1, JSON.stringify([I.toolbar, I.ver]));
+ok('I1 1180 下工具行换行后仍不压卡', I.card.t >= I.toolbar.b - 1, JSON.stringify([I.toolbar.b, I.card.t]));
+ok('I2 1180 下版本号仍贴 stage 底', Math.abs(I.ver.b - I.stage.b) <= 1, JSON.stringify([I.ver.b, I.stage.b]));
 ok('I3 1180 下仍不越出面板', I.stage.b <= I.pm.b + 1, JSON.stringify([I.stage.b, I.pm.b]));
 
 await b.close();
