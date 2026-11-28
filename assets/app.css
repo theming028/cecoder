@@ -5410,27 +5410,21 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
    ============================================================ */
 body[data-page="home"] .panel-main {
   isolation: isolate;
-  /* 第 111 轮：底色 / 色相全部换成参考站（deepseek.com）的原版冷蓝灰，
-     网格去掉（用户：不要格子）——起伏只由 canvas 云雾负责 */
+  /* 第 117 轮：底色 / 渐变照搬参考站（deepseek.com 首页 hero section）——
+     canvas 拿不到 WebGL2 时，这层就是它的降级底色 */
   background-color: #FBFCFE;
-  background-image:
-    radial-gradient(ellipse 66% 62% at 92% 4%, rgba(84, 116, 182, .17), transparent 72%),
-    radial-gradient(ellipse 62% 58% at 2% 98%, rgba(84, 116, 182, .15), transparent 74%);
-  background-repeat: no-repeat, no-repeat;
-  background-size: 100% 100%, 100% 100%;
-  background-position: 0 0, 0 0;
+  background-image: linear-gradient(180deg, #9cc1e7 0%, rgba(250, 250, 250, 0) 100%);
 }
-/* 云雾层：低分辨率 canvas（尺寸由 JS 按 1/6 给），铺满整个 panel-main */
-.pm-mist { display: none; }
-body[data-page="home"] .pm-mist {
+/* 第 117 轮：背景两层 canvas（WebGL pattern + 静态网格），铺满 panel-main。
+   mask 与参考站一致：顶部近乎不透明（#000000fc → #000000e8 于 8.98%）一路淡出到全透明，
+   于是上半屏是原版那块蓝白流体、往下自然化进底色。 */
+.pm-mist, .pm-grid { display: none; }
+body[data-page="home"] .pm-mist,
+body[data-page="home"] .pm-grid {
   display: block; position: absolute; inset: 0; width: 100%; height: 100%;
   z-index: -1; pointer-events: none;
-}
-/* 中心留白：雾压到标题 / 输入框下面仍然要读得清（静态层，不参与动画） */
-body[data-page="home"] .panel-main::after {
-  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: radial-gradient(ellipse 56% 50% at 50% 44%,
-    rgba(255, 255, 255, .52), rgba(255, 255, 255, .18) 56%, transparent 80%);
+  -webkit-mask: linear-gradient(#000000fc 0%, #000000e8 8.98%, transparent 100%);
+  mask: linear-gradient(#000000fc 0%, #000000e8 8.98%, transparent 100%);
 }
 
 /* ============================================================

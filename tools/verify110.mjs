@@ -4,6 +4,7 @@
    ③ 首页环境光重做成「云雾流场」：1/6 分辨率 canvas 每 50ms 画一次，雾团沿左下→右上慢漂 */
 const BASE = (process.env.CECODER_ROOT || process.cwd()).replace(/\\/g, '/');
 import puppeteer from 'puppeteer-core';
+import { installGlSampler } from './_glsample.mjs';
 
 const b = await puppeteer.launch({ executablePath: (process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe'), headless: 'new', args: ['--force-device-scale-factor=1'] });
 let pass = 0; const fail = [];
@@ -117,41 +118,35 @@ const h = await b.newPage(); h.__e = [];
 h.on('pageerror', e => h.__e.push('pageerror: ' + e.message));
 h.on('console', m => { if (m.type() === 'error') h.__e.push('console: ' + m.text()); });
 await h.setViewport({ width: 1440, height: 900 });
+await installGlSampler(h);   /* 第 117 轮：背景是 WebGL2，像素只能同帧 readPixels（见 _glsample.mjs） */
 await h.goto('file:///' + BASE + '/cecoder-home.html', { waitUntil: 'load' });
 await wait(900);
 const H = await h.evaluate(() => {
   const pm = document.getElementById('panelMain'), cv = document.getElementById('pmMist');
   const pr = pm.getBoundingClientRect(), cs = getComputedStyle(cv);
-  const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
-  let cov = 0, r = 0, g2 = 0, bl = 0, n = 0;
-  for (let i = 0; i < d.length; i += 4) {
-    if (d[i + 3] > 6) { cov++; r += d[i]; g2 += d[i + 1]; bl += d[i + 2]; n++; }
-  }
+  const gl = cv.getContext('webgl2');
   return {
     pm: [Math.round(pr.width), Math.round(pr.height)], cv: [cv.width, cv.height],
-    ratio: +(cv.width / pr.width).toFixed(2), cov: +(cov / (d.length / 4)).toFixed(2),
-    rgb: n ? [Math.round(r / n), Math.round(g2 / n), Math.round(bl / n)] : null,
+    ratio: +(cv.width / pr.width).toFixed(2),
+    gl: !!gl, lost: gl ? gl.isContextLost() : null,
+    frames: window.__gl ? window.__gl.frames : 0,
+    sig: window.__gl ? window.__gl.sig : null,
     disp: cs.display, z: cs.zIndex, pe: cs.pointerEvents,
     w: cs.width, h: cs.height
   };
 });
-/* 第 116 轮：1/6 → 1/2（6px 块换成 2px 块，肉眼看不出采样网格） */
-ok('D1 云雾 canvas 铺满面板、按 1/2 分辨率', H.disp === 'block' && H.z === '-1' && H.ratio >= 0.45 && H.ratio <= 0.55 && H.w === H.pm[0] + 'px' && H.h === H.pm[1] + 'px', JSON.stringify([H.disp, H.z, H.ratio, H.w, H.h]));
-ok('D2 画满了（>90% 像素有雾）', H.cov > 0.9, H.cov);
-ok('D3 雾是蓝调（蓝通道最高）', H.rgb && H.rgb[2] > H.rgb[0] && H.rgb[2] > H.rgb[1], JSON.stringify(H.rgb));
+/* 第 117 轮：低分辨率 2D 云雾整体换成参考站原版 WebGL2 pattern */
+ok('D1 背景 canvas 铺满面板、内部像素 = CSS 尺寸（dpr≤1.5，不再降采样）', H.disp === 'block' && H.z === '-1' && H.ratio >= 0.99 && H.ratio <= 1.01 && H.w === H.pm[0] + 'px' && H.h === H.pm[1] + 'px', JSON.stringify([H.disp, H.z, H.ratio, H.w, H.h]));
+ok('D2 拿到的是 WebGL2 context，且没丢', H.gl && H.lost === false, JSON.stringify([H.gl, H.lost]));
+ok('D3 已在绘制（有帧 + 采到像素）', H.frames > 0 && Array.isArray(H.sig) && H.sig.length === 3, JSON.stringify([H.frames, H.sig]));
 ok('D4 不拦点击（pointer-events: none）', H.pe === 'none', H.pe);
 
-const sig = () => h.evaluate(() => {
-  const cv = document.getElementById('pmMist');
-  const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
-  let a = 0, m = 0;
-  for (let i = 3; i < d.length; i += 4) { a += d[i]; m = Math.max(m, d[i]); }
-  return [Math.round(a / (d.length / 4)), m];
-});
-const S1 = await sig(); await wait(1500); const S2 = await sig();
-ok('D5 雾在缓慢流动（两次像素指纹不同）', S1[0] !== S2[0] || S1[1] !== S2[1], JSON.stringify([S1, S2]));
+const sig = () => h.evaluate(() => (window.__gl && window.__gl.sig ? window.__gl.sig.join(',') : ''));
+const S1 = await sig(); await wait(4000); const S2 = await sig();
+ok('D5 雾在缓慢流动（两次像素指纹不同）', !!S1 && S1 !== S2, JSON.stringify([S1, S2]));
 
-/* 帧率与标题可读 */
+/* 帧率与标题可读（先关取样，readPixels 会打断管线） */
+await h.evaluate(() => { if (window.__gl) window.__gl.on = false; });
 const frames = await h.evaluate(() => new Promise(res => {
   const d = []; let last = performance.now(); let n = 0;
   const f = t => { d.push(t - last); last = t; if (++n < 120) requestAnimationFrame(f); else res(d); };
@@ -171,8 +166,8 @@ const s = await b.newPage();
 await s.setViewport({ width: 1440, height: 900 });
 await s.goto('file:///' + BASE + '/cecoder-session.html', { waitUntil: 'load' });
 await wait(400);
-const S = await s.evaluate(() => { const cv = document.getElementById('pmMist'); return cv ? [getComputedStyle(cv).display, cv.width] : null; });
-ok('D8 其它页面不画雾（display:none、canvas 保持初始尺寸）', S && S[0] === 'none' && S[1] === 220, JSON.stringify(S));
+const S = await s.evaluate(() => { const cv = document.getElementById('pmMist'); return cv ? [getComputedStyle(cv).display, cv.width, cv.height] : null; });
+ok('D8 其它页面不画雾（display:none、canvas 未被撐开）', S && S[0] === 'none' && S[1] === 300 && S[2] === 150, JSON.stringify(S));
 ok('E1 首页无报错', h.__e.length === 0, h.__e.join(' | '));
 
 console.log('\n第 110 轮：' + pass + ' / ' + (pass + fail.length) + ' 通过');

@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer-core';
+import { installGlSampler } from './_glsample.mjs';
 const BASE = (process.env.CECODER_ROOT || process.cwd()).replace(/\\/g, '/');
 const EXE = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 let pass = 0, fail = 0;
@@ -12,8 +13,9 @@ const p = await b.newPage();
 const errs = [];
 p.on('pageerror', e => errs.push(e.message));
 await p.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
+await installGlSampler(p);   /* 第 117 轮：背景是 WebGL2，像素只能同帧 readPixels */
 await p.goto('file:///' + BASE + '/cecoder-home.html', { waitUntil: 'load' });
-await wait(900);
+await wait(1400);
 
 /* ---------- A 背景：去网格 + 参考站原版色 ---------- */
 const A = await p.evaluate(() => {
@@ -29,23 +31,24 @@ const A = await p.evaluate(() => {
   };
 });
 ok('A1 只在首页生效', A.page === 'home', A.page);
-ok('A2 网格已去掉（0 条 linear-gradient，无 44px 重复底）', A.linear === 0 && !/44px/.test(A.size), JSON.stringify([A.linear, A.size]));
+/* 第 117 轮：背景照搬参考站 —— panel-main 上只剩他们那条 #9cc1e7 → 透明的纵向渐变当降级底 */
+ok('A2 网格已去掉（背景只剩 1 条纵向渐变，无 44px 重复底）', A.linear === 1 && !/44px/.test(A.size), JSON.stringify([A.linear, A.size]));
 ok('A3 底色换成参考站原版近白冷蓝 #FBFCFE（蓝>绿>红）', A.rgb[2] > A.rgb[1] && A.rgb[1] > A.rgb[0] && Math.abs(A.rgb[0] - 251) <= 2, JSON.stringify(A.rgb));
-ok('A4 两团静态柔光仍画在背景上', A.radial === 2, String(A.radial));
+ok('A4 静态柔光已经交给 canvas（背景上不再画 radial）', A.radial === 0, String(A.radial));
 
-/* canvas 里的雾色必须是参考站那套冷蓝灰（色相 ~219°，不是产品主色 226° 的亮蓝，也不是紫） */
+/* 背景里的雾色必须是参考站那套冷蓝灰（色相 ~219°，不是产品主色 226° 的亮蓝，也不是紫）
+   第 117 轮：换成 WebGL2 后取不到 2D 像素，改用 _glsample 同帧 readPixels 的三通道均值 */
 const M = await p.evaluate(() => {
-  const cv = document.getElementById('pmMist');
-  const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
-  let r = 0, g = 0, b2 = 0, n = 0;
-  for (let i = 0; i < d.length; i += 4) { if (d[i + 3] > 10) { r += d[i]; g += d[i + 1]; b2 += d[i + 2]; n++; } }
-  r /= n; g /= n; b2 /= n;
-  const mx = Math.max(r, g, b2), mn = Math.min(r, g, b2), dd = mx - mn;
-  const hue = mx === b2 ? 240 + 60 * (r - g) / (dd || 1) : -1;
-  return { rgb: [Math.round(r), Math.round(g), Math.round(b2)], hue: +hue.toFixed(1), cov: +(n / (d.length / 4)).toFixed(2) };
+  const g = window.__gl;
+  const rgb = g && g.rgb ? g.rgb : [0, 0, 0];
+  const [r, gg, b2] = rgb;
+  const mx = Math.max(r, gg, b2), mn = Math.min(r, gg, b2), dd = mx - mn;
+  const hue = mx === b2 ? 240 + 60 * (r - gg) / (dd || 1) : -1;
+  const ok = g && Array.isArray(g.sig) && g.sig.every(v => v > 100);
+  return { rgb, hue: +hue.toFixed(1), cov: ok ? 1 : 0, frames: g ? g.n : 0 };
 });
 ok('A5 雾色是参考站冷蓝灰（220±10°，G>R 不发紫）', M.hue > 210 && M.hue < 232 && M.rgb[1] > M.rgb[0], JSON.stringify(M));
-ok('A6 雾铺满面板（覆盖率 > 90%）', M.cov > 0.9, String(M.cov));
+ok('A6 背景整层都画上了（采样行全部有像素）', M.cov === 1 && M.frames > 0, JSON.stringify([M.cov, M.frames]));
 
 /* ---------- B 工具栏：chip 磨砂白 + label 白 85% ---------- */
 /* 第 107 轮起默认不预选任何 chip，先点一个才有选中态可测 */

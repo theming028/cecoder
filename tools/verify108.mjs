@@ -5,6 +5,7 @@
       两层分别跑 32s / 24s 的 alternate 动画（reduced-motion 下停） */
 const BASE = (process.env.CECODER_ROOT || process.cwd()).replace(/\\/g, '/');
 import puppeteer from 'puppeteer-core';
+import { installGlSampler } from './_glsample.mjs';
 
 const b = await puppeteer.launch({ executablePath: (process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe'), headless: 'new', args: ['--force-device-scale-factor=1'] });
 let pass = 0; const fail = [];
@@ -85,8 +86,9 @@ ok('C1 uidone 无脚本报错', p.__e.length === 0, p.__e.join(' | '));
 const h = await b.newPage(); h.__e = [];
 h.on('pageerror', e => h.__e.push('pageerror: ' + e.message));
 await h.setViewport({ width: 1440, height: 900 });
+await installGlSampler(h);   /* 第 117 轮：背景是 WebGL2，readPixels 要同帧取（见 _glsample.mjs） */
 await h.goto('file:///' + BASE + '/cecoder-home.html', { waitUntil: 'load' });
-await wait(600);
+await wait(900);
 const H0 = await h.evaluate(() => {
   const pm = document.getElementById('panelMain');
   const cs = getComputedStyle(pm), bs = getComputedStyle(pm, '::before'), as = getComputedStyle(pm, '::after');
@@ -94,7 +96,7 @@ const H0 = await h.evaluate(() => {
   return {
     page: document.body.dataset.page,
     /* Chrome 对 color-mix 结果返回 color(srgb 0..1) —— 统一折到 0..255 */
-    bg: cs.backgroundColor, rgb: (() => { const v = m.slice(0, 3).map(Number); return v.every(n => n <= 1) ? v.map(n => Math.round(n * 255)) : v; })(),
+    bg: cs.backgroundColor, bgImage: cs.backgroundImage, rgb: (() => { const v = m.slice(0, 3).map(Number); return v.every(n => n <= 1) ? v.map(n => Math.round(n * 255)) : v; })(),
     grid: cs.backgroundImage.split('linear-gradient').length - 1,
     gridSize: cs.backgroundSize,
     isolation: cs.isolation,
@@ -102,32 +104,48 @@ const H0 = await h.evaluate(() => {
     glows: cs.backgroundImage.split('radial-gradient').length - 1,
     before: { name: bs.animationName },
     after: { name: as.animationName, z: as.zIndex, pos: as.position, bg: as.backgroundImage },
-    /* 第 110 轮：动的那层换成 canvas 云雾（#pmMist） */
-    mist: (() => { const cv = document.getElementById('pmMist'); if (!cv) return null; const v = getComputedStyle(cv); return { disp: v.display, z: v.zIndex, pos: v.position, w: cv.width }; })()
+    /* 第 117 轮：背景换成参考站原版 WebGL2（#pmMist）+ 静态网格（#pmGrid） */
+    mist: (() => {
+      const cv = document.getElementById('pmMist');
+      if (!cv) return null;
+      const v = getComputedStyle(cv);
+      const gl = cv.getContext('webgl2');
+      const r = cv.getBoundingClientRect();
+      return {
+        disp: v.display, z: v.zIndex, pos: v.position,
+        attr: [cv.width, cv.height], css: [Math.round(r.width), Math.round(r.height)],
+        gl: !!gl, lost: gl ? gl.isContextLost() : null,
+        mask: /transparent 100%/.test(v.webkitMaskImage || v.maskImage || '')
+      };
+    })(),
+    grid: (() => {
+      const cv = document.getElementById('pmGrid');
+      if (!cv) return null;
+      const v = getComputedStyle(cv);
+      return { disp: v.display, z: v.zIndex, attr: [cv.width, cv.height] };
+    })()
   };
 });
 ok('D1 只在首页生效（body[data-page=home]）', H0.page === 'home', H0.page);
 ok('D2 底色是极淡主色（蓝通道 > 红通道，且几乎白）', H0.rgb[2] > H0.rgb[0] && H0.rgb[2] - H0.rgb[0] >= 3 && H0.rgb[0] > 235, JSON.stringify(H0.rgb));
-/* 第 111 轮：用户要求去掉网格，只剩两团柔光 + canvas 云雾 */
-ok('D3 网格已去掉（第 111 轮：首页不要格子）', H0.grid === 0 && !/44px/.test(H0.gridSize), JSON.stringify([H0.grid, H0.gridSize]));
-ok('D4 静态两团蓝光画在 panel-main 背景上（isolation + 2 个 radial）', H0.isolation === 'isolate' && H0.glows === 2, JSON.stringify([H0.isolation, H0.glows]));
-ok('D5 ::after 是静态的中心留白层（无动画）', H0.before.name === 'none' && H0.after.name === 'none' && /radial-gradient/.test(H0.after.bg), JSON.stringify([H0.before.name, H0.after.name]));
-/* 第 116 轮：内部分辨率 1/6 → 1/2（每源像素 2 屏像素，块感不可辨） */
-ok('D6 云雾层自成层（absolute + z-index:-1 + 1/2 分辨率）', H0.mist && H0.mist.disp === 'block' && H0.mist.pos === 'absolute' && H0.mist.z === '-1' && H0.mist.w > 300, JSON.stringify(H0.mist));
+/* 第 117 轮：背景照搬参考站 —— panel-main 自身只留一条 #9cc1e7 → 透明的纵向渐变当降级底色 */
+ok('D3 背景是一条纵向渐变（原站 #9cc1e7 → 透明），没有网格', /linear-gradient/.test(H0.bgImage || '') && !/44px/.test(H0.gridSize || ''), JSON.stringify([String(H0.bg).slice(0, 60), H0.gridSize]));
+ok('D4 没有全尺寸伪元素动画（::before / ::after 都停用）', H0.before.name === 'none' && H0.after.name === 'none', JSON.stringify([H0.before.name, H0.after.name]));
+ok('D5 背景第一层是 WebGL2 canvas（absolute / z-index:-1 / 与面板等大）',
+  !!H0.mist && H0.mist.disp === 'block' && H0.mist.pos === 'absolute' && H0.mist.z === '-1' &&
+  H0.mist.gl && H0.mist.lost === false &&
+  H0.mist.attr[0] === H0.mist.css[0] && H0.mist.attr[1] === H0.mist.css[1], JSON.stringify(H0.mist));
+ok('D6 第二层是原站那张静态网格 canvas（同样是背景层、不吃事件）',
+  !!H0.grid && H0.grid.disp === 'block' && H0.grid.z === '-1' && H0.grid.attr[0] > 300, JSON.stringify(H0.grid));
 
-/* 动的是 canvas 的像素（不是 CSS 动画） */
-/* 用「按位置加权」的指纹：单看平均 alpha 会因四舍五入撞成同一个值 */
-const sig = () => h.evaluate(() => {
-  const cv = document.getElementById('pmMist');
-  const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
-  let sum = 0;
-  for (let i = 3, k = 0; i < d.length; i += 4, k++) sum += d[i] * ((k % 11) + 1);
-  return sum;
-});
+/* 动的是 canvas 的像素（不是 CSS 动画）
+   第 117 轮：背景是 WebGL2，取不到 2D 像素 —— 用 _glsample 在 drawArrays 之后同帧
+   readPixels 拿到的那一行指纹（[RGB 均值, 最大亮度]）。 */
+const sig = () => h.evaluate(() => (window.__gl && window.__gl.sig ? window.__gl.sig.join(',') : ''));
 const s1 = await sig();
-await wait(1600);
+await wait(4000);
 const s2 = await sig();
-ok('D7 云雾在流动（canvas 像素在变）', s1 !== s2, JSON.stringify([s1, s2]));
+ok('D7 云雾在流动（同帧采样到的像素在变）', !!s1 && s1 !== s2, JSON.stringify([s1, s2]));
 
 /* reduced-motion 下只画一帧就停 */
 await h.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
@@ -136,7 +154,7 @@ await wait(600);
 const r1 = await sig();
 await wait(1200);
 const r2 = await sig();
-ok('D8 prefers-reduced-motion：云雾停住', r1 === r2 && r1 > 0, JSON.stringify([r1, r2]));
+ok('D8 prefers-reduced-motion：云雾停住', !!r1 && r1 === r2, JSON.stringify([r1, r2]));
 await h.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
 
 /* 内容仍然压在光层之上（标题可读、不被盖住） */

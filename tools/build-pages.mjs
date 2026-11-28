@@ -43,7 +43,7 @@ const P = {
 const stageChat = P.stageopen.replace('class="stage"', 'class="stage is-chat"');
 const pmChat = P.panelmain.replace('class="panel-main"', 'class="panel-main is-chat"');
 
-function wrap({ title, page, body }) {
+function wrap({ title, page, body, scripts = '' }) {
   return `<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -56,6 +56,7 @@ function wrap({ title, page, body }) {
 <body data-page="${page}">
 ${body}
 <script src="assets/app.js"></script>
+${scripts}
 </body>
 </html>
 `;
@@ -86,6 +87,8 @@ const home = wrap({
   title: 'Cecoder · 落地首页',
   page: 'home',
   body: homeBody,
+  /* 第 117 轮：参考站原版 WebGL2 背景，只在首页引入 */
+  scripts: '<script src="assets/flowfield.js"></script>',
 });
 
 /* ---------- 2 会话页：对话/轨迹 + 对话流 + 输入区 +（可收起的）右栏 ---------- */

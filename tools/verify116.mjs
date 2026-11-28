@@ -1,102 +1,94 @@
-/* 第 116 轮验收：首页「云雾」背景的观感修正
-   用户反馈两条：①细看有马赛克；②"混沌云"看不出在运动。
-   ①的成因：canvas 内部按 1/6 分辨率绘制、CSS 拉满 → 每个源像素变成 6×6 屏像素，
-     缓变渐变放大后是一片软方块。改 1/2 后只剩 2px。
-   ②的成因：每点只在自身 3~4% 屏宽的范围内小幅往复（周期 8~20s），位移总量 <60px；
-     改成幅度 7~17%、周期 30~58s，另加第二种角速度叠加出"变形"而非"整块平移"。
-   本脚本只量可量化的部分：采样比、运动幅度、帧成本、静止偏好、其它页面不画雾。 */
+/* 第 117 轮验收：首页背景换成参考站（www.deepseek.com）原版实现
+   用户原话：「算了，你就把参考网站的原封不动的复制过来吧」——
+   于是把线上 bundle 里的 WebGL2 片元着色器「pattern」（checks + 域扭曲 + 8 段漩涡，
+   三段颜色 mix）逐行搬进 assets/flowfield.js，参数取他们首页 hero 传的那一组；
+   第二层是他们那张静态网格（90px / 线 10% / 点 4%）；两层共用同一条 mask。
+   本脚本只量可量化的部分：结构、着色器与参数是否原样、是否在动、帧率、省电模式、其它页不受影响。 */
 import puppeteer from 'puppeteer-core';
+import { readFileSync } from 'node:fs';
+import { installGlSampler } from './_glsample.mjs';
+
 const BASE = (process.env.CECODER_ROOT || process.cwd()).replace(/\\/g, '/');
-const EXE = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
+const EXE = process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 let pass = 0, fail = 0;
 const ok = (label, cond, detail) => {
   if (cond) { pass++; console.log('  ok   ' + label); }
   else { fail++; console.log('  FAIL ' + label + (detail ? '  << ' + detail : '')); }
 };
 const wait = ms => new Promise(r => setTimeout(r, ms));
-const b = await puppeteer.launch({ executablePath: EXE, headless: 'new', args: ['--force-device-scale-factor=1'] });
+
+const b = await puppeteer.launch({ executablePath: EXE, headless: 'new', args: ['--force-device-scale-factor=1', '--enable-unsafe-swiftshader'] });
 
 const h = await b.newPage();
 const errs = [];
 h.on('pageerror', e => errs.push(e.message));
 h.on('console', m => { if (m.type() === 'error') errs.push('console: ' + m.text()); });
 await h.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
+await installGlSampler(h);
 await h.goto('file:///' + BASE + '/cecoder-home.html', { waitUntil: 'load' });
-await wait(1200);
+await wait(1500);
 
-/* ---------- A 采样比：块尺寸 ---------- */
+/* ---------- A 结构：两层 canvas ---------- */
 const A = await h.evaluate(() => {
-  const cv = document.getElementById('pmMist');
-  const r = cv.getBoundingClientRect();
   const pm = document.getElementById('panelMain').getBoundingClientRect();
-  return {
-    inner: [cv.width, cv.height],
-    css: [Math.round(r.width), Math.round(r.height)],
-    panel: [Math.round(pm.width), Math.round(pm.height)],
-    ratio: +(r.width / cv.width).toFixed(3),
-    ir: getComputedStyle(cv).imageRendering,
-    disp: getComputedStyle(cv).display,
-    pe: getComputedStyle(cv).pointerEvents
-  };
-});
-ok('A1 一个源像素只放大到 2~2.5 个屏像素（块感不可辨）', A.ratio >= 1.9 && A.ratio <= 2.5, JSON.stringify([A.ratio, A.inner]));
-ok('A2 canvas 铺满整个 panel-main', A.css[0] === A.panel[0] && A.css[1] === A.panel[1], JSON.stringify([A.css, A.panel]));
-ok('A3 没开 pixelated（否则 2px 块反而更硬）', A.ir === 'auto', A.ir);
-ok('A4 仍是装饰层：显示中、不吃事件', A.disp === 'block' && A.pe === 'none', JSON.stringify([A.disp, A.pe]));
-
-/* ---------- B 运动幅度：1.5 秒内雾应该明显变过 ---------- */
-const B = await h.evaluate(async () => {
-  const cv = document.getElementById('pmMist');
-  const ctx = cv.getContext('2d');
-  const snap = () => ctx.getImageData(0, 0, cv.width, cv.height).data;
-  const a = snap();
-  await new Promise(r => setTimeout(r, 1500));
-  const c = snap();
-  let sum = 0, max = 0, moved = 0, n = a.length / 4;
-  for (let i = 0; i < a.length; i += 4) {
-    const d = Math.abs(a[i + 3] - c[i + 3]);
-    sum += d; if (d > max) max = d; if (d > 4) moved++;
-  }
-  return { n, avg: +(sum / n).toFixed(2), max, movedPct: +(moved / n * 100).toFixed(1) };
-});
-ok('B1 1.5 秒内平均 alpha 变化 ≥ 3（肉眼能看出在走）', B.avg >= 3, String(B.avg));
-ok('B2 超过 30% 的像素发生了变化', B.movedPct >= 30, B.movedPct + '%');
-ok('B3 存在明显位移（单点 alpha 变化峰值 ≥ 25）', B.max >= 25, String(B.max));
-
-/* 两次相隔 0.4 秒的快照也要有差异（15fps 下每帧都在更新，不是偶发跳变） */
-const B2 = await h.evaluate(async () => {
-  const cv = document.getElementById('pmMist');
-  const ctx = cv.getContext('2d');
-  const a = ctx.getImageData(0, 0, cv.width, cv.height).data;
-  await new Promise(r => setTimeout(r, 400));
-  const c = ctx.getImageData(0, 0, cv.width, cv.height).data;
-  let d = 0;
-  for (let i = 3; i < a.length; i += 4) d += Math.abs(a[i] - c[i]);
-  return +(d / (a.length / 4)).toFixed(2);
-});
-ok('B4 0.4 秒内仍在变（不是 1~2 秒才跳一下）', B2 >= 0.6, String(B2));
-
-/* ---------- C 帧成本：加分辨率后主线程不能掉帧 ---------- */
-const C = await h.evaluate(async () => {
-  const gaps = [];
-  let last = performance.now();
-  await new Promise(res => {
-    const t0 = performance.now();
-    const step = () => {
-      const now = performance.now();
-      gaps.push(now - last); last = now;
-      if (now - t0 < 2500) requestAnimationFrame(step); else res();
+  const one = (id) => {
+    const cv = document.getElementById(id);
+    if (!cv) return null;
+    const v = getComputedStyle(cv), r = cv.getBoundingClientRect();
+    return {
+      attr: [cv.width, cv.height],
+      css: [Math.round(r.width), Math.round(r.height)],
+      disp: v.display, pos: v.position, z: v.zIndex, pe: v.pointerEvents,
+      mask: /rgba\(0, 0, 0, 0\) 100%/.test(v.webkitMaskImage || v.maskImage || ''),
+      gl2: !!cv.getContext('webgl2')
     };
-    requestAnimationFrame(step);
-  });
-  gaps.sort((a, b) => a - b);
-  const q = p => gaps[Math.min(gaps.length - 1, Math.floor(gaps.length * p))];
-  return { n: gaps.length, p50: +q(.5).toFixed(1), p95: +q(.95).toFixed(1), max: +gaps[gaps.length - 1].toFixed(1) };
+  };
+  return { panel: [Math.round(pm.width), Math.round(pm.height)], flow: one('pmMist'), grid: one('pmGrid') };
 });
-ok('C1 帧间隔 p95 ≤ 20ms（60fps 不抖）', C.p95 <= 20, JSON.stringify(C));
-ok('C2 无长帧（最大间隔 ≤ 34ms）', C.max <= 34, JSON.stringify(C));
+ok('A1 第一层是 WebGL2 背景、与面板等大', !!A.flow && A.flow.gl2 && A.flow.disp === 'block' && A.flow.pos === 'absolute' &&
+  A.flow.css[0] === A.panel[0] && A.flow.css[1] === A.panel[1] &&
+  A.flow.attr[0] === A.flow.css[0] && A.flow.attr[1] === A.flow.css[1], JSON.stringify([A.panel, A.flow]));
+ok('A2 第二层是原站那张静态网格 canvas', !!A.grid && A.grid.disp === 'block' && A.grid.pos === 'absolute' &&
+  A.grid.css[0] === A.panel[0] && !A.grid.gl2, JSON.stringify(A.grid));
+ok('A3 两层都压在内容之下、不吃事件', A.flow.z === '-1' && A.grid.z === '-1' &&
+  A.flow.pe === 'none' && A.grid.pe === 'none', JSON.stringify([A.flow.z, A.grid.z, A.flow.pe, A.grid.pe]));
+ok('A4 两层共用原站那条 mask（顶部不透明 → 到底部淡出）', A.flow.mask && A.grid.mask, JSON.stringify([A.flow.mask, A.grid.mask]));
 
-/* ---------- D 雾层仍只盖背景：标题/输入卡可命中 ---------- */
+/* ---------- B 源码：着色器与参数是否原样搬过来 ---------- */
+const js = readFileSync(BASE + '/assets/flowfield.js', 'utf8');
+const homeHtml = readFileSync(BASE + '/cecoder-home.html', 'utf8');
+const sessionHtml = readFileSync(BASE + '/cecoder-session.html', 'utf8');
+ok('B1 只在首页引入 flowfield.js', /<script src="assets\/flowfield\.js">/.test(homeHtml) && !/<script src="assets\/flowfield\.js">/.test(sessionHtml), '');
+ok('B2 着色器是原版那段（GLSL ES 3.0 + blend_multi + 漩涡循环）',
+  /#version 300 es/.test(js) && /vec3 blend_multi\(float mixer, float softness\)/.test(js) &&
+  /u_swirlIterations/.test(js) && /checks_shape_uv/.test(js), '');
+ok('B3 参数取他们首页传的那一组',
+  /'#8AA3D6'/.test(js) && /speed: 14/.test(js) && /distortion: 20/.test(js) && /swirl: 12/.test(js) &&
+  /swirlIterations: 8/.test(js) && /scale: 0\.5/.test(js) && /rotation: -5/.test(js) &&
+  /proportion: 50/.test(js) && /softness: 100/.test(js) && /shapeScale: 10/.test(js) && /offsetY: 65/.test(js), '');
+ok('B4 时间驱动用原版三条周期（420 / 460 / 90）', /\[420, 460, 90\]/.test(js), '');
+ok('B5 旧的 2D 云雾实现已下线（app.js 里不再有 pmMist 的绘制）',
+  !/function pmMist/.test(readFileSync(BASE + '/assets/app.js', 'utf8')), '');
+
+/* ---------- C 在动 + 帧率 ---------- */
+const sig = () => h.evaluate(() => (window.__gl && window.__gl.sig ? window.__gl.sig.join(',') : ''));
+const C0 = await h.evaluate(() => ({ frames: window.__gl ? window.__gl.frames : 0, sig: window.__gl ? window.__gl.sig : null, err: window.__gl ? window.__gl.err : null }));
+ok('C1 已在绘制且采样非空白', C0.frames > 10 && Array.isArray(C0.sig) && C0.sig.every(v => v > 100), JSON.stringify(C0));
+const s1 = await sig();
+await wait(4000);
+const s2 = await sig();
+ok('C2 4 秒内画面在变（同帧采样的三条横线指纹不同）', !!s1 && s1 !== s2, JSON.stringify([s1, s2]));
+
+await h.evaluate(() => { if (window.__gl) window.__gl.on = false; });
+const C3 = await h.evaluate(async () => {
+  const before = window.__gl.frames;
+  await new Promise(r => setTimeout(r, 2000));
+  return { before, after: window.__gl.frames };
+});
+const fps = (C3.after - C3.before) / 2;
+ok('C3 帧率贴着原版的 30fps 节流（22~34）', fps >= 22 && fps <= 34, fps.toFixed(1) + 'fps');
+
+/* ---------- D 内容仍可命中 ---------- */
 const D = await h.evaluate(() => {
   const hero = document.querySelector('.hero').getBoundingClientRect();
   const el = document.elementFromPoint(hero.left + 20, hero.top + 10);
@@ -104,40 +96,41 @@ const D = await h.evaluate(() => {
   const el2 = document.elementFromPoint(card.left + card.width / 2, card.top + 10);
   return { hero: el ? el.tagName + '.' + el.className : null, card: el2 ? el2.tagName + '.' + el2.className : null };
 });
-ok('D1 标题区命中的是内容元素（雾没盖上去）', !!D.hero && !/pm-mist/.test(D.hero), String(D.hero));
-ok('D2 输入卡可命中', !!D.card && !/pm-mist/.test(D.card), String(D.card));
+ok('D1 标题区命中的是内容元素（背景层没盖上来）', !!D.hero && !/pm-mist|pm-grid/.test(D.hero), String(D.hero));
+ok('D2 输入卡可命中', !!D.card && !/pm-mist|pm-grid/.test(D.card), String(D.card));
 
-/* ---------- E prefers-reduced-motion：只画一帧、不动 ---------- */
+/* ---------- E prefers-reduced-motion：只画一帧 ---------- */
 const rp = await b.newPage();
 await rp.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
 await rp.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+await installGlSampler(rp);
 await rp.goto('file:///' + BASE + '/cecoder-home.html', { waitUntil: 'load' });
 await wait(900);
-const E = await rp.evaluate(async () => {
-  const cv = document.getElementById('pmMist');
-  const ctx = cv.getContext('2d');
-  const a = ctx.getImageData(0, 0, cv.width, cv.height).data;
-  await new Promise(r => setTimeout(r, 800));
-  const c = ctx.getImageData(0, 0, cv.width, cv.height).data;
-  let d = 0, cov = 0;
-  for (let i = 0; i < a.length; i += 4) { d += Math.abs(a[i + 3] - c[i + 3]); if (a[i + 3] > 0) cov++; }
-  return { same: d === 0, covPct: +(cov / (a.length / 4) * 100).toFixed(1) };
-});
-ok('E1 省电模式下雾静止（两帧完全一致）', E.same, JSON.stringify(E));
-ok('E2 省电模式下仍画了一帧（不是空白）', E.covPct > 60, String(E.covPct));
+const E1 = await rp.evaluate(() => ({ frames: window.__gl.frames, sig: window.__gl.sig }));
+await wait(1600);
+const E2 = await rp.evaluate(() => ({ frames: window.__gl.frames, sig: window.__gl.sig }));
+ok('E1 省电模式下不再逐帧绘制（帧数不涨）', E1.frames >= 1 && E2.frames === E1.frames, JSON.stringify([E1.frames, E2.frames]));
+ok('E2 省电模式下仍画了第一帧（不是空白）', Array.isArray(E1.sig) && E1.sig.every(v => v > 100), JSON.stringify(E1.sig));
 await rp.close();
 
-/* ---------- F 其它页面不画雾 ---------- */
-const s2 = await b.newPage();
-await s2.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
-await s2.goto('file:///' + BASE + '/cecoder-session.html', { waitUntil: 'load' });
+/* ---------- F 其它页面不受影响 ---------- */
+const s2p = await b.newPage();
+await s2p.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
+await s2p.goto('file:///' + BASE + '/cecoder-session.html', { waitUntil: 'load' });
 await wait(600);
-const F = await s2.evaluate(() => {
+const F = await s2p.evaluate(() => {
   const cv = document.getElementById('pmMist');
-  return cv ? { disp: getComputedStyle(cv).display, w: cv.width } : null;
+  const grid = document.getElementById('pmGrid');
+  return {
+    disp: cv ? getComputedStyle(cv).display : null,
+    /* 不能拿 getContext('webgl2') 判「脚本没跑」—— 这一调用本身就会建上下文；
+       改看内部像素尺寸：脚本没启动时 canvas 停在默认的 300×150 */
+    size: cv ? [cv.width, cv.height] : null,
+    gridDisp: grid ? getComputedStyle(grid).display : null
+  };
 });
-ok('F1 会话页雾层隐藏、canvas 未启动', !!F && F.disp === 'none' && F.w === 220, JSON.stringify(F));
-await s2.close();
+ok('F1 会话页背景层隐藏、脚本没启动（canvas 仍是默认 300×150）', F.disp === 'none' && F.size && F.size[0] === 300 && F.size[1] === 150 && F.gridDisp === 'none', JSON.stringify(F));
+await s2p.close();
 
 ok('G1 首页无脚本报错', errs.length === 0, errs.join(' | '));
 

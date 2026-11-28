@@ -5,6 +5,7 @@
    ④ 首页环境光 = 低分辨率 canvas 云雾流场（第 110 轮重做），只画小图、不跑 CSS 大图层动画 */
 const BASE = (process.env.CECODER_ROOT || process.cwd()).replace(/\\/g, '/');
 import puppeteer from 'puppeteer-core';
+import { installGlSampler } from './_glsample.mjs';
 
 const b = await puppeteer.launch({ executablePath: (process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe'), headless: 'new', args: ['--force-device-scale-factor=1'] });
 let pass = 0; const fail = [];
@@ -157,44 +158,38 @@ ok('G1 ui 页无报错', u.__e.length === 0, u.__e.join(' | '));
 const h = await b.newPage(); h.__e = [];
 h.on('pageerror', e => h.__e.push('pageerror: ' + e.message));
 await h.setViewport({ width: 1440, height: 900 });
+await installGlSampler(h);   /* 第 117 轮：背景是 WebGL2，像素只能同帧 readPixels（见 _glsample.mjs） */
 await h.goto('file:///' + BASE + '/cecoder-home.html', { waitUntil: 'load' });
 await wait(900);
 const H0 = await h.evaluate(() => {
   const pm = document.getElementById('panelMain'), cv = document.getElementById('pmMist');
+  const gridEl = document.getElementById('pmGrid');
   const cs = getComputedStyle(pm), as = getComputedStyle(pm, '::after'), vcs = getComputedStyle(cv);
   const pr = pm.getBoundingClientRect();
-  const ctx = cv.getContext('2d');
-  const d = ctx.getImageData(0, 0, cv.width, cv.height).data;
-  let cov = 0;
-  for (let i = 3; i < d.length; i += 4) if (d[i] > 6) cov++;
+  const gl = cv.getContext('webgl2');
   return {
     pm: [Math.round(pr.width), Math.round(pr.height)],
     cv: [cv.width, cv.height], ratio: +(cv.width / pr.width).toFixed(2),
-    cov: +(cov / (d.length / 4)).toFixed(2),
+    gl: !!gl, lost: gl ? gl.isContextLost() : null,
+    frames: window.__gl ? window.__gl.frames : 0,
     disp: vcs.display, z: vcs.zIndex, pos: vcs.position, w: vcs.width, h: vcs.height,
-    glows: cs.backgroundImage.split('radial-gradient').length - 1,
-    grid: /44px 44px/.test(cs.backgroundSize),   /* 第 111 轮：已去掉 */
+    bgImage: cs.backgroundImage,
     afterAnim: as.animationName,
+    grid: gridEl ? { disp: getComputedStyle(gridEl).display, z: getComputedStyle(gridEl).zIndex } : null,
     anims: document.getAnimations().filter(a => a.playState === 'running').map(a => a.animationName).filter(n => /pm/i.test(n))
   };
 });
-ok('H1 首页有一层铺满面板的云雾 canvas（1/2 分辨率）', H0.disp === 'block' && H0.pos === 'absolute' && H0.z === '-1' && H0.ratio > 0.45 && H0.ratio < 0.55, JSON.stringify([H0.disp, H0.pos, H0.z, H0.ratio]));
-ok('H2 canvas 铺满面板且真的画上了（>90% 像素有雾）', H0.w === H0.pm[0] + 'px' && H0.cov > 0.9, JSON.stringify([H0.w, H0.cov]));
-ok('H3 没有全尺寸 CSS 动画（::after 是静态留白层）', H0.afterAnim === 'none' && H0.anims.length === 0, JSON.stringify([H0.afterAnim, H0.anims]));
-ok('H4 两团静态柔光仍画在 panel-main 背景上，网格按第 111 轮去掉', H0.glows === 2 && !H0.grid, JSON.stringify([H0.glows, H0.grid]));
+ok('H1 首页有一层铺满面板的 WebGL2 背景 canvas', H0.disp === 'block' && H0.pos === 'absolute' && H0.z === '-1' && H0.gl && H0.lost === false, JSON.stringify([H0.disp, H0.pos, H0.z, H0.gl, H0.lost]));
+ok('H2 canvas 与面板等大且真的在画（已有绘制帧）', H0.w === H0.pm[0] + 'px' && H0.cv[0] === H0.pm[0] && H0.frames > 0, JSON.stringify([H0.w, H0.cv, H0.pm, H0.frames]));
+ok('H3 没有全尺寸 CSS 动画（背景全交给 canvas）', H0.afterAnim === 'none' && H0.anims.length === 0, JSON.stringify([H0.afterAnim, H0.anims]));
+ok('H4 降级底色是原站那条 #9cc1e7 纵向渐变 + 第二层静态网格', /rgb\(156, 193, 231\)/.test(H0.bgImage) && !!H0.grid && H0.grid.disp === 'block', JSON.stringify([String(H0.bgImage).slice(0, 50), H0.grid]));
 
-/* 画面在动：取同一块区域两次像素指纹比 */
-const sig = () => h.evaluate(() => {
-  const cv = document.getElementById('pmMist');
-  const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
-  let a = 0, m = 0;
-  for (let i = 3; i < d.length; i += 4) { a += d[i]; m = Math.max(m, d[i]); }
-  return [Math.round(a / (d.length / 4)), m];
-});
+/* 画面在动：取同帧采样到的三条横线指纹比（原版动效很慢，等 4 秒） */
+const sig = () => h.evaluate(() => (window.__gl && window.__gl.sig ? window.__gl.sig.join(',') : ''));
 const S1 = await sig();
-await wait(1600);
+await wait(4000);
 const S2 = await sig();
-ok('H5 云雾在缓慢流动（像素指纹变了）', S1[0] !== S2[0] || S1[1] !== S2[1], JSON.stringify([S1, S2]));
+ok('H5 云雾在缓慢流动（像素指纹变了）', !!S1 && S1 !== S2, JSON.stringify([S1, S2]));
 
 /* 内容压在雾之上（标题可命中） */
 const H4 = await h.evaluate(() => {
@@ -204,7 +199,8 @@ const H4 = await h.evaluate(() => {
 });
 ok('H6 标题仍可命中（雾层不盖内容）', /ch|hero/.test(H4.hit), JSON.stringify(H4));
 
-/* 帧率：连着 120 帧的平均间隔应接近 16.7ms */
+/* 帧率：连着 120 帧的平均间隔应接近 16.7ms（先关掉取样，readPixels 会打断管线） */
+await h.evaluate(() => { if (window.__gl) window.__gl.on = false; });
 const frames = await h.evaluate(() => new Promise(res => {
   const d = []; let last = performance.now(); let n = 0;
   const f = t => { d.push(t - last); last = t; if (++n < 120) requestAnimationFrame(f); else res(d); };
@@ -220,7 +216,7 @@ await wait(700);
 const R1 = await sig();
 await wait(1400);
 const R2 = await sig();
-ok('H8 prefers-reduced-motion：云雾停在第一帧', R1[0] === R2[0] && R1[1] === R2[1] && R1[0] > 0, JSON.stringify([R1, R2]));
+ok('H8 prefers-reduced-motion：云雾停在第一帧', !!R1 && R1 === R2, JSON.stringify([R1, R2]));
 ok('E2 首页无报错', h.__e.length === 0, h.__e.join(' | '));
 
 console.log('\n第 109 轮：' + pass + ' / ' + (pass + fail.length) + ' 通过');
