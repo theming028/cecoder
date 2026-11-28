@@ -21,9 +21,10 @@ const box=s=>p.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return n
 await p.click('[data-chips="process"] .chip[data-wb="通用"]');
 await new Promise(r=>setTimeout(r,260));
 let chips = await p.evaluate(()=>[...document.querySelectorAll('[data-chips="process"] .chip')].map(e=>Math.round(e.getBoundingClientRect().width)));
-eq('chip 通用 选中宽', chips[0], 66); eq('chip 需求 未选宽', chips[1], 48);
+/* 第 119 轮：图标改成常显（padding 9→8、gap 4→3），选中与未选中同宽 63 */
+eq('chip 通用 选中宽', chips[0], 63); eq('chip 需求 未选宽', chips[1], 63);
 const ic = await p.evaluate(()=>{const c=document.querySelectorAll('[data-chips="process"] .chip');return [getComputedStyle(c[0].querySelector('.chip-ico')).display, getComputedStyle(c[1].querySelector('.chip-ico')).display];});
-if(ic[0]!=='none' && ic[1]==='none') pass++; else fail.push('chip 图标显隐 '+JSON.stringify(ic));
+if(ic[0]!=='none' && ic[1]!=='none') pass++; else fail.push('chip 图标常显 '+JSON.stringify(ic));
 
 // --- 场景卡三态 ---
 let s0 = await box('.scene'); eq('scene idle 高', s0[3], 80);

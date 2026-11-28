@@ -462,6 +462,19 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
   .stage .hero-sub { white-space: normal; height: auto; text-wrap: pretty; }
 }
 
+/* 第 119 轮：工作台图标改成常显后，单排工具栏的需求宽度从 852 涨到 920。
+   容器 820~920 这一段（约 1200px 窗口）既还没进上面的两排网格、又塞不下，
+   会把「+ 新建」顶出内容列 —— 这一档只收起两个分区标签（-114px），chips 不动；
+   低于 820 的主角是两排网格，标签要留着，所以再恢复回来。 */
+@container (max-width: 920px) {
+  .stage .toolbar .tb-label { display: none; }
+  .stage .toolbar .tb-chips { margin-left: 0; }
+}
+@container (max-width: 820px) {
+  .stage .toolbar .tb-label { display: inline; }
+  .stage .toolbar .tb-chips { margin-left: 0; }
+}
+
 /* ===== Hero ===== */
 .hero { flex: 0 0 auto; perspective: 600px; }
 .hero-title {
@@ -661,8 +674,15 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 .chip.is-active:hover { background: #EFF4FF; border-color: var(--cds-blue-4); }
 /* 工作台 chip：图标只在选中态出现（layers/tb-chip-icon.json · dy2983:48499 · 66×32）
    未选中 0 图标（28+9×2+2 = 48），选中 14 图标（1+9+14+4+28+9+1 = 66） */
-.chip-ico { display: none; }
-.chip.is-active .chip-ico { display: inline-flex; }
+.chip-ico { display: inline-flex; }
+/* 第 119 轮：图标不再只在选中态出现 —— 六个工作台 chip 默认就带图标，
+   选中态只是把颜色交给 .chip.is-active 的蓝（图标内 svg 的硬编码 #3770F7 已改成 currentColor）。 */
+/* 常显之后每个 chip 宽 48 → 66，整行多出约 110px，窄窗（1280 内容列 920）会顶出去：
+   首页工具栏单独收紧一档（padding 9→8、chip 间距 4→3、分隔线左右 15/16→12），
+   合计省 45px，1280 下刚好回到列内。 */
+body[data-page="home"] .toolbar .chip { padding: 0 8px; gap: 3px; }
+body[data-page="home"] .toolbar .tb-chips { gap: 3px; }
+body[data-page="home"] .toolbar .tb-div { margin: 0 12px; }
 
 /* 快速任务 chip 选中态（layers/quick-chip.json · nk2868:58658 · 76×32）
    底 rgba(91,88,255,.08) · 1px 实线 rgba(91,88,255,.16) · 字 #5B58FF（DSL 里 fill 是 #1F1F1F，
@@ -5477,16 +5497,13 @@ body[data-page="home"] .qf-bar {
   -webkit-backdrop-filter: blur(15px) saturate(140%);
   backdrop-filter: blur(15px) saturate(140%);
 }
-/* 第 118 轮：场景卡改成「黑 10% + 白色半透明描边」——压在蓝白流体上做一层暗玻璃，
-   卡片与背景的层次靠明暗而不是靠白。
-   顺手去掉 15px backdrop blur：它下面就是每帧在重画的 WebGL canvas，
-   一块 960×80 的区域每帧重新采样 + 模糊，是首页最贵的一笔合成开销；
-   黑 10% 本身已经有足够的分离度，模糊在这里没有可见收益。 */
+/* 第 119 轮：场景卡回到白色玻璃（第 118 轮试过黑 10%，压在蓝白流体上偏脏）——
+   白 85% + 15px backdrop blur，跟 .chip / .wb-bar 同一套磨砂语言。 */
 body[data-page="home"] .scene {
-  background: rgba(0, 0, 0, .1);
-  border-color: rgba(255, 255, 255, .6);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
+  background: rgba(255, 255, 255, .85);
+  border-color: rgba(255, 255, 255, .7);
+  -webkit-backdrop-filter: blur(15px) saturate(140%);
+  backdrop-filter: blur(15px) saturate(140%);
 }
 /* 容器变透之后，里面的纯白小卡改成极淡的蓝白描边才分得开 */
 body[data-page="home"] .wb-opt,
@@ -5495,21 +5512,11 @@ body[data-page="home"] .scene-add { background: rgba(255, 255, 255, .72); }
 /* 边框在半透明底上会发灰，统一提亮 */
 body[data-page="home"] .wb-bar,
 body[data-page="home"] .qf-bar { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .7); }
-/* idle 悬浮：底色是黑的，hover 不能再跳到白 96%（会闪），只在黑 10% 上加深一档 */
+/* idle 悬浮：跟白底时期一致，提到 96% 白 */
 body[data-page="home"] .scene[data-state="idle"]:hover,
 body[data-page="home"] .scene[data-state="idle"]:focus-within {
-  background: rgba(0, 0, 0, .16);
-  border-color: rgba(255, 255, 255, .8);
+  background: rgba(255, 255, 255, .96);
 }
-
-/* ============================================================
-   第 118 轮：sc-htxt（看板态标题组）统一 #152443
-   —— .scene-title / .scene-desc 各自写着 #1F1F1F / #868686，
-     只在父级写 color 不透传，所以三个都点名。
-   ============================================================ */
-body[data-page="home"] .sc-htxt,
-body[data-page="home"] .sc-htxt .scene-title,
-body[data-page="home"] .sc-htxt .scene-desc { color: #152443; }
 
 /* ============================================================
    第 112 轮：任务总结页的「完工烟花」画布

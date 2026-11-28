@@ -3,7 +3,9 @@
    ② 背景（WebGL2 pattern）纯成本优化：绘制缓冲 0.7 倍、常量 uniform 只设一次、
       powerPreference 不再强制集显 —— 观感不变，验收看「构图仍然铺满 + 片元数下降 + 帧率不降」；
    ③ `.scene` 场景卡：黑 10% + 白色半透明描边，去掉 15px backdrop blur（压在每帧重画的 canvas 上太贵）；
-   ④ `.sc-htxt` 标题组文字 #152443（title / desc 都点名，父级 color 不透传）。 */
+   ④ `.sc-htxt` 标题组文字 #152443（title / desc 都点名，父级 color 不透传）。
+   【第 119 轮已回滚 ③④：场景卡回白 85% + 15px blur，标题组回 #1F1F1F / #868686 ——
+     下面 C / D 两组断言同步改成回滚后的口径，验收点仍是「本轮的取舍没有偷偷改回去」。 */
 import puppeteer from 'puppeteer-core';
 import { installGlSampler } from './_glsample.mjs';
 
@@ -46,7 +48,7 @@ ok('A2 700 高：同样是 18%（不是被 clamp 钉死的 150）', Math.abs(B_t
 ok('A3 顶部偏移与容器高度成正比（比值差 < 1%）', Math.abs(A_t / A900.pm.h - B_t / A700.pm.h) < 0.01, JSON.stringify([A_t / A900.pm.h, B_t / A700.pm.h]));
 ok('A4 hero 仍贴在 stage 顶（结构没变）', Math.abs(A900.hero.t - A900.stage.t) <= 1 && Math.abs(A700.hero.t - A700.stage.t) <= 1, JSON.stringify([A900.hero.t, A900.stage.t]));
 
-/* ---------- C 场景卡：黑 10% + 白描边、无毛玻璃 ---------- */
+/* ---------- C 场景卡：第 119 轮已回滚到白色磨砂（黑 10% 只是第 118 轮的一次尝试） ---------- */
 await h.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
 await h.reload({ waitUntil: 'load' });
 await wait(1200);
@@ -55,11 +57,11 @@ const S = await h.evaluate(() => {
   const c = getComputedStyle(sc);
   return { bg: c.backgroundColor, border: c.borderColor, bw: c.borderWidth, bf: c.backdropFilter || c.webkitBackdropFilter || 'none' };
 });
-ok('C1 场景卡底色 = rgba(0,0,0,.1)', /rgba\(0, 0, 0, 0\.1\)/.test(S.bg), S.bg);
+ok('C1 场景卡底色 = 白 85%（第 119 轮回滚）', /rgba\(255, 255, 255, 0\.85\)/.test(S.bg), S.bg);
 ok('C2 描边 = 白色半透明（非全不透明）', /rgba\(255, 255, 255, 0\.\d+\)/.test(S.border) && S.bw === '1px', JSON.stringify([S.border, S.bw]));
-ok('C3 不再挂 backdrop blur（压在动态 canvas 上太贵）', S.bf === 'none', S.bf);
+ok('C3 白玻璃配套 15px backdrop blur', /blur\(15px\)/.test(S.bf), S.bf);
 
-/* hover 不能跳回白底（暗底上会闪） */
+/* hover：白底时期的口径是提到白 96% */
 const boxy = await h.evaluate(() => { const r = document.querySelector('.scene').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
 await h.mouse.move(boxy.x, boxy.y);
 await wait(420);
@@ -67,11 +69,11 @@ const SH = await h.evaluate(() => {
   const c = getComputedStyle(document.querySelector('.scene'));
   return { bg: c.backgroundColor, border: c.borderColor };
 });
-ok('C4 悬浮时底色加深但仍偏黑（不透明白）', /rgba\(0, 0, 0, 0\.\d+\)/.test(SH.bg) && !/rgba\(255, 255, 255/.test(SH.bg), JSON.stringify(SH));
+ok('C4 悬浮提到白 96%', /rgba\(255, 255, 255, 0\.96\)/.test(SH.bg), JSON.stringify(SH));
 await h.mouse.move(4, 4);
 await wait(320);
 
-/* ---------- D sc-htxt 文字色 ---------- */
+/* ---------- D sc-htxt 文字色（第 119 轮撤掉 #152443，回到各自的 token） ---------- */
 await h.click('#scIdle');
 await wait(520);
 const D = await h.evaluate(() => {
@@ -84,9 +86,9 @@ const D = await h.evaluate(() => {
   };
 });
 ok('D1 看板态已展开', D.state === 'open' || D.state === 'collapsed', D.state);
-ok('D2 sc-htxt 本体 #152443', D.ht === 'rgb(21, 36, 67)', D.ht);
-ok('D3 sc-htxt 里的标题 #152443（父级 color 不透传，必须点名）', D.title === 'rgb(21, 36, 67)', D.title);
-ok('D4 sc-htxt 里的副标题 #152443', D.desc === 'rgb(21, 36, 67)', D.desc);
+ok('D2 sc-htxt 本体回到 #1F1F1F', D.ht === 'rgb(31, 31, 31)', D.ht);
+ok('D3 标题 #1F1F1F', D.title === 'rgb(31, 31, 31)', D.title);
+ok('D4 副标题回到 #868686', D.desc === 'rgb(134, 134, 134)', D.desc);
 
 /* ---------- B 背景：缓冲缩小、仍在动、帧率不降 ---------- */
 const B = await h.evaluate(() => {
