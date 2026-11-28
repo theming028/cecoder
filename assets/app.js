@@ -4674,6 +4674,19 @@
       udFold.setAttribute('data-tip', folded ? '展开' : '折叠');
       var cv = document.getElementById('udCanvas');
       if (cv) cv.classList.toggle('is-folded', folded);
+      /* 第 126 轮：展开方向要自己补过渡 —— 折叠态是 absolute，切回 relative 的那一帧
+         浏览器直接布局到终值 240，transition 抓不到。做法：同一 tick 里先内联成 32px
+         （此时还没重排，所以不会先闪一下 240），再隔两帧松手，让 32 → 240 走 transition。 */
+      if (!folded) {
+        udPagesEl.style.width = '32px';
+        udPagesEl.style.flexBasis = '32px';
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            udPagesEl.style.width = '';
+            udPagesEl.style.flexBasis = '';
+          });
+        });
+      }
       if (!udUser) udApplyZoom();
     });
 

@@ -149,10 +149,12 @@ await p.click('#udPgGmail'); await wait(420);
 const I = await p.evaluate(() => {
   const q = s => document.querySelector(s);
   return { h: Math.round(q('#udPgGmail').closest('.ud-page').getBoundingClientRect().height),
-    hidden: q('#udPgGmailStates').hidden, exp: q('#udPgGmail').getAttribute('aria-expanded'),
+    fold: q('#udPgGmailStates').classList.contains('is-fold'), exp: q('#udPgGmail').getAttribute('aria-expanded'),
     tr: getComputedStyle(q('#udPgGmail .ud-chev-r')).transform };
 });
-ok('F6 再点收起：回到 44 高、箭头复位', I.h === 44 && I.hidden === true && I.exp === 'false' && I.tr === 'none', JSON.stringify(I));
+/* 第 125/126 轮：折叠态从 hidden 换成 .is-fold，箭头折叠时缩一档（scale .86）、不旋转 */
+ok('F6 再点收起：回到 44 高、箭头缩回不旋转',
+  I.h === 44 && I.fold === true && I.exp === 'false' && /matrix\(0\.86, 0, 0, 0\.86/.test(I.tr), JSON.stringify(I));
 
 /* 折叠往返后仍正常 */
 await p.click('#udFold'); await wait(300);

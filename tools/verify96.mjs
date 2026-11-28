@@ -125,12 +125,14 @@ ok('D15 「−」回落到 21 时被夹到 25%', z2 === '25%', z2);
 await p.click('#udFold'); await wait(300);
 const F = await p.evaluate(() => {
   const pg = document.querySelector('#udPages'); const cv = document.querySelector('.ud-canvas');
-  return { cls: pg.classList.contains('is-fold'), body: getComputedStyle(pg.querySelector('.ud-pages-body')).display,
+  const bodyCS = getComputedStyle(pg.querySelector('.ud-pages-body'));
+  return { cls: pg.classList.contains('is-fold'), body: bodyCS.display, bodyOp: bodyCS.opacity, bodyVis: bodyCS.visibility,
     h: Math.round(pg.getBoundingClientRect().height), w: Math.round(pg.getBoundingClientRect().width),
     abs: getComputedStyle(pg).position === 'absolute', folded: cv.classList.contains('is-folded'),
     pad: getComputedStyle(document.querySelector('.ud-stage')).paddingLeft, tip: document.querySelector('#udFold').getAttribute('data-tip') };
 });
-ok('F1 折叠后只剩标题条（body 不显示）', F.cls === true && F.body === 'none', JSON.stringify(F));
+/* 第 126 轮：body 不再 display:none（那会把宽度过渡里的淡出掐断），改成 opacity 0 + visibility hidden */
+ok('F1 折叠后只剩标题条（body 淡出且不可见）', F.cls === true && F.bodyOp === '0' && F.bodyVis === 'hidden', JSON.stringify(F));
 ok('F2 折叠后收成 32×32 浮键', F.h === 32 && F.w === 32, JSON.stringify([F.w, F.h]));
 ok('F3 折叠后画布吃满整幅（stage 内距恒 24）', F.folded === true && F.pad === '24px' && F.abs === true, JSON.stringify([F.folded, F.pad, F.abs]));
 ok('F4 折叠图标提示变「展开」', F.tip === '展开', F.tip);

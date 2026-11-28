@@ -4950,9 +4950,17 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
   backdrop-filter: blur(6px) saturate(150%);
   /* 第 98 轮：左边那根 1px 竖线（贴画布左缘，之前被白底吃掉过）+ 右边 1px 线 + 向右投影，把前景从灰底网格里托起来 */
   box-shadow: inset 1px 0 0 0 #EBECED, inset -1px 0 0 0 #E5E5E5, 2px 0 10px 0 rgba(0, 0, 0, .08);
+  /* 第 126 轮：整栏的收齐 / 展开改成和左侧任务栏（.ws-drawer）同一套「宽度滑动」——
+     原来是一步跳到 absolute 的 32×32 浮键，中间没有任何过渡。
+     宽度 .26s + 同一条 cubic-bezier(.2,.8,.2,1)，底色/阴影同步淡出。 */
+  transition: width .26s cubic-bezier(.2, .8, .2, 1),
+              flex-basis .26s cubic-bezier(.2, .8, .2, 1),
+              background-color .22s var(--cds-motion-ease),
+              box-shadow .22s var(--cds-motion-ease);
 }
 .ud-pages-head {
   flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
+  transition: padding .26s cubic-bezier(.2, .8, .2, 1), opacity .16s var(--cds-motion-ease);
   /* 稿 4068:65598：标题距左 19、距上 16；折叠图标 14 右边距 12 → 28×28 热区，右内距 5 让图标落在 221
      第 99 轮：底部内距 8 → 0（卡片自带的 9px 顶距已够，头上不再叠两层留白） */
   padding: 13px 5px 0 19px;
@@ -4978,18 +4986,26 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
   flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin;
   /* 稿 4068:65598：卡片顶到 y=50（头 13+28=41 + 9），左右 12；卡片之间 4 */
   padding: 9px 12px 12px; display: flex; flex-direction: column; gap: 4px;
+  transition: opacity .16s var(--cds-motion-ease);
 }
 .ud-pages-body::-webkit-scrollbar { width: 6px; }
 .ud-pages-body::-webkit-scrollbar-thumb { background: #DCDFE5; border-radius: 3px; }
 /* 折叠：整列收成左上角一颗 32×32 浮键（就是 .ud-pages-fold 本体），点它再展开 */
 .ud-canvas.is-folded .ud-pages {
   position: absolute; left: 12px; top: 12px; z-index: 3;
-  width: 32px; height: 32px; flex: 0 0 auto; overflow: visible;
+  /* 第 126 轮：flex-basis 写成 32px 而不是 auto —— auto 不可插值，
+     展开切回 relative 时宽度会直接跳到 240，过渡就抓不到了 */
+  width: 32px; height: 32px; flex: 0 0 32px; overflow: visible;
   background: none; box-shadow: none;
 }
 .ud-canvas.is-folded .ud-pages-head { padding: 0; gap: 0; }
+/* 折叠时标题与内容不能再用 display:none —— 那会把宽度过渡里的内容淡出掐断，
+   改成淡出 + 不可点，面板本体继续被 overflow 收窄；终态 32×32 的观感不变 */
 .ud-canvas.is-folded .ud-pages-t,
-.ud-canvas.is-folded .ud-pages-body { display: none; }
+.ud-canvas.is-folded .ud-pages-body {
+  opacity: 0; pointer-events: none; visibility: hidden;
+  transition: opacity .16s var(--cds-motion-ease), visibility 0s linear .26s;
+}
 /* 折叠态换成稿 4068:57550 的 32×32 白底面板键 */
 .ud-canvas.is-folded .ud-pages-fold {
   width: 32px; height: 32px; color: var(--cds-text-primary); background: #FFFFFF;
@@ -4997,6 +5013,9 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 }
 .ud-canvas.is-folded .ud-pages-fold .ico-fold { display: none; }
 .ud-canvas.is-folded .ud-pages-fold .ico-expand { display: block; }
+/* 第 126 轮：展开方向的过渡靠 JS 补两帧（见 app.js 里 udFold 的处理）——
+   试过用 @keyframes 播宽度，但折叠态是 absolute、切回 relative 的那一帧动画时钟不推进
+   （getAnimations() 里 currentTime 一直停在 0），所以改成「先内联成 32px 再松手」的过渡。 */
 
 .ud-tree, .ud-page {
   flex: 0 0 auto; width: 100%; box-sizing: border-box; text-align: left;
