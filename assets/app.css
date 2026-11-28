@@ -995,7 +995,8 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 }
 .c-card {
   position: absolute; left: 0; right: 0; top: 0; height: calc(var(--ci-h, 46px) + 82px + var(--c-tag-h, 0px));
-  background: var(--cds-bg-container); border: 1px solid var(--cds-line-strong);
+  /* 第 112 轮：描边改纯黑 12%（原来 #E5E5E5 在白卡上偏灰、压不住彩色流光） */
+  background: var(--cds-bg-container); border: 1px solid rgba(0, 0, 0, .12);
   border-radius: 8px; box-shadow: var(--cds-shadow-1);
   transition: border-color var(--cds-motion-duration) var(--cds-motion-ease);
 }
@@ -5430,7 +5431,9 @@ body[data-page="home"] .panel-main::after {
    雾在下面流动时能透出来（真正做出玻璃感，不是白色实底）。
    ============================================================ */
 body[data-page="home"] .chip {
-  background: rgba(255, 255, 255, .85);
+  /* 第 112 轮：白底 85% → 80%，边框整圈去掉（描边留 1px 透明，避免尺寸跳） */
+  background: rgba(255, 255, 255, .8);
+  border-color: transparent;
   -webkit-backdrop-filter: blur(15px) saturate(140%);
   backdrop-filter: blur(15px) saturate(140%);
 }
@@ -5440,7 +5443,7 @@ body[data-page="home"] .tb-chips-dim .chip:hover,
 body[data-page="home"] .tb-chips-dim .chip.is-active { opacity: 1; }
 /* 选中态仍是浅蓝，但也做成透的（实底会把玻璃感打断） */
 body[data-page="home"] .chip.is-active,
-body[data-page="home"] .chip.is-active:hover { background: rgba(243, 247, 255, .9); }
+body[data-page="home"] .chip.is-active:hover { background: rgba(243, 247, 255, .9); border-color: transparent; }
 body[data-page="home"] .tb-chips-dim .chip.is-active,
 body[data-page="home"] .tb-chips-dim .chip.is-active:hover { background: rgba(244, 243, 255, .9); }
 /* 白底之后 hover 的浅灰底会显脏，改成提亮 */
@@ -5449,6 +5452,9 @@ body[data-page="home"] .tb-chips-dim .chip:not(.chip-new):not(.is-active):hover,
 body[data-page="home"] .tb-chips-dim .chip:not(.chip-new):not(.is-active):focus-visible {
   background: rgba(255, 255, 255, .96);
 }
+body[data-page="home"] .chip-new,
+body[data-page="home"] .chip-new:hover,
+body[data-page="home"] .chip-new:focus-visible { border-color: transparent; }
 body[data-page="home"] .chip-new:hover { background: rgba(255, 255, 255, .96); }
 
 /* 分区标签：白字 85% */
@@ -5474,3 +5480,9 @@ body[data-page="home"] .qf-bar { box-shadow: inset 0 0 0 1px rgba(255, 255, 255,
 body[data-page="home"] .scene { border-color: rgba(255, 255, 255, .7); }
 body[data-page="home"] .scene[data-state="idle"]:hover,
 body[data-page="home"] .scene[data-state="idle"]:focus-within { background: rgba(255, 255, 255, .96); }
+
+/* ============================================================
+   第 112 轮：任务总结页的「完工烟花」画布
+   盖在 panel-main 上（z 9 > 内容列 8），只接绘制、不接鼠标事件。
+   ============================================================ */
+.sum-fw { position: absolute; inset: 0; z-index: 9; pointer-events: none; display: block; }

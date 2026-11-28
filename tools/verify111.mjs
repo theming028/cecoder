@@ -61,13 +61,15 @@ const B = await p.evaluate(() => {
   return {
     n: chips.length + quick.length,
     first: g(chips[1] || chips[0]), quick1: g(quick[0]),
+    borders: (chips.length + quick.length) > 0 ? [...chips, ...quick].every(c => getComputedStyle(c).borderTopColor === 'rgba(0, 0, 0, 0)') : false,
     active: act ? getComputedStyle(act).backgroundColor : null,
     label: { color: label.color, op: label.opacity },
     label2: { color: label2.color, op: label2.opacity }
   };
 });
-ok('B1 两组 chip 都拿到了磨砂白 85%', /rgba\(255, 255, 255, 0\.85\)/.test(B.first.bg) && /rgba\(255, 255, 255, 0\.85\)/.test(B.quick1.bg), JSON.stringify([B.first.bg, B.quick1.bg]));
+ok('B1 两组 chip 都拿到了磨砂白 80%（第 112 轮由 85% 降下来）', /rgba\(255, 255, 255, 0\.8\)/.test(B.first.bg) && /rgba\(255, 255, 255, 0\.8\)/.test(B.quick1.bg), JSON.stringify([B.first.bg, B.quick1.bg]));
 ok('B2 chip 带毛玻璃（blur 15px）', /blur\(15px\)/.test(B.first.bf) && /blur\(15px\)/.test(B.quick1.bf), JSON.stringify([B.first.bf, B.quick1.bf]));
+ok('B2b 所有 chip 的边框都去掉了（transparent）', B.borders, String(B.borders));
 ok('B3 快速任务组不再整组压到 80% 透明（否则变 68% 白）', B.quick1.op === '1', B.quick1.op);
 ok('B4 tb-label 白字 85%（含「快速任务」）', /rgba\(255, 255, 255, 0\.85\)/.test(B.label.color) && /rgba\(255, 255, 255, 0\.85\)/.test(B.label2.color) && B.label2.op === '1', JSON.stringify([B.label, B.label2]));
 ok('B5 选中态仍是浅蓝但做成透的（不打断玻璃感）', /rgba\(243, 247, 255, 0\.9\)/.test(B.active), B.active);
