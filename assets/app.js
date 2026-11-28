@@ -3917,8 +3917,17 @@
         udBoardEl.classList.toggle('is-w-sm', w <= 1100);
         udBoardEl.classList.toggle('is-w-xs', w <= 760);
       }
+      /* 第 107 轮：画板名后面跟尺寸，换分辨率跟着变 */
+      udBoardTitle(w, h);
       udApplyZoom();
     };
+    var udBoardTitle = function (w, h) {
+      var name = '智能客服管理系统 · 默认 (' + w + 'x' + h + ')';
+      var lb = document.getElementById('udBoardLabel');
+      if (lb) lb.textContent = name;
+      if (udBoardEl) udBoardEl.setAttribute('aria-label', '画板：' + name);
+    };
+    udBoardTitle(UD_W, UD_H);
     if (udBoardEl) {
       udBoardEl.classList.toggle('is-w-sm', UD_W <= 1100);
       udBoardEl.classList.toggle('is-w-xs', UD_W <= 760);
@@ -3945,26 +3954,31 @@
       udTx = x; udTy = y;
       if (udWrap) udWrap.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
     };
-    if (udBoardEl && udWrap) {
-      udBoardEl.addEventListener('click', function (e) { e.stopPropagation(); });
-      udBoardEl.addEventListener('pointerdown', function (e) {
+    var udDragStart = function (e, fromName) {
         if (e.button !== 0) return;
-        /* 第 104 轮：接着在画布上下手 = 放弃上一条没写完的批注，但框/点留着（撤销只走「取消 / ×」） */
-        if (udPop && !udPop.hidden) udClosePop(false);
-        var udPopBusy = false;
-        /* 第 101 轮：框选模式下不拖画板，改成画红框 */
-        if (udMqOn && !udPopBusy) { udMqStart(e); return; }
-        /* 第 104 轮：编辑 / 批注模式下的点按是「选元素 / 落批注点」，也不拖画板 */
-        if (udMode === 'edit' || udMode === 'mark') return;
+        /* 第 107 轮：页面预览是纯预览 —— 画板本身不响应点选/拖动，但标题栏照样能拖 */
+        if (!fromName && udView === 'prev') return;
+        if (!fromName) {
+          /* 第 104 轮：接着在画布上下手 = 放弃上一条没写完的批注，但框/点留着（撤销只走「取消 / ×」） */
+          if (udPop && !udPop.hidden) udClosePop(false);
+          /* 第 101 轮：框选模式下不拖画板，改成画红框 */
+          if (udMqOn) { udMqStart(e); return; }
+          /* 第 104 轮：编辑 / 批注模式下的点按是「选元素 / 落批注点」，也不拖画板 */
+          if (udMode === 'edit' || udMode === 'mark') return;
+        }
         var sr = udScroll.getBoundingClientRect(), wr = udWrap.getBoundingClientRect();
         udDrag = {
           id: e.pointerId, sx: e.clientX, sy: e.clientY, tx: udTx, ty: udTy, moved: false,
+          fromName: !!fromName,
           baseL: wr.left - udTx, baseT: wr.top - udTy, w: wr.width, h: wr.height,
           vaL: sr.left, vaT: sr.top, vaR: sr.right, vaB: sr.bottom
         };
         try { udBoardEl.setPointerCapture(e.pointerId); } catch (err) {}
         e.preventDefault();
-      });
+    };
+    if (udBoardEl && udWrap) {
+      udBoardEl.addEventListener('click', function (e) { e.stopPropagation(); });
+      udBoardEl.addEventListener('pointerdown', function (e) { udDragStart(e, false); });
       udBoardEl.addEventListener('pointermove', function (e) {
         if (!udDrag || e.pointerId !== udDrag.id) return;
         var dx = e.clientX - udDrag.sx, dy = e.clientY - udDrag.sy;
@@ -3983,13 +3997,17 @@
       });
       var udDragEnd = function (e) {
         if (!udDrag || (e && e.pointerId !== udDrag.id)) return;
-        var moved = udDrag.moved;
+        var moved = udDrag.moved, fromName = udDrag.fromName;
         udDrag = null;
         document.body.classList.remove('ud-dragging');
-        if (!moved) udSel(!udBoardEl.classList.contains('is-sel'));
+        /* 第 107 轮：从标题栏按下不算「点画板」，松手别去切选中态 */
+        if (!moved && !fromName) udSel(!udBoardEl.classList.contains('is-sel'));
       };
       udBoardEl.addEventListener('pointerup', udDragEnd);
       udBoardEl.addEventListener('pointercancel', udDragEnd);
+      /* 第 107 轮：画板名就是画板标题栏 —— 任何情形下按住都能拖画板 */
+      var udBoardLabel = document.getElementById('udBoardLabel');
+      if (udBoardLabel) udBoardLabel.addEventListener('pointerdown', function (e) { udDragStart(e, true); });
     }
     if (udScroll) udScroll.addEventListener('click', function (e) { if (e.target === udScroll || e.target === udStageEl) udSel(false); });
 
@@ -4158,7 +4176,8 @@
 
     var udPop = document.getElementById('udPop');
     var udPopTitle = document.getElementById('udPopTitle');
-    var udPopGrip = document.getElementById('udPopGrip');
+    /* 第 107 轮：标题栏中间的 grip 图标去掉，整条标题栏都能拖 */
+    var udPopHead = udPop ? udPop.querySelector('.ud-pop-head') : null;
     var udPopPos = document.getElementById('udPopPos');
     var udPopSize = document.getElementById('udPopSize');
     var udPopTa = document.getElementById('udPopTa');
@@ -4284,12 +4303,12 @@
 
     /* 浮窗拖动（稿里区域批注标题右侧那颗 move 键） */
     var udPopDrag = null;
-    if (udPopGrip) {
-      udPopGrip.addEventListener('pointerdown', function (e) {
-        if (!udPop) return;
+    if (udPopHead) {
+      udPopHead.addEventListener('pointerdown', function (e) {
+        if (!udPop || e.target.closest('.ud-pop-x')) return;
         var r = udPop.getBoundingClientRect();
         udPopDrag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, l: r.left, t: r.top };
-        try { udPopGrip.setPointerCapture(e.pointerId); } catch (err) {}
+        try { udPopHead.setPointerCapture(e.pointerId); } catch (err) {}
         e.preventDefault();
       });
       document.addEventListener('pointermove', function (e) {
@@ -4684,9 +4703,20 @@
           li.setAttribute('aria-selected', li.classList.contains('is-on') ? 'true' : 'false');
         });
       });
+      /* 第 107 轮：整棵树同时只有一个选中项 —— 跨页面组也只有一个状态是选中的
+         （页面行只管展开/收起，点它不动选中态） */
+      var udPickOne = function (el) {
+        Array.prototype.forEach.call(udStatesBox.querySelectorAll('.ud-tree-row, .ud-state'), function (n) {
+          var on = n === el;
+          n.classList.toggle('is-on', on);
+          n.setAttribute('aria-selected', on ? 'true' : 'false');
+          var dot = n.querySelector('.ud-dot');
+          if (dot) dot.classList.toggle('is-idle', !on);
+        });
+      };
       udStatesBox.addEventListener('click', function (e) {
         var row = e.target.closest('.ud-state');
-        if (row) udPickState(row);
+        if (row) udPickOne(row);
       });
     }
 
@@ -4762,6 +4792,132 @@
         udResSet(false);
       });
     }
+
+
+    /* ============================================================
+       第 107 轮：三个页签 = 三个视图
+       画板（默认）/ 页面关系（稿 4168:57067 的卡片关系图）/ 页面预览（纯画布，不支持标注）
+       ============================================================ */
+    var udRel = document.getElementById('udRel');
+    var udRelMap = document.getElementById('udRelMap');
+    var udRelLines = document.getElementById('udRelLines');
+    var udView = 'board';
+    /* 交互关系（连线）：登录 → Gmail / 发起申诉；个人信息 → 发起申诉；申诉 → 账号恢复；Gmail → 账号恢复
+       （5 条边都不交叉：上排一条横线 + 一条竖线，下排两条横线，右侧一条竖线） */
+    var udRelEdges = [
+      { a: 'login', p: 'r', b: 'gmail', q: 'l' },
+      { a: 'login', p: 'b', b: 'appeal', q: 't' },
+      { a: 'gmail', p: 'b', b: 'recovery', q: 't' },
+      { a: 'info', p: 'r', b: 'appeal', q: 'l' },
+      { a: 'appeal', p: 'r', b: 'recovery', q: 'l' }
+    ];
+    var udRelCardOf = function (id) {
+      return udRelMap ? udRelMap.querySelector('.ud-rel-card[data-id="' + id + '"]') : null;
+    };
+    var udRelAnchor = function (el, side) {
+      var x = parseFloat(el.style.left) || 0, y = parseFloat(el.style.top) || 0;
+      var w = el.offsetWidth, h = el.offsetHeight;
+      if (side === 'l') return [x, y + h / 2];
+      if (side === 'r') return [x + w, y + h / 2];
+      if (side === 't') return [x + w / 2, y];
+      return [x + w / 2, y + h];
+    };
+    var udRelBuild = function () {
+      if (!udRelLines || !udRelMap) return;
+      var svg = udRelLines;
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      var NS = 'http://www.w3.org/2000/svg';
+      udRelEdges.forEach(function (e) {
+        var ca = udRelCardOf(e.a), cb = udRelCardOf(e.b);
+        if (!ca || !cb) return;
+        var A = udRelAnchor(ca, e.p), B = udRelAnchor(cb, e.q);
+        var d;
+        var sameY = Math.abs(A[1] - B[1]) < 1, sameX = Math.abs(A[0] - B[0]) < 1;
+        if (sameY) d = 'M' + A[0] + ' ' + A[1] + 'H' + B[0];
+        else if (sameX) d = 'M' + A[0] + ' ' + A[1] + 'V' + B[1];
+        else {
+          /* 斜向：两端各拉一段竖直控制点，走成 S 形，不直切卡片 */
+          var k = Math.max(34, Math.abs(B[1] - A[1]) * 0.5) * (B[1] > A[1] ? 1 : -1);
+          d = 'M' + A[0] + ' ' + A[1] +
+            'C' + A[0] + ' ' + (A[1] + k) + ' ' + B[0] + ' ' + (B[1] - k) + ' ' + B[0] + ' ' + B[1];
+        }
+        var path = document.createElementNS(NS, 'path');
+        path.setAttribute('class', 'ud-rel-line');
+        path.setAttribute('d', d);
+        path.setAttribute('data-a', e.a);
+        path.setAttribute('data-b', e.b);
+        svg.appendChild(path);
+        /* 目标端一颗 3px 小圆点，给方向感 */
+        var dot = document.createElementNS(NS, 'circle');
+        dot.setAttribute('class', 'ud-rel-dot');
+        dot.setAttribute('cx', B[0]);
+        dot.setAttribute('cy', B[1]);
+        dot.setAttribute('r', 3);
+        dot.setAttribute('data-a', e.a);
+        dot.setAttribute('data-b', e.b);
+        svg.appendChild(dot);
+      });
+    };
+    /* 点卡 = 选中：本卡亮、有关联的卡亮、其余卡与线暗掉 */
+    var udRelPick = function (id) {
+      if (!udRelMap) return;
+      var nb = {};
+      udRelEdges.forEach(function (e) { if (e.a === id) nb[e.b] = 1; if (e.b === id) nb[e.a] = 1; });
+      Array.prototype.forEach.call(udRelMap.querySelectorAll('.ud-rel-card'), function (c) {
+        var cid = c.getAttribute('data-id');
+        c.classList.toggle('is-on', !!id && cid === id);
+        c.classList.toggle('is-dim', !!id && cid !== id && !nb[cid]);
+        c.setAttribute('aria-selected', !id || cid === id ? 'true' : 'false');
+      });
+      if (!udRelLines) return;
+      Array.prototype.forEach.call(udRelLines.querySelectorAll('.ud-rel-line, .ud-rel-dot'), function (n) {
+        var hot = !!id && (n.getAttribute('data-a') === id || n.getAttribute('data-b') === id);
+        n.classList.toggle('is-hot', hot);
+        n.classList.toggle('is-dim', !!id && !hot);
+      });
+    };
+    var udRelFit = function () {
+      if (!udRel || !udRelMap) return;
+      var aw = udRel.clientWidth - 48, ah = udRel.clientHeight - 48;
+      var k = Math.min(aw / 592, ah / 271, 1);
+      udRelMap.style.setProperty('--ud-rel-s', String(Math.max(0.45, k)));
+    };
+    var udBlank = document.getElementById('uiBlank');
+    var udSetView = function (v) {
+      if (udView === v) return;
+      udView = v;
+      if (udCanvasBox) {
+        udCanvasBox.classList.toggle('is-rel', v === 'rel');
+        udCanvasBox.classList.toggle('is-prev', v === 'prev');
+      }
+      /* 预览视图要把工具条上的标注类键一起收起来（它们在 .ud-bar 里，不在画布内） */
+      if (udBlank) udBlank.classList.toggle('is-prev', v === 'prev');
+      if (udRel) udRel.hidden = v !== 'rel';
+      /* 换视图时把标注 / 编辑 / 框选状态全部收干净（预览视图本来就不许标注） */
+      udExitAll(); udSel(false); udHideDom();
+      if (v === 'board') udApplyZoom();
+      if (v === 'rel') { udRelBuild(); udRelFit(); udRelPick(null); }
+    };
+    if (udRelMap) {
+      udRelMap.addEventListener('click', function (e) {
+        var card = e.target.closest('.ud-rel-card');
+        udRelPick(card ? card.getAttribute('data-id') : null);
+      });
+      udRelMap.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        var card = e.target.closest('.ud-rel-card');
+        if (!card) return;
+        e.preventDefault();
+        udRelPick(card.getAttribute('data-id'));
+      });
+    }
+    var udTabsBar = document.getElementById('uiTabs');
+    if (udTabsBar) udTabsBar.addEventListener('click', function (e) {
+      var t = e.target.closest('.tk-tab');
+      if (!t || !t.getAttribute('data-ud-view')) return;
+      udSetView(t.getAttribute('data-ud-view'));
+    });
+    window.addEventListener('resize', function () { if (udView === 'rel') udRelFit(); });
 
     /* 分组展开/收起（默认展开，与稿一致） */
     var udTreeHead = document.getElementById('udTreeHead');

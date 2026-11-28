@@ -115,7 +115,8 @@ const G = await p.evaluate(() => ({
   bs: getComputedStyle(document.querySelector('.ud-board-name')).fontSize
 }));
 ok('G1 工具条画板名 = 智能客服管理系统 · 默认', G.bar === '智能客服管理系统 · 默认', G.bar);
-ok('G2 画板上方名字同步、仍 12px', G.board === '智能客服管理系统 · 默认' && G.bs === '12px', JSON.stringify([G.board, G.bs]));
+/* 第 107 轮：画板上方名字后面带了分辨率 */
+ok('G2 画板上方名字同步（含分辨率）、仍 12px', G.board === '智能客服管理系统 · 默认 (1440x900)' && G.bs === '12px', JSON.stringify([G.board, G.bs]));
 
 ok('H1 无 JS 报错', p.__e.length === 0, p.__e.join(' | '));
 

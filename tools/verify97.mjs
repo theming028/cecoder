@@ -113,7 +113,7 @@ const D = await p.evaluate(() => {
 ok('D1 画板原生 1440×900', D.w === '1440px' && D.h === '900px', JSON.stringify([D.w, D.h]));
 ok('D2 默认 25%：wrap 宽 = 1440×0.25 = 360', Math.abs(D.wrap[2] - 1440 * D.s) <= 1 && Math.abs(D.s - 0.25) < 1e-6, JSON.stringify([D.wrap[2], D.s]));
 ok('D3 画板显示尺寸保持 16:10', Math.abs(D.board[2] / D.board[3] - 1.6) < 0.02, D.board[2] + '×' + D.board[3]);
-ok('D4 画板名「智能客服管理系统 · 默认」12/20 #868686', D.name[0] === '智能客服管理系统 · 默认' && D.name[1] === '12px' && D.name[2] === '20px' && D.name[3] === 'rgb(134, 134, 134)', JSON.stringify(D.name));
+ok('D4 画板名「智能客服管理系统 · 默认 (1440x900)」12/20 #868686', D.name[0] === '智能客服管理系统 · 默认 (1440x900)' && D.name[1] === '12px' && D.name[2] === '20px' && D.name[3] === 'rgb(134, 134, 134)', JSON.stringify(D.name));
 ok('D5 画板光标是抓手（可拖）', D.cursor === 'grab', D.cursor);
 
 const c = await p.evaluate(() => { const r = document.querySelector('#udBoard').getBoundingClientRect(); return [Math.round(r.x + r.width / 2), Math.round(r.y + r.height / 2)]; });

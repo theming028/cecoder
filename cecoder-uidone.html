@@ -571,11 +571,11 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
          左侧改成 画板（选中）/ 页面关系 / 页面预览 / 竖线 / ＋ -->
     <div class="task-tabs ud-tabs" id="uiTabs">
       <div class="tk-tabs-l" role="tablist" aria-label="工序资产">
-        <button class="tk-tab is-on" type="button" role="tab" aria-selected="true">
+        <button class="tk-tab is-on" type="button" role="tab" aria-selected="true" data-ud-view="board">
           <span class="ico ico14" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none"><path fill="currentColor" d="M12.869511,5.0760913C12.941325,5.0760913,13,5.0174007,13,4.9456673L13,3.9674182C13,3.8956037,12.941325,3.8369448,12.869511,3.8369448L10.1956282,3.8369448L10.1956282,1.13039222C10.1956282,1.058674883,10.1369362,1,10.0652037,1L9.0217581,1C8.9499435,1,8.8912692,1.058674883,8.8912692,1.13040839L8.8912692,3.8369448L5.1739268,3.8369448L5.1739268,1.13039222C5.1739268,1.058674883,5.1152515,1,5.0434213,1L3.9999759,1C3.9282587,1,3.8695838,1.058674883,3.8695838,1.13040839L3.8695838,3.8369448L1.13040839,3.8369448C1.058674883,3.8369448,1,3.8956037,1,3.9674182L1,4.9456834999999995C1,5.0174007,1.058674883,5.0760913,1.13040839,5.0760913L3.8695838,5.0760913L3.8695838,8.9239249L1.13040839,8.9239249C1.058674883,8.9239249,1,8.9825821,1,9.0543165L1,10.0325823C1,10.1042995,1.058674883,10.1630545,1.13040839,10.1630545L3.8695838,10.1630545L3.8695838,12.869477C3.8695838,12.941324,3.9282746,12.999983,3.9999759,12.999983L5.0434213,12.999983C5.1152515,12.999983,5.1739268,12.941308,5.1739268,12.869477L5.1739268,10.1630545L8.8912692,10.1630545L8.8912692,12.869477C8.8912692,12.941324,8.9499612,12.999983,9.021759,12.999983L10.0652046,12.999983C10.1369381,12.999983,10.1956291,12.941308,10.1956291,12.869477L10.1956291,10.1630545L12.869494,10.1630545C12.941325,10.1630545,12.999985,10.1043148,12.999985,10.0325823L12.999985,9.0543156C12.999985,8.9825821,12.941309,8.923924,12.869512,8.923924L10.1956282,8.923924L10.1956282,5.0760751L12.869511,5.0760913ZM8.8912692,8.9239249L5.1739268,8.9239249L5.1739268,5.076076L8.8912692,5.076076L8.8912692,8.9239249Z"/></svg></span>画板
         </button>
-        <button class="tk-tab" type="button" role="tab" aria-selected="false">页面关系</button>
-        <button class="tk-tab" type="button" role="tab" aria-selected="false">页面预览</button>
+        <button class="tk-tab" type="button" role="tab" aria-selected="false" data-ud-view="rel">页面关系</button>
+        <button class="tk-tab" type="button" role="tab" aria-selected="false" data-ud-view="prev">页面预览</button>
         <span class="tk-vsep" aria-hidden="true"></span>
         <button class="tk-icon-btn" type="button" aria-label="新建工序资产"><span class="ico ico14"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2.2v9.6M2.2 7h9.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span></button>
       </div>
@@ -695,7 +695,7 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
         <div class="ud-scroll" id="udScroll">
           <div class="ud-stage" id="udStage">
             <div class="ud-board-wrap" id="udBoardWrap" style="--ud-s:1">
-              <div class="ud-board-name">智能客服管理系统 · 默认</div>
+              <div class="ud-board-name" id="udBoardLabel">智能客服管理系统 · 默认 (1440x900)</div>
               <!-- 第 100 轮：画板改成容器 div（原 <button> 塞不了块级页面），里面是生成结果「智能客服管理系统」；
                    四栏：导航 56 / 会话 296 / 对话 flex / 客户 316，全部挂在 .ud-board-doc 作用域下，类名 kb-* -->
               <div class="ud-board" id="udBoard" role="group" tabindex="0" data-sel="false" aria-label="画板：智能客服管理系统 · 默认">
@@ -948,6 +948,32 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
           </div>
         </div>
 
+        <!-- ============================================================
+             第 107 轮：页面关系（稿 4168:57067）—— 灰底网格上摆所有产出页面卡，卡间连线表示交互；
+             点某张卡 = 选中（1.6px 主色 + 实线框），与该卡没有交互关系的卡和线一起暗下去；
+             点地图空白处取消选中。5 张卡的位置/宽度取自稿：592×271 画布内 3 列 × 2 行
+             ============================================================ -->
+        <div class="ud-rel" id="udRel" hidden>
+          <div class="ud-rel-map" id="udRelMap">
+            <svg class="ud-rel-lines" id="udRelLines" viewBox="0 0 592 271" width="592" height="271" aria-hidden="true"></svg>
+            <div class="ud-rel-card" data-id="login" style="left:189px;top:0;width:96px" role="button" tabindex="0" aria-label="账密登录页面">
+              <span class="ud-rel-t">账密登录</span><span class="ud-rel-p">/login</span>
+            </div>
+            <div class="ud-rel-card" data-id="gmail" style="left:420px;top:0;width:140px" role="button" tabindex="0" aria-label="Gmail 邮箱登录页面">
+              <span class="ud-rel-t">Gmail 邮箱登录</span><span class="ud-rel-p">/login/gmail</span>
+            </div>
+            <div class="ud-rel-card" data-id="info" style="left:0;top:189px;width:124px" role="button" tabindex="0" aria-label="填写个人信息页面">
+              <span class="ud-rel-t">填写个人信息</span><span class="ud-rel-p">/account/info</span>
+            </div>
+            <div class="ud-rel-card" data-id="appeal" style="left:189px;top:189px;width:131px" role="button" tabindex="0" aria-label="发起申诉页">
+              <span class="ud-rel-t">发起申诉页</span><span class="ud-rel-p">/account/appeal</span>
+            </div>
+            <div class="ud-rel-card" data-id="recovery" style="left:420px;top:189px;width:142px" role="button" tabindex="0" aria-label="账号恢复页">
+              <span class="ud-rel-t">账号恢复页</span><span class="ud-rel-p">/account/recovery</span>
+            </div>
+          </div>
+        </div>
+
         <!-- 第 99 轮：左列底改毛玻璃（半透明白 + backdrop blur），画布网格从底下柔化透出；状态行可点切换 -->
         <aside class="ud-pages" id="udPages" aria-label="页面层级和状态">
           <div class="ud-pages-head">
@@ -982,7 +1008,7 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
                 <span class="ud-page-t">Gmail 邮箱登录</span>
               </button>
               <ul class="ud-states" id="udPgGmailStates" hidden>
-                <li class="ud-state is-on"><span class="ud-dot" aria-hidden="true"></span>默认</li>
+                <li class="ud-state"><span class="ud-dot is-idle" aria-hidden="true"></span>默认</li>
                 <li class="ud-state"><span class="ud-dot is-idle" aria-hidden="true"></span>加载失败</li>
               </ul>
             </div>
@@ -993,7 +1019,7 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
                 <span class="ud-page-t">账号恢复页</span>
               </button>
               <ul class="ud-states" id="udPgRecoverStates" hidden>
-                <li class="ud-state is-on"><span class="ud-dot" aria-hidden="true"></span>默认</li>
+                <li class="ud-state"><span class="ud-dot is-idle" aria-hidden="true"></span>默认</li>
                 <li class="ud-state"><span class="ud-dot is-idle" aria-hidden="true"></span>链接已过期</li>
               </ul>
             </div>
@@ -1055,7 +1081,6 @@ M24,20C21.799999,20,20,21.7999992,20,24C20,26.200000799999998,21.799999,28,24,28
     <div class="ud-pop" id="udPop" role="dialog" aria-labelledby="udPopTitle" hidden>
       <div class="ud-pop-head">
         <span class="ud-pop-title" id="udPopTitle">区域批注</span>
-        <span class="ud-pop-grip" id="udPopGrip" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><path d="M6.1 3.1h4.5a2.3 2.3 0 0 1 2.3 2.3v4.5M9.9 12.9H5.4a2.3 2.3 0 0 1-2.3-2.3V6.1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M11.4 1.9 13.4 3.9 11.4 5.9M4.6 14.1 2.6 12.1 4.6 10.1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <button class="ud-pop-x" type="button" id="udPopX" aria-label="关闭"><svg viewBox="0 0 14 14" fill="none"><path d="M3.7 3.7 10.3 10.3M10.3 3.7 3.7 10.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
       </div>
       <div class="ud-pop-meta">

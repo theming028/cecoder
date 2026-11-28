@@ -4622,7 +4622,10 @@ body[data-page="ui"] .ui-blank.is-gen {
 .ud-board-name {
   height: 20px; font-size: 12px; line-height: 20px; color: #868686;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  /* 第 107 轮：画板名就是画板的标题栏 —— 按住就能拖画板（任何模式下都生效） */
+  cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none;
 }
+body.ud-dragging .ud-board-name { cursor: grabbing; }
 .ud-board {
   /* 第 100 轮：从 <button> 改成容器 <div>（里面要装真页面，button 里不能有块级内容） */
   position: absolute; left: 0; top: 28px; display: block;
@@ -4936,7 +4939,8 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 .ud-page { padding: 8px; }
 .ud-tree-row, .ud-state {
   display: flex; align-items: center; gap: 4px; border-radius: 4px;
-  font-size: 14px; line-height: 22px; color: var(--cds-text-primary);
+  /* 第 107 轮：14 → 13（用户要求左列统一 13px） */
+  font-size: 13px; line-height: 20px; color: var(--cds-text-primary);
 }
 .ud-tree-row {
   width: 100%; box-sizing: border-box; height: 28px; padding: 0 8px;
@@ -4964,6 +4968,11 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 .ud-page-t { flex: 1 1 auto; min-width: 0; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* 第 99 轮：行 hover 从 #FAFAFA 提到 #F2F2F2（白卡上要能看出来） */
 .ud-tree-row:hover { background: var(--cds-surface-inset); }
+/* 第 107 轮：页面行也能被选中，样式与状态行一致（全局同时只有一个选中项） */
+.ud-tree-row.is-on { background: #F5F8FF; box-shadow: inset 0 0 0 1px #DAE4FE; color: var(--cds-color-primary); }
+.ud-tree-row.is-on .ud-tree-t, .ud-tree-row.is-on .ud-page-t { font-weight: 500; }
+.ud-tree-row.is-on .ud-doc, .ud-tree-row.is-on .ud-chev { color: var(--cds-color-primary); }
+.ud-canvas.is-prev .ud-page-t { font-weight: 500; }
 /* 页面组的折叠箭头：收起朝右，展开转 90° 朝下 */
 .ud-chev-r { transition: transform var(--cds-motion-duration) var(--cds-motion-ease); }
 .ud-tree-row[aria-expanded="true"] .ud-chev-r { transform: rotate(90deg); }
@@ -5210,7 +5219,8 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
   position: absolute; box-sizing: border-box;
   border: calc(1.6px / var(--ud-s, 1)) dashed var(--cds-color-primary);
 }
-.ud-dom.is-sel { border-style: solid; }
+/* 第 107 轮：选中框要「蓝色粗边框」——比悬停虚线厚一档（1.6 → 2.5，视觉尺寸恒定） */
+.ud-dom.is-sel { border-style: solid; border-width: calc(2.5px / var(--ud-s, 1)); }
 .ud-dom-tag {
   position: absolute; left: calc(-1.6px / var(--ud-s, 1)); bottom: 100%;
   margin-bottom: calc(4px / var(--ud-s, 1));
@@ -5243,9 +5253,9 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 @keyframes udPopIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .ud-pop-head { display: flex; align-items: center; height: 22px; margin-bottom: 8px; }
 .ud-pop-title { flex: 0 0 auto; font-size: 14px; line-height: 22px; font-weight: 500; color: #1F1F1F; }
-.ud-pop-grip { flex: 0 0 auto; margin-left: 74px; width: 16px; height: 16px; display: inline-flex; color: #6B6B6B; cursor: grab; }
-.ud-pop-grip svg { width: 16px; height: 16px; }
-.ud-pop.is-mark .ud-pop-grip { display: none; }
+/* 第 107 轮：标题栏中间的 grip 图标去掉了 —— 整条标题栏都能拖浮窗 */
+.ud-pop-head { cursor: grab; }
+.ud-pop-x { cursor: pointer; }
 .ud-pop-x {
   flex: 0 0 auto; margin-left: auto; width: 14px; height: 14px; padding: 0;
   border: 0; background: none; color: #6B6B6B; cursor: pointer; display: inline-flex;
@@ -5315,3 +5325,58 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 .ud-res-row.is-on { background: #F5F8FF; box-shadow: inset 0 0 0 1px #DAE4FE; color: var(--cds-color-primary); }
 .ud-res-row.is-on .ud-res-k { color: var(--cds-color-primary); }
 .ud-res-row.is-on .ud-res-v { color: #6B6B6B; }
+
+/* ============================================================
+   第 107 轮：页签三视图（画板 / 页面关系 / 页面预览）
+   页面关系：灰底网格上摆产出页面卡 + 连线（稿 4168:57067：592×271、卡高 82、内距 20）
+   页面预览：灰底网格 + 只有 html 画布，纯预览（无标注 / 无选中 / 无工具键）
+   ============================================================ */
+
+/* 关系图：铺满画布、灰底网格从 .ud-canvas 透过来；地图 592×271 居中，空间不够按比例缩 */
+.ud-rel {
+  position: relative; flex: 1 1 auto; min-width: 0; min-height: 0;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  overflow: auto;
+}
+.ud-rel[hidden] { display: none; }
+.ud-rel-map {
+  position: relative; flex: 0 0 auto; width: 592px; height: 271px;
+  transform: scale(var(--ud-rel-s, 1)); transform-origin: center center;
+}
+.ud-rel-lines { position: absolute; left: 0; top: 0; width: 592px; height: 271px; overflow: visible; }
+.ud-rel-line {
+  fill: none; stroke: #B7C6E4; stroke-width: 1.5; stroke-linecap: round;
+  transition: stroke var(--cds-motion-duration) var(--cds-motion-ease), opacity var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.ud-rel-line.is-hot { stroke: var(--cds-color-primary); stroke-width: 1.6; }
+.ud-rel-line.is-dim { opacity: .22; }
+.ud-rel-dot { fill: #B7C6E4; transition: fill var(--cds-motion-duration) var(--cds-motion-ease), opacity var(--cds-motion-duration) var(--cds-motion-ease); }
+.ud-rel-dot.is-hot { fill: var(--cds-color-primary); }
+.ud-rel-dot.is-dim { opacity: .22; }
+
+/* 页面卡：白底 1px #E5E5E5、内距 20（标题 14/500/22 + 路由 12/400/16，间隔 4 → 82 高） */
+.ud-rel-card {
+  position: absolute; top: 0; box-sizing: border-box; height: 82px; padding: 20px;
+  display: flex; flex-direction: column; gap: 4px;
+  background: #FFFFFF; border-radius: 4px;
+  box-shadow: 0 0 0 1px #E5E5E5;
+  cursor: pointer; -webkit-user-select: none; user-select: none;
+  transition: box-shadow var(--cds-motion-duration) var(--cds-motion-ease),
+    opacity var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.ud-rel-card:hover { box-shadow: 0 0 0 1px #B4C9FC, 0 2px 8px 0 rgba(0, 0, 0, .04); }
+.ud-rel-card.is-on { box-shadow: 0 0 0 1.6px var(--cds-color-primary), 0 0 12px 0 rgba(55, 112, 247, .2); }
+.ud-rel-card.is-dim { opacity: .38; }
+.ud-rel-t { font-size: 14px; line-height: 22px; font-weight: 500; color: #1F1F1F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ud-rel-p { font-size: 12px; line-height: 16px; color: #868686; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ud-rel-card.is-dim .ud-rel-t { color: #1F1F1F; }
+
+/* 页面关系 / 页面预览：中栏只留视图本身（左列「页面层级和状态」与画板滚动区都收起来） */
+.ud-canvas.is-rel .ud-pages, .ud-canvas.is-prev .ud-pages { display: none; }
+/* 页面关系：画板滚动区让位给关系图；页面预览反过来 —— 只有画板 */
+.ud-canvas.is-rel .ud-scroll { display: none; }
+/* 页面预览：网格 + 只有画布，工具条上的标注类键与「批注 (n)」全收（纯预览，不支持任何标注） */
+.ud-blank.is-prev .ud-tools,
+.ud-blank.is-prev .ud-link { display: none; }
+/* 纯预览也不给画板四角手柄 */
+.ud-canvas.is-prev .ud-handle { display: none !important; }

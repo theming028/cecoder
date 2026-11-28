@@ -256,11 +256,12 @@ const G2 = await p.evaluate(() => {
     title: document.getElementById('udPopTitle').textContent,
     pos: document.getElementById('udPopPos').textContent,
     sizeHidden: document.getElementById('udPopSize').hidden,
-    grip: getComputedStyle(document.getElementById('udPopGrip')).display };
+    gripGone: !document.getElementById('udPopGrip') };
 });
 ok('G3 点击处落一个编号序号点（1）', G2.pins === 1 && G2.no === '1', JSON.stringify([G2.pins, G2.no]));
+ok('G3b 标题栏中间的 grip 图标已去掉（第 107 轮）', G2.gripGone, G2.gripGone);
 ok('G4 序号点视觉 18×18（随缩放反缩）', G2.w === 18 && G2.h === 18, JSON.stringify([G2.w, G2.h]));
-ok('G5 弹「位置批注」浮窗（无尺寸、无拖动键）', G2.hidden === false && G2.title === '位置批注' && /^位置：X \d+，Y \d+$/.test(G2.pos) && G2.sizeHidden === true && G2.grip === 'none', JSON.stringify([G2.title, G2.pos, G2.sizeHidden, G2.grip]));
+ok('G5 弹「位置批注」浮窗（无尺寸、无 grip 图标）', G2.hidden === false && G2.title === '位置批注' && /^位置：X \d+，Y \d+$/.test(G2.pos) && G2.sizeHidden === true && G2.gripGone === true, JSON.stringify([G2.title, G2.pos, G2.sizeHidden, G2.gripGone]));
 
 await p.type('#udPopTa', '这里加一个导出按钮');
 await p.click('#udPopSend'); await wait(350);

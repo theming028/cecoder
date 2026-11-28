@@ -88,7 +88,7 @@ ok('C10 页面项文案：Gmail 邮箱登录 / 账号恢复页', A.pages2[0][0] 
 ok('D1 画板原生 1440×900', A.board[1] === '1440px' && A.board[2] === '900px', JSON.stringify([A.board[1], A.board[2]]));
 ok('D2 画板白底圆角 4 + 外描边 1px #E5E5E5 + 0/8/16 阴影（第 100 轮：内容不透明，inset 会被吞）', A.board[3] === '4px'
   && /rgb\(229, 229, 229\) 0px 0px 0px 1px/.test(A.board[4]) && /rgba\(0, 0, 0, 0\.04\) 0px 8px 16px 0px/.test(A.board[4]), A.board[4]);
-ok('D3 画板名 12/20 #868686「智能客服管理系统 · 默认」', A.name[2] === '12px' && A.name[3] === '20px' && A.name[4] === 'rgb(134, 134, 134)' && A.name[0] === '智能客服管理系统 · 默认', JSON.stringify(A.name));
+ok('D3 画板名 12/20 #868686「智能客服管理系统 · 默认 (1440x900)」（第 107 轮带尺寸）', A.name[2] === '12px' && A.name[3] === '20px' && A.name[4] === 'rgb(134, 134, 134)' && A.name[0] === '智能客服管理系统 · 默认 (1440x900)', JSON.stringify(A.name));
 ok('D4 标签 20 高、与画板间距 8（画板顶 28）', A.name[1] === 20, A.name[1]);
 ok('D5 默认按可用区域自适应：25%（1440 下中栏 654 − 左列 240 = 414）', A.zoom === '25%' && A.s === '0.25', A.zoom + ' / ' + A.s);
 ok('D6 缩放写在 --ud-s 上（画板用 transform 缩放，不改 800/400）', !!A.s, A.s);
