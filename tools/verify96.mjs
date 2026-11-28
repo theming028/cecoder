@@ -122,7 +122,7 @@ ok('D14 「+」按 25 步进（25→50）', z1[0] === '50%' && z1[1] === '0.5', 
 await p.click('#udZoomOut'); await p.click('#udZoomOut'); await wait(200);
 const z2 = await p.evaluate(() => document.querySelector('#udZoomVal').textContent);
 ok('D15 「−」回落到 21 时被夹到 25%', z2 === '25%', z2);
-await p.click('#udFold'); await wait(300);
+await p.click('#udFold'); await wait(480);   /* 第 128 轮：收展动画 .28/.32s，等足 */
 const F = await p.evaluate(() => {
   const pg = document.querySelector('#udPages'); const cv = document.querySelector('.ud-canvas');
   const bodyCS = getComputedStyle(pg.querySelector('.ud-pages-body'));
@@ -134,11 +134,12 @@ const F = await p.evaluate(() => {
 /* 第 126 轮：body 不再 display:none（那会把宽度过渡里的淡出掐断），改成 opacity 0 + visibility hidden */
 ok('F1 折叠后只剩标题条（body 淡出且不可见）', F.cls === true && F.bodyOp === '0' && F.bodyVis === 'hidden', JSON.stringify(F));
 ok('F2 折叠后收成 32×32 浮键', F.h === 32 && F.w === 32, JSON.stringify([F.w, F.h]));
-ok('F3 折叠后画布吃满整幅（stage 内距恒 24）', F.folded === true && F.pad === '24px' && F.abs === true, JSON.stringify([F.folded, F.pad, F.abs]));
+/* 第 128 轮：折叠态不再 absolute 脱流（脱流会让画布瞬跳 + 面板位置跳），改成流内收窄 + margin 贴左上 */
+ok('F3 折叠后在流内收成浮键（stage 内距恒 24）', F.folded === true && F.pad === '24px' && F.abs === false, JSON.stringify([F.folded, F.pad, F.abs]));
 ok('F4 折叠图标提示变「展开」', F.tip === '展开', F.tip);
 
 /* 展开 + 分组收起 */
-await p.click('#udFold'); await wait(250);
+await p.click('#udFold'); await wait(480);
 await p.click('#udTreeHead'); await wait(420);
 /* 第 125 轮：折叠态从 hidden 换成 .is-fold（display:none 没法做收展过渡），
    所以这里判 is-fold + max-height 0 + aria-hidden，不再判 hidden/display */

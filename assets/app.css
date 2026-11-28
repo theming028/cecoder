@@ -4955,8 +4955,14 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
   /* 第 126 轮：整栏的收齐 / 展开改成和左侧任务栏（.ws-drawer）同一套「宽度滑动」——
      原来是一步跳到 absolute 的 32×32 浮键，中间没有任何过渡。
      宽度 .26s + 同一条 cubic-bezier(.2,.8,.2,1)，底色/阴影同步淡出。 */
-  transition: width .26s cubic-bezier(.2, .8, .2, 1),
-              flex-basis .26s cubic-bezier(.2, .8, .2, 1),
+  /* 第 128 轮：三条曲线都换成「两头慢」的 cubic-bezier(.4,0,.2,1) 并拉长到 .28/.32s ——
+     原来的 .2/.8 前段极快，240→32 的宽度第一帧就能走掉 22%，581→32 的高度更是第一帧掉 140px，
+     看着就是整块面板「塌下去再缩」。will-change 提前把这一层提出来，避免每帧重排掉帧。 */
+  will-change: width, height;
+  transition: width .28s cubic-bezier(.4, 0, .2, 1),
+              flex-basis .28s cubic-bezier(.4, 0, .2, 1),
+              height .32s cubic-bezier(.4, 0, .2, 1),
+              margin .32s cubic-bezier(.4, 0, .2, 1),
               background-color .22s var(--cds-motion-ease),
               box-shadow .22s var(--cds-motion-ease);
 }
@@ -4988,16 +4994,23 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
   flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin;
   /* 稿 4068:65598：卡片顶到 y=50（头 13+28=41 + 9），左右 12；卡片之间 4 */
   padding: 9px 12px 12px; display: flex; flex-direction: column; gap: 4px;
+  /* 第 128 轮：内容宽度钉死在展开态的 240 —— 整栏收窄时不再带着 6 张卡片一起重排
+     （实测展开时那块重排要 70~80ms，中间卡住几帧，看着就是闪一下）；
+     收窄后多出来的部分由 .ud-pages 的 overflow 裁掉，观感仍是「横向滑走」。 */
+  width: 240px; box-sizing: border-box;
   transition: opacity .16s var(--cds-motion-ease);
 }
 .ud-pages-body::-webkit-scrollbar { width: 6px; }
 .ud-pages-body::-webkit-scrollbar-thumb { background: #DCDFE5; border-radius: 3px; }
-/* 折叠：整列收成左上角一颗 32×32 浮键（就是 .ud-pages-fold 本体），点它再展开 */
+/* 折叠：整列收成左上角一颗 32×32 浮键（就是 .ud-pages-fold 本体），点它再展开
+   第 128 轮：不再用 absolute 脱流 —— 一脱流，画布瞬间吃满 240px、面板自身也跳 12px，
+   整个动作就成了「闪一下再缩」。改成仍在流内收窄：宽/高/外边距一起过渡，
+   位置靠 margin 贴到左上（配合 align-self: flex-start 松开高度拉伸）。
+   flex-basis 必须写成 32px：auto 不可插值，展开时会直接跳回 240。 */
 .ud-canvas.is-folded .ud-pages {
-  position: absolute; left: 12px; top: 12px; z-index: 3;
-  /* 第 126 轮：flex-basis 写成 32px 而不是 auto —— auto 不可插值，
-     展开切回 relative 时宽度会直接跳到 240，过渡就抓不到了 */
+  position: relative; left: auto; top: auto; z-index: 3;
   width: 32px; height: 32px; flex: 0 0 32px; overflow: visible;
+  align-self: flex-start; margin: 12px 0 0 12px;
   background: none; box-shadow: none;
 }
 .ud-canvas.is-folded .ud-pages-head { padding: 0; gap: 0; }

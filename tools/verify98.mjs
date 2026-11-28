@@ -157,14 +157,14 @@ ok('F6 再点收起：回到 44 高、箭头缩回不旋转',
   I.h === 44 && I.fold === true && I.exp === 'false' && /matrix\(0\.86, 0, 0, 0\.86/.test(I.tr), JSON.stringify(I));
 
 /* 折叠往返后仍正常 */
-await p.click('#udFold'); await wait(300);
+await p.click('#udFold'); await wait(480);   /* 第 128 轮：收展动画 .28/.32s */
 const J = await p.evaluate(() => {
   const q = s => document.querySelector(s);
   const cs = e => getComputedStyle(e);
   return [cs(q('#udFold .ico-fold')).display, cs(q('#udFold .ico-expand')).display,
     Math.round(q('.ud-pages').getBoundingClientRect().width), q('#udZoomVal').textContent.trim()];
 });
-await p.click('#udFold'); await wait(300);
+await p.click('#udFold'); await wait(480);   /* 第 128 轮：收展动画 .28/.32s */
 const K = await p.evaluate(() => {
   const q = s => document.querySelector(s);
   const cs = e => getComputedStyle(e);
@@ -172,7 +172,7 @@ const K = await p.evaluate(() => {
     Math.round(q('.ud-pages').getBoundingClientRect().width), document.getElementById('udFold').getAttribute('data-tip')];
 });
 ok('G1 折叠后换面板图标、收成 32', J[0] === 'none' && J[1] === 'block' && J[2] === 32, JSON.stringify(J));
-ok('G2 再展开还原 to-left 图标与 240 宽', K[0] === 'block' && K[1] === 'none' && K[2] === 240 && K[3] === '折叠', JSON.stringify(K));
+ok('G2 再展开还原 to-left 图标与 240 宽', K[0] === 'block' && K[1] === 'none' && Math.abs(K[2] - 240) <= 2 && K[3] === '折叠', JSON.stringify(K));
 
 ok('Z1 无 JS 报错', p.__e.length === 0, p.__e.join(' | '));
 

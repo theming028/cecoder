@@ -35,6 +35,8 @@ const read = () => h.evaluate(() => {
   return {
     w: Math.round(r.width), h: Math.round(r.height),
     x: Math.round(r.x), pos: s.position,
+    gap: Math.round(r.x - document.getElementById('udCanvas').getBoundingClientRect().x),
+    top: Math.round(r.y - document.getElementById('udCanvas').getBoundingClientRect().y),
     tr: s.transition,
     canvasW: Math.round(cv.getBoundingClientRect().width),
     bodyOp: bcs.opacity, bodyVis: bcs.visibility,
@@ -48,9 +50,10 @@ const read = () => h.evaluate(() => {
 /* ---------- A 展开态 ---------- */
 const A = await read();
 ok('A1 展开态 240 宽、在流内（relative）', A.w === 240 && A.pos === 'relative', JSON.stringify([A.w, A.pos]));
-ok('A2 宽度过渡 = .26s cubic-bezier(.2,.8,.2,1)（任务栏同一条曲线）',
-  /width 0\.26s cubic-bezier\(0\.2, 0\.8, 0\.2, 1\)/.test(A.tr), A.tr.slice(0, 90));
-ok('A3 flex-basis 也参与过渡（否则 relative 下宽度由 flex-basis 决定，动画会跳）', /flex-basis 0\.26s/.test(A.tr), A.tr.slice(0, 140));
+/* 第 128 轮：为消除「塌下去」的闪动，曲线换成两头慢的 .4/0/.2、时长 .28s */
+ok('A2 宽度过渡 = .28s cubic-bezier(.4,0,.2,1)',
+  /width 0\.28s cubic-bezier\(0\.4, 0, 0\.2, 1\)/.test(A.tr), A.tr.slice(0, 90));
+ok('A3 flex-basis / height 也参与过渡', /flex-basis 0\.28s/.test(A.tr) && /height 0\.32s/.test(A.tr), A.tr.slice(0, 160));
 ok('A4 展开态内容不透明、可见', A.bodyOp === '1' && A.bodyVis === 'visible', JSON.stringify([A.bodyOp, A.bodyVis]));
 
 /* ---------- B 收起：中间帧必须在动 ---------- */
@@ -61,10 +64,10 @@ ok('B1 收起过程中宽度在收缩（32 < w < 240）', B1.w > 32 && B1.w < 24
 ok('B2 收起过程中标题在淡出（0 < op < 1）', B1.titleOp > 0 && B1.titleOp < 1, String(B1.titleOp));
 await wait(450);
 const B2 = await read();
-ok('B3 收起终态：32×32 浮键（absolute）', B2.w === 32 && B2.h === 32 && B2.pos === 'absolute', JSON.stringify([B2.w, B2.h, B2.pos]));
+ok('B3 收起终态：32×32 浮键（第 128 轮改为流内 relative）', B2.w === 32 && B2.h === 32 && B2.pos === 'relative', JSON.stringify([B2.w, B2.h, B2.pos]));
 ok('B4 收起终态：内容 opacity 0 + visibility hidden（不再靠 display:none 硬切）', B2.bodyOp === '0' && B2.bodyVis === 'hidden', JSON.stringify([B2.bodyOp, B2.bodyVis]));
-/* 画布宽度由缩放逻辑自己算（不随左列 flex 变），所以这里只验证左列确实脱离了文档流 */
-ok('B5 收起后左列不再占流（absolute，不挤压画布）', B2.pos === 'absolute', B2.pos);
+/* 第 128 轮：折叠态改为流内 32 宽，位置靠 margin 12 贴画布左上 */
+ok('B5 收起后贴画布左上 12px', B2.gap === 12 && B2.top === 12, JSON.stringify([B2.gap, B2.top]));
 ok('B6 aria / 提示同步成「展开」', B2.exp === 'false' && B2.tip === '展开', JSON.stringify([B2.exp, B2.tip]));
 
 /* ---------- C 展开：方向也要有过渡 ---------- */
@@ -88,8 +91,8 @@ await h.click('#udFold');
 await wait(600);
 const D = await read();
 ok('D1 快速连点三次后状态自洽（要么全展开要么全收起，不留半截）',
-  (D.w === 32 && D.pos === 'absolute' && D.bodyOp === '0') || (D.w === 240 && D.pos === 'relative' && D.bodyOp === '1'),
-  JSON.stringify([D.w, D.pos, D.bodyOp]));
+  (D.w === 32 && D.bodyOp === '0' && D.top === 12) || (D.w === 240 && D.bodyOp === '1' && D.gap === 0),
+  JSON.stringify([D.w, D.pos, D.bodyOp, D.gap, D.top]));
 
 ok('E1 全程无 JS 报错', errs.length === 0, JSON.stringify(errs.slice(0, 3)));
 
