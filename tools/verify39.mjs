@@ -159,7 +159,8 @@ ok('D10 顶栏右按钮文字 #455973', vis.help.color === 'rgb(69, 89, 115)', v
 ok('D11 分段控件轨道 rgba(31,68,118,.12)', vis.seg.backgroundColor === 'rgba(31, 68, 118, 0.12)', vis.seg.backgroundColor);
 ok('D12 分段选中底板白 + r6', vis.pill.backgroundColor === 'rgb(255, 255, 255)' && vis.pill.borderRadius === '6px', JSON.stringify(vis.pill));
 ok('D13 分段文字 #1F1F1F', vis.segItem.color === 'rgb(31, 31, 31)', vis.segItem.color);
-ok('D14 去边框后内容列顶部仍 198', vis.stageTop === 198, String(vis.stageTop));
+/* 第 118 轮：顶部锚点从固定 150px 改成 panel-main 高的 18%（852 高时 = 153 + panel 顶 48 = 201） */
+ok('D14 内容列顶部 = panel 顶 + panel 高的 18%', Math.abs(vis.stageTop - (48 + 852 * 0.18)) <= 2, String(vis.stageTop));
 ok('D15 无脚本报错', p.__e.length === 0, p.__e.join(' | '));
 await p.screenshot({ path: 'ref39-visual.png' });
 await p.close();

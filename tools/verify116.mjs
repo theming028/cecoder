@@ -45,9 +45,12 @@ const A = await h.evaluate(() => {
   };
   return { panel: [Math.round(pm.width), Math.round(pm.height)], flow: one('pmMist'), grid: one('pmGrid') };
 });
-ok('A1 第一层是 WebGL2 背景、与面板等大', !!A.flow && A.flow.gl2 && A.flow.disp === 'block' && A.flow.pos === 'absolute' &&
+/* 第 118 轮：绘制缓冲按 CSS 尺寸 × dpr × 0.7 给（片元数砍到 49%），CSS 尺寸仍铺满面板 */
+ok('A1 第一层是 WebGL2 背景、铺满面板、绘制缓冲 0.7 倍',
+  !!A.flow && A.flow.gl2 && A.flow.disp === 'block' && A.flow.pos === 'absolute' &&
   A.flow.css[0] === A.panel[0] && A.flow.css[1] === A.panel[1] &&
-  A.flow.attr[0] === A.flow.css[0] && A.flow.attr[1] === A.flow.css[1], JSON.stringify([A.panel, A.flow]));
+  Math.abs(A.flow.attr[0] - A.flow.css[0] * 0.7) <= 3 && Math.abs(A.flow.attr[1] - A.flow.css[1] * 0.7) <= 3,
+  JSON.stringify([A.panel, A.flow]));
 ok('A2 第二层是原站那张静态网格 canvas', !!A.grid && A.grid.disp === 'block' && A.grid.pos === 'absolute' &&
   A.grid.css[0] === A.panel[0] && !A.grid.gl2, JSON.stringify(A.grid));
 ok('A3 两层都压在内容之下、不吃事件', A.flow.z === '-1' && A.grid.z === '-1' &&

@@ -131,10 +131,12 @@ ok('D2 底色是极淡主色（蓝通道 > 红通道，且几乎白）', H0.rgb[
 /* 第 117 轮：背景照搬参考站 —— panel-main 自身只留一条 #9cc1e7 → 透明的纵向渐变当降级底色 */
 ok('D3 背景是一条纵向渐变（原站 #9cc1e7 → 透明），没有网格', /linear-gradient/.test(H0.bgImage || '') && !/44px/.test(H0.gridSize || ''), JSON.stringify([String(H0.bg).slice(0, 60), H0.gridSize]));
 ok('D4 没有全尺寸伪元素动画（::before / ::after 都停用）', H0.before.name === 'none' && H0.after.name === 'none', JSON.stringify([H0.before.name, H0.after.name]));
-ok('D5 背景第一层是 WebGL2 canvas（absolute / z-index:-1 / 与面板等大）',
+/* 第 118 轮：绘制缓冲按 CSS × 0.7 给（片元数砍到 49%），CSS 尺寸仍与面板等大 */
+ok('D5 背景第一层是 WebGL2 canvas（absolute / z-index:-1 / 铺满面板、缓冲 0.7 倍）',
   !!H0.mist && H0.mist.disp === 'block' && H0.mist.pos === 'absolute' && H0.mist.z === '-1' &&
   H0.mist.gl && H0.mist.lost === false &&
-  H0.mist.attr[0] === H0.mist.css[0] && H0.mist.attr[1] === H0.mist.css[1], JSON.stringify(H0.mist));
+  Math.abs(H0.mist.attr[0] - H0.mist.css[0] * 0.7) <= 3 && Math.abs(H0.mist.attr[1] - H0.mist.css[1] * 0.7) <= 3,
+  JSON.stringify(H0.mist));
 ok('D6 第二层是原站那张静态网格 canvas（同样是背景层、不吃事件）',
   !!H0.grid && H0.grid.disp === 'block' && H0.grid.z === '-1' && H0.grid.attr[0] > 300, JSON.stringify(H0.grid));
 

@@ -330,7 +330,12 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
    宽度以 panel-main 为基准（100%）：够宽时封顶 960，窄窗 / 右栏展开时按可用宽自适应收窄。 */
 .stage {
   position: absolute; left: 50%; transform: translateX(-50%);
-  top: calc(clamp(150px, 22vh, 240px) - 48px); bottom: 8px;
+  /* 第 118 轮：顶部锚点从「clamp(150px, 22vh, 240px) - 48px」改成纯比例 ——
+     原来 22vh 被 150/240 两道闸夹住，900 高以内就一直是死值 150px，
+     窗口变高变矮顶部区域纹丝不动。改成 panel-main 高度的 18%（相对定位的包含块
+     就是 panel-main，852 高时 = 153px，与原来 150px 差 3px），
+     于是顶部留白随容器等比缩放，不再有「卡在某个值」的段落。 */
+  top: 18%; bottom: 8px;
   /* 第 16 轮：盒宽比内容宽 12px（左右各 6px 内边距）——输入卡 focus 外阴影
      0 0 0 4px 向左右各扩 4px，原先卡贴 stage 内容缘、环被 overflow-x:clip 裁掉。
      第 39 轮：上限 860 → 960；下限仍交给「可用宽 - 12」，不设 min-width，宁可收窄也不出横向滚动 */
@@ -5465,13 +5470,23 @@ body[data-page="home"] .tb-label { color: var(--cds-text-secondary); }
 body[data-page="home"] .tb-label-2 { opacity: 1; }
 body[data-page="home"] .tb-div { background: rgba(31, 31, 31, .14); }
 
-/* 工作台子项容器 / 快速任务推荐工序容器 / 场景卡：同样的磨砂白 85% */
+/* 工作台子项容器 / 快速任务推荐工序容器：磨砂白 85%（第 111 轮） */
 body[data-page="home"] .wb-bar,
-body[data-page="home"] .qf-bar,
-body[data-page="home"] .scene {
+body[data-page="home"] .qf-bar {
   background: rgba(255, 255, 255, .85);
   -webkit-backdrop-filter: blur(15px) saturate(140%);
   backdrop-filter: blur(15px) saturate(140%);
+}
+/* 第 118 轮：场景卡改成「黑 10% + 白色半透明描边」——压在蓝白流体上做一层暗玻璃，
+   卡片与背景的层次靠明暗而不是靠白。
+   顺手去掉 15px backdrop blur：它下面就是每帧在重画的 WebGL canvas，
+   一块 960×80 的区域每帧重新采样 + 模糊，是首页最贵的一笔合成开销；
+   黑 10% 本身已经有足够的分离度，模糊在这里没有可见收益。 */
+body[data-page="home"] .scene {
+  background: rgba(0, 0, 0, .1);
+  border-color: rgba(255, 255, 255, .6);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 /* 容器变透之后，里面的纯白小卡改成极淡的蓝白描边才分得开 */
 body[data-page="home"] .wb-opt,
@@ -5480,9 +5495,21 @@ body[data-page="home"] .scene-add { background: rgba(255, 255, 255, .72); }
 /* 边框在半透明底上会发灰，统一提亮 */
 body[data-page="home"] .wb-bar,
 body[data-page="home"] .qf-bar { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .7); }
-body[data-page="home"] .scene { border-color: rgba(255, 255, 255, .7); }
+/* idle 悬浮：底色是黑的，hover 不能再跳到白 96%（会闪），只在黑 10% 上加深一档 */
 body[data-page="home"] .scene[data-state="idle"]:hover,
-body[data-page="home"] .scene[data-state="idle"]:focus-within { background: rgba(255, 255, 255, .96); }
+body[data-page="home"] .scene[data-state="idle"]:focus-within {
+  background: rgba(0, 0, 0, .16);
+  border-color: rgba(255, 255, 255, .8);
+}
+
+/* ============================================================
+   第 118 轮：sc-htxt（看板态标题组）统一 #152443
+   —— .scene-title / .scene-desc 各自写着 #1F1F1F / #868686，
+     只在父级写 color 不透传，所以三个都点名。
+   ============================================================ */
+body[data-page="home"] .sc-htxt,
+body[data-page="home"] .sc-htxt .scene-title,
+body[data-page="home"] .sc-htxt .scene-desc { color: #152443; }
 
 /* ============================================================
    第 112 轮：任务总结页的「完工烟花」画布
@@ -5492,8 +5519,9 @@ body[data-page="home"] .scene[data-state="idle"]:focus-within { background: rgba
 
 /* ============================================================
    第 113 / 114 轮的「首页布局改进」已整体回退 —— 用户要求：恢复首页布局改进前的版本。
-   于是回到第 112 轮那套：`.stage` 基础规则里的 22vh 顶部锚点照旧，flex:1 的
-   `.stage-spacer` 继续把「工具行 → 两条展开栏 → 输入卡」这一组顶到底部，
+   于是回到第 112 轮那套：flex:1 的
+   `.stage-spacer` 继续把「工具行 → 两条展开栏 → 输入卡」这一组顶到底部
+   （顶部锚点在第 118 轮改成了 panel-main 的 18%，见 `.stage` 规则里的注释），
    版本号在流里贴着它收尾（屏幕底），工具行与展开栏本来就排在卡之上，
    卡高 ci+82、环境行坐在卡外 #F2F2F2 背板上 —— 与本轮之前完全一致。
    第 113 轮里属于「非布局」的取色/可达性修正保留：③④ 分组标签配色、

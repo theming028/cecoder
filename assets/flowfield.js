@@ -8,8 +8,10 @@
       offset (0, 65) / grain 0。
    时间驱动也照抄：pattern 用 3 条不同周期的正弦（420s / 460s / 90s）累加相位，
       loop1、loop2 给图案加漂移，loop3 是漩涡的 (sin, cos) 相位。
-   尺寸 maxDpr 1.5；帧率 30fps（原版 1e3/30 节流）；IntersectionObserver +
+   尺寸 maxDpr 1.5 × RENDER 0.7；帧率 30fps（原版 1e3/30 节流）；IntersectionObserver +
    visibilitychange 暂停；prefers-reduced-motion 只画一帧（preserveDrawingBuffer）。
+   第 118 轮做了一轮纯成本优化（构图不变）：绘制缓冲 0.7 倍、常量 uniform 只设一次、
+   时间/尺寸 uniform 只在 resize 时刷、powerPreference 不再强制 low-power。
    第二层是他们的静态网格 canvas（spacing 90 / 线 10% / 点 4%），
    两层挂同一条 mask：顶部不透明、到底部淡出。
    ============================================================ */
@@ -22,7 +24,7 @@
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var gl = canvas.getContext('webgl2', {
     alpha: true, premultipliedAlpha: false,
-    powerPreference: 'low-power', preserveDrawingBuffer: !!reduced
+    powerPreference: 'default', preserveDrawingBuffer: !!reduced
   });
   if (!gl) { canvas.style.display = 'none'; return; }
 
@@ -205,6 +207,10 @@ void main() {
     var t = h.replace('#', '');
     return [parseInt(t.slice(0, 2), 16) / 255, parseInt(t.slice(2, 4), 16) / 255, parseInt(t.slice(4, 6), 16) / 255];
   };
+  /* 第 118 轮：色值只算一次（原来每帧 map 出 6 组数组再逐个 uniform4f） */
+  var COLORS = [0, 1, 2, 3, 4, 5].map(function (i) {
+    return i < OPT.colors.length ? hex2rgb(OPT.colors[i]) : [0, 0, 0];
+  });
 
   /* ------- 时间 uniform：原版 makeClock 的 pattern 分支 ------- */
   var TAU = Math.PI * 2;
@@ -236,11 +242,21 @@ void main() {
    'u_softness', 'u_shape', 'u_shapeScale', 'u_distortion', 'u_swirl', 'u_swirlIterations'
   ].forEach(function (k) { U[k] = gl.getUniformLocation(prog, k); });
 
-  var dpr = 1;
-  var draw = function (dtMs) {
-    var c = [0, 1, 2, 3, 4, 5].map(function (i) {
-      return i < OPT.colors.length ? hex2rgb(OPT.colors[i]) : [0, 0, 0];
-    });
+  /* ------- 第 118 轮：性能改造（观感不变，只砍成本） -------
+     ① 常量 uniform 挪到初始化时设一次 —— 原来每帧刷 20 个 uniform、还每帧新建 6 组
+        色值数组，这些值从头到尾没变过；
+     ② 绘制缓冲按 CSS 尺寸 × RENDER(0.7) 给：片元着色器是这层唯一的成本大头，
+        片元数直接砍到 49%。着色器里 uv 是「CSS 像素坐标」量纲
+        （uv *= u_resolution 之后又 /= u_pixelRatio），所以把 u_pixelRatio 一起折算，
+        构图、纹理尺度与全分辨率逐像素一致，只是被双线性放大；
+        这个 pattern 的特征尺度在 100px 以上（noise 波长 ≈ 285px、checks 更粗），
+        0.7 倍放大肉眼看不出来；
+     ③ 与尺寸相关的两个 uniform（resolution / pixelRatio）挪进 fit()，只在尺寸变时刷；
+     ④ powerPreference 从 low-power 改 default —— low-power 会主动请求集显，
+        这个着色器在集显上就是顿的，交给浏览器按机器选。 */
+  var RENDER = 0.7;
+  var setStaticUniforms = function () {
+    var c = COLORS;
     gl.uniform1f(U.u_scale, OPT.scale);
     gl.uniform2f(U.u_offset, (OPT.offsetX || 0) / 100, (OPT.offsetY || 0) / 100);
     gl.uniform1f(U.u_rotation, OPT.rotation / 90);
@@ -259,21 +275,31 @@ void main() {
     gl.uniform1f(U.u_distortion, OPT.distortion / 100);
     gl.uniform1f(U.u_swirl, OPT.swirl / 50);
     gl.uniform1f(U.u_swirlIterations, OPT.swirlIterations);
+  };
+  setStaticUniforms();
+
+  /* 每帧只做两件事：推进时间、画一个全屏四边形 */
+  var draw = function (dtMs) {
     clock(0.001 * dtMs * (OPT.speed / 14));
-    gl.uniform1f(U.u_pixelRatio, dpr);
-    gl.uniform2f(U.u_resolution, canvas.width, canvas.height);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   };
 
   var fit = function () {
     var r = canvas.getBoundingClientRect();
     if (r.width < 2 || r.height < 2) return false;
-    var d = Math.min(window.devicePixelRatio || 1, 1.5);
-    dpr = d;
-    var pw = Math.round(r.width * d), ph = Math.round(r.height * d);
+    var css = Math.min(window.devicePixelRatio || 1, 1.5);
+    var d = css * RENDER;                 /* 一个 CSS 像素落多少片元 */
+    var pw = Math.max(2, Math.round(r.width * d));
+    var ph = Math.max(2, Math.round(r.height * d));
     if (canvas.width !== pw) canvas.width = pw;
     if (canvas.height !== ph) canvas.height = ph;
     gl.viewport(0, 0, pw, ph);
+    gl.uniform2f(U.u_resolution, pw, ph);
+    /* 着色器里 uv = (fragCoord - res/2) * noise_scale / u_pixelRatio，
+       要让它等于「CSS 像素坐标 × noise_scale」，u_pixelRatio 就得取「缓冲 / CSS」的比值
+       （原版 dpr 下正好等于 devicePixelRatio，dpr 因子里外抵消，所以图案不随 dpr 变尺度）。
+       现在缓冲是 CSS × 0.7，这里传 0.35/0.7/1.0…，构图与全分辨率逐像素一致。 */
+    gl.uniform1f(U.u_pixelRatio, d);
     return true;
   };
 
@@ -380,7 +406,9 @@ void main() {
   var fit = function () {
     var rect = cv.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) return false;
-    var d = Math.min(window.devicePixelRatio || 1, 2);
+    /* 第 118 轮：上限 2 → 1.5 —— 4K/Retina 下这块静态纹理能到 2200×1700，
+       每帧都要参与合成，1.5 倍下 0.5px 细线仍然清晰，显存与带宽省一半 */
+    var d = Math.min(window.devicePixelRatio || 1, 1.5);
     W = rect.width;
     H = rect.height;
     cv.width = Math.round(W * d);

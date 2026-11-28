@@ -1,7 +1,7 @@
 /* 第 114/115 轮验收：首页布局「恢复改进前」的守卫
    —— 第 113 轮那批布局实验（整组垂直居中、工具行压到卡下、环境行收进卡内、
       版本号脱流）全部撤回，回到第 112 轮那套：
-      hero 走 22vh 锚点 → flex:1 的 .stage-spacer 撑开 → 工具行/两条展开栏在卡上 →
+      hero 锚在 panel 高的 18% → flex:1 的 .stage-spacer 撑开 → 工具行/两条展开栏在卡上 →
       输入卡（ci+82）→ 卡外 #F2F2F2 背板上的环境行 → 版本号在流里贴底。
    顺带守住：非布局修正（标签配色、焦点环、会话来源）仍在、会话页不受影响。 */
 import puppeteer from 'puppeteer-core';
@@ -38,7 +38,8 @@ const A = await h.evaluate(() => {
   };
 });
 ok('A1 .stage-spacer 恢复占位（撑开中部空白）', A.spacer > 100, String(A.spacer));
-ok('A2 stage 顶部回到 22vh 锚点（不再贴 panel 顶）', A.stage.t > 100 && Math.abs(A.hero.t - A.stage.t) <= 1, JSON.stringify([A.stage.t, A.hero.t]));
+/* 第 118 轮：锚点从 22vh（被 clamp 夹死）改成 panel 高的 18% */
+ok('A2 stage 顶部按比例锚定（panel 高的 18%）、hero 贴在 stage 顶', A.stage.t > 100 && Math.abs(A.hero.t - A.stage.t) <= 1, JSON.stringify([A.stage.t, A.hero.t]));
 ok('A3 stage 不再用 safe center 居中整组', !/center/.test(A.stageJustify), A.stageJustify);
 ok('A4 stage 无额外 padding-bottom（版本号不再脱流让位）', A.stagePadB === '0px', A.stagePadB);
 ok('A5 工具行仍排在输入卡之上', A.toolbar.b <= A.card.t, JSON.stringify([A.toolbar.b, A.card.t]));

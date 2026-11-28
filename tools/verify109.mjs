@@ -180,7 +180,8 @@ const H0 = await h.evaluate(() => {
   };
 });
 ok('H1 首页有一层铺满面板的 WebGL2 背景 canvas', H0.disp === 'block' && H0.pos === 'absolute' && H0.z === '-1' && H0.gl && H0.lost === false, JSON.stringify([H0.disp, H0.pos, H0.z, H0.gl, H0.lost]));
-ok('H2 canvas 与面板等大且真的在画（已有绘制帧）', H0.w === H0.pm[0] + 'px' && H0.cv[0] === H0.pm[0] && H0.frames > 0, JSON.stringify([H0.w, H0.cv, H0.pm, H0.frames]));
+/* 第 118 轮：CSS 尺寸与面板等大，绘制缓冲是它的 0.7 倍 */
+ok('H2 canvas 与面板等大、缓冲 0.7 倍且真的在画（已有绘制帧）', H0.w === H0.pm[0] + 'px' && Math.abs(H0.cv[0] - H0.pm[0] * 0.7) <= 3 && H0.frames > 0, JSON.stringify([H0.w, H0.cv, H0.pm, H0.frames]));
 ok('H3 没有全尺寸 CSS 动画（背景全交给 canvas）', H0.afterAnim === 'none' && H0.anims.length === 0, JSON.stringify([H0.afterAnim, H0.anims]));
 ok('H4 降级底色是原站那条 #9cc1e7 纵向渐变 + 第二层静态网格', /rgb\(156, 193, 231\)/.test(H0.bgImage) && !!H0.grid && H0.grid.disp === 'block', JSON.stringify([String(H0.bgImage).slice(0, 50), H0.grid]));
 

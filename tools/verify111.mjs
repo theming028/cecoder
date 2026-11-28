@@ -83,10 +83,13 @@ const C = await p.evaluate(() => {
   const g = sel => { const el = document.querySelector(sel); if (!el) return null; const c = getComputedStyle(el); return { bg: c.backgroundColor, bf: c.backdropFilter || c.webkitBackdropFilter }; };
   return { wb: g('.wb-bar'), qf: g('.qf-bar'), sc: g('.scene') };
 });
-for (const [k, name] of [['wb', '工作台子项栏 wb-bar'], ['qf', '推荐工序栏 qf-bar'], ['sc', '场景卡 scene']]) {
+for (const [k, name] of [['wb', '工作台子项栏 wb-bar'], ['qf', '推荐工序栏 qf-bar']]) {
   const v = C[k];
   ok('C-' + k + ' ' + name + ' = 白 85% + 毛玻璃', !!v && /rgba\(255, 255, 255, 0\.85\)/.test(v.bg) && /blur\(15px\)/.test(v.bf), JSON.stringify(v));
 }
+/* 第 118 轮：场景卡改成「黑 10% + 白色半透明描边」，并去掉 backdrop blur（压在每帧重画的 canvas 上太贵） */
+ok('C-sc 场景卡 = 黑 10% + 无 backdrop blur（第 118 轮改的）',
+  !!C.sc && /rgba\(0, 0, 0, 0\.1\)/.test(C.sc.bg) && (!C.sc.bf || C.sc.bf === 'none'), JSON.stringify(C.sc));
 
 /* ---------- D 不回归：栏展开后仍在、内容可读、无报错 ---------- */
 /* 子项栏已在 B 段点开，这里不再重复点（再点会收起） */

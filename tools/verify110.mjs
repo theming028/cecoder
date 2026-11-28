@@ -136,7 +136,8 @@ const H = await h.evaluate(() => {
   };
 });
 /* 第 117 轮：低分辨率 2D 云雾整体换成参考站原版 WebGL2 pattern */
-ok('D1 背景 canvas 铺满面板、内部像素 = CSS 尺寸（dpr≤1.5，不再降采样）', H.disp === 'block' && H.z === '-1' && H.ratio >= 0.99 && H.ratio <= 1.01 && H.w === H.pm[0] + 'px' && H.h === H.pm[1] + 'px', JSON.stringify([H.disp, H.z, H.ratio, H.w, H.h]));
+/* 第 118 轮：绘制缓冲 = CSS × 0.7（片元数砍到 49%，观感不变） */
+ok('D1 背景 canvas 铺满面板、绘制缓冲 0.7 倍', H.disp === 'block' && H.z === '-1' && H.ratio >= 0.65 && H.ratio <= 0.75 && H.w === H.pm[0] + 'px' && H.h === H.pm[1] + 'px', JSON.stringify([H.disp, H.z, H.ratio, H.w, H.h]));
 ok('D2 拿到的是 WebGL2 context，且没丢', H.gl && H.lost === false, JSON.stringify([H.gl, H.lost]));
 ok('D3 已在绘制（有帧 + 采到像素）', H.frames > 0 && Array.isArray(H.sig) && H.sig.length === 3, JSON.stringify([H.frames, H.sig]));
 ok('D4 不拦点击（pointer-events: none）', H.pe === 'none', H.pe);
