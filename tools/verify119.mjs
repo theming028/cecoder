@@ -56,7 +56,8 @@ const idle = A.filter(x => !x.active);
 ok('A2 未选中的 chip 图标也显示（不再是 0 图标）', idle.length >= 5 && idle.every(x => x.disp !== 'none'), JSON.stringify(idle.map(x => x.disp)));
 ok('A3 未选中图标跟文字同色（currentColor，不是品牌蓝/灰）', idle.every(x => x.col === x.txt), JSON.stringify(idle.map(x => [x.col, x.txt])));
 ok('A4 图标常显后 chip 宽 63（含图标 14 + 间距 3），六个一致', A.every(x => x.w === 63), JSON.stringify(A.map(x => x.w)));
-ok('A5 选中态图标转品牌蓝 rgb(55,112,247)', A.filter(x => x.active).every(x => x.col === 'rgb(55, 112, 247)'), JSON.stringify(A.filter(x => x.active).map(x => x.col)));
+/* 第 121 轮：选中态反色成蓝底白字，图标跟着变白 */
+ok('A5 选中态图标 = 白（蓝底白字时代）', A.filter(x => x.active).every(x => x.col === 'rgb(255, 255, 255)'), JSON.stringify(A.filter(x => x.active).map(x => x.col)));
 
 /* 切换选中：图标跟着变色，宽度不变（不再出现「选中才多出图标」的跳变） */
 await h.click('[data-chips="process"] .chip[data-wb="架构"]');
@@ -66,7 +67,7 @@ const A2b = await h.evaluate(() => {
   return cs.map(c => ({ t: c.textContent.trim(), w: Math.round(c.getBoundingClientRect().width), col: getComputedStyle(c.querySelector('.chip-ico')).color }));
 });
 ok('A6 换选「架构」：宽度不变（无 63→66 跳变）', A2b.every(x => x.w === 63), JSON.stringify(A2b.map(x => x.w)));
-ok('A7 换选后蓝色只落在新选中项上', A2b.filter(x => x.col === 'rgb(55, 112, 247)').length === 1 && A2b.find(x => x.t === '架构').col === 'rgb(55, 112, 247)', JSON.stringify(A2b.map(x => [x.t, x.col])));
+ok('A7 换选后只有新选中项是「反色」（白图标）', A2b.filter(x => x.col === 'rgb(255, 255, 255)').length === 1 && A2b.find(x => x.t === '架构').col === 'rgb(255, 255, 255)', JSON.stringify(A2b.map(x => [x.t, x.col])));
 await h.click('[data-chips="process"] .chip[data-wb="通用"]');
 await wait(300);
 

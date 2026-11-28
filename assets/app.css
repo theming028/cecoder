@@ -477,9 +477,10 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 
 /* ===== Hero ===== */
 .hero { flex: 0 0 auto; perspective: 600px; }
+/* 第 120 轮：标题改 #152443（比正文主色更冷的深蓝，跟首页蓝白流体同一色系） */
 .hero-title {
   margin: 0; font-size: 24px; font-weight: 600; line-height: 32px;
-  color: var(--cds-text-primary); white-space: nowrap; height: 32px;
+  color: #152443; white-space: nowrap; height: 32px;
 }
 .hero-sub {
   margin: 8px 0 0; width: max-content; max-width: 100%; font-size: 14px; line-height: 22px; height: 22px;
@@ -489,8 +490,9 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 /* ----- 标题入场：逐字升起 + 蓝色扫光 ----- */
 .hero-title .ch {
   display: inline-block;
+  /* 逐字取的是这段渐变，父级 color 不透传 —— 暗部四处跟着标题一起换 #152443，蓝扫光不动 */
   background-image: linear-gradient(100deg,
-    #1F1F1F 0%, #1F1F1F 34%, #3770F7 50%, #1F1F1F 66%, #1F1F1F 100%);
+    #152443 0%, #152443 34%, #3770F7 50%, #152443 66%, #152443 100%);
   background-size: 300% 100%;
   background-position: 100% 0;
   -webkit-background-clip: text; background-clip: text;
@@ -664,14 +666,13 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
 }
 .chip:hover { background: var(--cds-fill); }
 
-/* 工作台 chip 选中态（layers/ws-chip.json · dy2983:48053 · 66×32）
-   底 #F5F8FF · 1px 实线 #C7D7FC · 字/图标 #3770F7 · 字重 400→500 · 无投影 */
+/* 第 121 轮：工作台 chip 选中态反过来 —— 原来是「浅蓝底 + 蓝字」，现在蓝底白字
+   （底/描边都用品牌蓝 #3770F7，字与图标纯白，字重仍 500；hover 加深一档 */
 .chip.is-active {
-  color: var(--cds-color-primary); border-color: var(--cds-blue-chip);
-  background: var(--cds-blue-1); font-weight: 500;
+  color: #FFFFFF; border-color: #3770F7; background: #3770F7; font-weight: 500;
 }
-.chip.is-active .ico { color: var(--cds-color-primary); }
-.chip.is-active:hover { background: #EFF4FF; border-color: var(--cds-blue-4); }
+.chip.is-active .ico { color: #FFFFFF; }
+.chip.is-active:hover { background: #2E5FD9; border-color: #2E5FD9; }
 /* 工作台 chip：图标只在选中态出现（layers/tb-chip-icon.json · dy2983:48499 · 66×32）
    未选中 0 图标（28+9×2+2 = 48），选中 14 图标（1+9+14+4+28+9+1 = 66） */
 .chip-ico { display: inline-flex; }
@@ -681,6 +682,28 @@ button { font-family: inherit; border: 0; background: none; padding: 0; cursor: 
    首页工具栏单独收紧一档（padding 9→8、chip 间距 4→3、分隔线左右 15/16→12），
    合计省 45px，1280 下刚好回到列内。 */
 body[data-page="home"] .toolbar .chip { padding: 0 8px; gap: 3px; }
+
+/* 第 120 轮：chip 的 hover 动效照搬参考站「和 DeepSeek 对话」按钮（ds-btn-secondary）。
+   它不是把底色换掉，而是一枚圆从中心放大铺满：::after 是 5% 黑圆，
+   常态 scale(0)+opacity 0，hover 走 transform .36s ease-out（scale 0→1）、opacity .1s 淡入；
+   参考站同时把描边 .18→.36 加深，chip 在首页本来就没有描边，所以只取前半段。
+   overflow:hidden 把圆裁在 chip 自己的圆角里（参考站也是这么做的）。 */
+body[data-page="home"] .toolbar .chip { position: relative; overflow: hidden; }
+body[data-page="home"] .toolbar .chip::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 220%; aspect-ratio: 1; border-radius: 50%;
+  background: rgba(0, 0, 0, .05);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0; pointer-events: none;
+  transition: transform .36s ease-out, opacity .1s;
+}
+body[data-page="home"] .toolbar .chip:hover::after,
+body[data-page="home"] .toolbar .chip:focus-visible::after {
+  opacity: 1; transform: translate(-50%, -50%) scale(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-page="home"] .toolbar .chip::after { transition: none; }
+}
 body[data-page="home"] .toolbar .tb-chips { gap: 3px; }
 body[data-page="home"] .toolbar .tb-div { margin: 0 12px; }
 
@@ -688,9 +711,10 @@ body[data-page="home"] .toolbar .tb-div { margin: 0 12px; }
    底 rgba(91,88,255,.08) · 1px 实线 rgba(91,88,255,.16) · 字 #5B58FF（DSL 里 fill 是 #1F1F1F，
    但 textColor 段覆盖为 paint_2960:44209 #5B58FF）· 字重 500 */
 .tb-chips-dim .chip.is-active {
-  color: var(--cds-ai-purple);
-  background: rgba(91, 88, 255, .08);
-  border-color: rgba(91, 88, 255, .16);
+  /* 第 121 轮：同样反过来 —— 紫底白字（#5B58FF 实底，字与图标纯白） */
+  color: #FFFFFF;
+  background: var(--cds-ai-purple);
+  border-color: var(--cds-ai-purple);
   font-weight: 500;
 }
 .tb-chips-dim .chip.is-active:hover { background: rgba(91, 88, 255, .14); border-color: rgba(91, 88, 255, .24); }
@@ -1011,7 +1035,8 @@ body[data-page="home"] .toolbar .tb-div { margin: 0 12px; }
    第 9 轮：输入文字变多时整块向上撑高（--ci-h 由 JS 按 scrollHeight 写入，
    46 → 256，卡高 = 输入高 + 82，背板与次级行随动，输入卡底边不动） */
 .composer {
-  position: relative; margin-top: 12px; flex: 0 0 auto;
+  /* 第 121 轮：顶部间距 12 → 8（用户要求再收紧一点） */
+  position: relative; margin-top: 8px; flex: 0 0 auto;
   height: calc(var(--ci-h, 46px) + 122px + var(--c-tag-h, 0px)); width: 100%;
 }
 .c-plate {
@@ -5469,21 +5494,24 @@ body[data-page="home"] .chip {
 body[data-page="home"] .tb-chips-dim .chip { opacity: 1; }
 body[data-page="home"] .tb-chips-dim .chip:hover,
 body[data-page="home"] .tb-chips-dim .chip.is-active { opacity: 1; }
-/* 选中态仍是浅蓝，但也做成透的（实底会把玻璃感打断） */
-body[data-page="home"] .chip.is-active,
-body[data-page="home"] .chip.is-active:hover { background: rgba(243, 247, 255, .9); border-color: transparent; }
-body[data-page="home"] .tb-chips-dim .chip.is-active,
-body[data-page="home"] .tb-chips-dim .chip.is-active:hover { background: rgba(244, 243, 255, .9); }
-/* 白底之后 hover 的浅灰底会显脏，改成提亮 */
-body[data-page="home"] .chip:hover { background: rgba(255, 255, 255, .96); }
+/* 第 121 轮：选中态改成实底（蓝 / 紫 + 白字），不再走半透明浅底 —— 半透白叠上去会
+   把品牌色冲淡成灰蓝，实底才镇得住下面流动的蓝白背景；hover 各加深一档 */
+body[data-page="home"] .chip.is-active { background: #3770F7; border-color: #3770F7; color: #FFFFFF; }
+body[data-page="home"] .chip.is-active:hover { background: #2E5FD9; border-color: #2E5FD9; }
+body[data-page="home"] .tb-chips-dim .chip.is-active { background: var(--cds-ai-purple); border-color: var(--cds-ai-purple); color: #FFFFFF; }
+body[data-page="home"] .tb-chips-dim .chip.is-active:hover { background: #4B48EE; border-color: #4B48EE; }
+/* 第 120 轮：hover 不再跳白 96% —— 参考站的反馈全部交给那枚扩散圆，
+   底色一跳亮正好把圆盖掉（5% 黑被 16% 的白抵消）。底色保持 .8 不动，
+   hover 终态 = .8 × .95 ≈ .76，从中心散开的那一下才看得见。 */
+body[data-page="home"] .chip:hover { background: rgba(255, 255, 255, .8); }
 body[data-page="home"] .tb-chips-dim .chip:not(.chip-new):not(.is-active):hover,
 body[data-page="home"] .tb-chips-dim .chip:not(.chip-new):not(.is-active):focus-visible {
-  background: rgba(255, 255, 255, .96);
+  background: rgba(255, 255, 255, .8);
 }
 body[data-page="home"] .chip-new,
 body[data-page="home"] .chip-new:hover,
 body[data-page="home"] .chip-new:focus-visible { border-color: transparent; }
-body[data-page="home"] .chip-new:hover { background: rgba(255, 255, 255, .96); }
+body[data-page="home"] .chip-new:hover { background: rgba(255, 255, 255, .8); }
 
 /* 分区标签：白字 85% */
 body[data-page="home"] .tb-label { color: var(--cds-text-secondary); }

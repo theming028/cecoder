@@ -1021,14 +1021,20 @@
     wdCards.forEach(function (c) { c.classList.remove('is-sel'); c.setAttribute('aria-pressed', 'false'); });
     if (!on) { card.classList.add('is-sel'); card.setAttribute('aria-pressed', 'true'); }
   }
+  /* 第 120 轮：带 data-goto 的卡（如「UI 设计工序」那条）不再进任务详情，直接跳对应工序页 */
+  function wdOpen(card) {
+    var go = card.getAttribute('data-goto');
+    if (go) { location.href = go; return; }
+    openTask(taskCards().indexOf(card));
+  }
   wdCards.forEach(function (card) {
     card.setAttribute('aria-pressed', 'false');
     /* 第 30 轮：点任务卡 → 独立的「任务详情」页 */
-    card.addEventListener('click', function () { openTask(taskCards().indexOf(card)); });
+    card.addEventListener('click', function () { wdOpen(card); });
     card.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
       e.preventDefault();
-      openTask(taskCards().indexOf(card));
+      wdOpen(card);
     });
   });
 

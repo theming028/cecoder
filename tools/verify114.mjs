@@ -43,7 +43,8 @@ ok('A2 stage 顶部按比例锚定（panel 高的 18%）、hero 贴在 stage 顶
 ok('A3 stage 不再用 safe center 居中整组', !/center/.test(A.stageJustify), A.stageJustify);
 ok('A4 stage 无额外 padding-bottom（版本号不再脱流让位）', A.stagePadB === '0px', A.stagePadB);
 ok('A5 工具行仍排在输入卡之上', A.toolbar.b <= A.card.t, JSON.stringify([A.toolbar.b, A.card.t]));
-ok('A6 工具行与卡顶间距 12px', Math.abs(A.card.t - A.toolbar.b - 12) <= 2, JSON.stringify([A.toolbar.b, A.card.t]));
+/* 第 121 轮：输入区顶部间距 12 → 8，这条跟着改 */
+ok('A6 工具行与卡顶间距 8px', Math.abs(A.card.t - A.toolbar.b - 8) <= 2, JSON.stringify([A.toolbar.b, A.card.t]));
 ok('A7 版本号回到 flex 流（position: static）', A.verPos === 'static', A.verPos);
 ok('A8 版本号贴 stage 底（距底 ≤ 1px）', Math.abs(A.ver.b - A.stage.b) <= 1, JSON.stringify([A.ver.b, A.stage.b]));
 
