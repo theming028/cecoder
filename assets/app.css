@@ -5401,15 +5401,15 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
    ============================================================ */
 body[data-page="home"] .panel-main {
   isolation: isolate;
-  background-color: color-mix(in srgb, var(--cds-color-primary) 7%, var(--cds-bg-container));
+  /* 第 111 轮：底色 / 色相全部换成参考站（deepseek.com）的原版冷蓝灰，
+     网格去掉（用户：不要格子）——起伏只由 canvas 云雾负责 */
+  background-color: #FBFCFE;
   background-image:
-    radial-gradient(ellipse 64% 60% at 92% 6%, color-mix(in srgb, var(--cds-color-primary) 15%, transparent), transparent 72%),
-    radial-gradient(ellipse 60% 56% at 4% 96%, color-mix(in srgb, var(--cds-color-primary) 13%, transparent), transparent 74%),
-    linear-gradient(to right, color-mix(in srgb, var(--cds-color-primary) 4.5%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--cds-color-primary) 4.5%, transparent) 1px, transparent 1px);
-  background-repeat: no-repeat, no-repeat, repeat, repeat;
-  background-size: 100% 100%, 100% 100%, 44px 44px, 44px 44px;
-  background-position: 0 0, 0 0, 0 0, 0 0;
+    radial-gradient(ellipse 66% 62% at 92% 4%, rgba(84, 116, 182, .17), transparent 72%),
+    radial-gradient(ellipse 62% 58% at 2% 98%, rgba(84, 116, 182, .15), transparent 74%);
+  background-repeat: no-repeat, no-repeat;
+  background-size: 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0;
 }
 /* 云雾层：低分辨率 canvas（尺寸由 JS 按 1/6 给），铺满整个 panel-main */
 .pm-mist { display: none; }
@@ -5420,6 +5420,57 @@ body[data-page="home"] .pm-mist {
 /* 中心留白：雾压到标题 / 输入框下面仍然要读得清（静态层，不参与动画） */
 body[data-page="home"] .panel-main::after {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: radial-gradient(ellipse 54% 48% at 50% 46%,
-    rgba(255, 255, 255, .38), rgba(255, 255, 255, .12) 58%, transparent 80%);
+  background: radial-gradient(ellipse 56% 50% at 50% 44%,
+    rgba(255, 255, 255, .52), rgba(255, 255, 255, .18) 56%, transparent 80%);
 }
+
+/* ============================================================
+   第 111 轮：首页「毛玻璃」化
+   白 85% 底 + 15px 模糊 = 一层压在半透明蓝雾上的磨砂白，
+   雾在下面流动时能透出来（真正做出玻璃感，不是白色实底）。
+   ============================================================ */
+body[data-page="home"] .chip {
+  background: rgba(255, 255, 255, .85);
+  -webkit-backdrop-filter: blur(15px) saturate(140%);
+  backdrop-filter: blur(15px) saturate(140%);
+}
+/* 快速任务组原来整组 opacity .8：磨砂白叠上去会变成 68% 白，跟左边不一致 —— 取消 */
+body[data-page="home"] .tb-chips-dim .chip { opacity: 1; }
+body[data-page="home"] .tb-chips-dim .chip:hover,
+body[data-page="home"] .tb-chips-dim .chip.is-active { opacity: 1; }
+/* 选中态仍是浅蓝，但也做成透的（实底会把玻璃感打断） */
+body[data-page="home"] .chip.is-active,
+body[data-page="home"] .chip.is-active:hover { background: rgba(243, 247, 255, .9); }
+body[data-page="home"] .tb-chips-dim .chip.is-active,
+body[data-page="home"] .tb-chips-dim .chip.is-active:hover { background: rgba(244, 243, 255, .9); }
+/* 白底之后 hover 的浅灰底会显脏，改成提亮 */
+body[data-page="home"] .chip:hover { background: rgba(255, 255, 255, .96); }
+body[data-page="home"] .tb-chips-dim .chip:not(.chip-new):not(.is-active):hover,
+body[data-page="home"] .tb-chips-dim .chip:not(.chip-new):not(.is-active):focus-visible {
+  background: rgba(255, 255, 255, .96);
+}
+body[data-page="home"] .chip-new:hover { background: rgba(255, 255, 255, .96); }
+
+/* 分区标签：白字 85% */
+body[data-page="home"] .tb-label { color: rgba(255, 255, 255, .85); }
+body[data-page="home"] .tb-label-2 { opacity: 1; }
+body[data-page="home"] .tb-div { background: rgba(255, 255, 255, .5); }
+
+/* 工作台子项容器 / 快速任务推荐工序容器 / 场景卡：同样的磨砂白 85% */
+body[data-page="home"] .wb-bar,
+body[data-page="home"] .qf-bar,
+body[data-page="home"] .scene {
+  background: rgba(255, 255, 255, .85);
+  -webkit-backdrop-filter: blur(15px) saturate(140%);
+  backdrop-filter: blur(15px) saturate(140%);
+}
+/* 容器变透之后，里面的纯白小卡改成极淡的蓝白描边才分得开 */
+body[data-page="home"] .wb-opt,
+body[data-page="home"] .qf-step { background: rgba(255, 255, 255, .72); }
+body[data-page="home"] .scene-add { background: rgba(255, 255, 255, .72); }
+/* 边框在半透明底上会发灰，统一提亮 */
+body[data-page="home"] .wb-bar,
+body[data-page="home"] .qf-bar { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .7); }
+body[data-page="home"] .scene { border-color: rgba(255, 255, 255, .7); }
+body[data-page="home"] .scene[data-state="idle"]:hover,
+body[data-page="home"] .scene[data-state="idle"]:focus-within { background: rgba(255, 255, 255, .96); }
