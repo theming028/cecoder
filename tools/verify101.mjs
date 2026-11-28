@@ -111,6 +111,8 @@ ok('C5 红框（#F53F3F）+ 序号「1」', /rgb\(245, 63, 63\)/.test(R1.border)
 const sc = t => { const m = /matrix\(([-\d.]+)/.exec(t || ''); return m ? parseFloat(m[1]) : 1; };
 ok('C6 序号按 1/缩放 反向缩（scale = 1/s）', Math.abs(sc(R1.inv) - 1 / C1.s) < 0.1, JSON.stringify([sc(R1.inv), C1.s]));
 
+/* 第 104 轮：画完第 1 个框会弹「区域批注」浮窗盖住右上角，先 Esc 收起（框保留、模式还在） */
+await p.keyboard.press('Escape'); await wait(200);
 const D2 = await drag(0.6, 0.55, 0.82, 0.8);
 const R2 = await p.evaluate(() => {
   const list = [...document.querySelectorAll('.ud-mq')];
@@ -139,7 +141,8 @@ await drag(0.86, 0.06, 0.861, 0.061);   /* 挑一个没有红框的空地，第 
 const R3 = await p.evaluate(() => document.querySelectorAll('.ud-mq').length);
 ok('C10 小拖动（<8px）不算框', R3 === 2, R3);
 
-/* Esc 退出，框保留 */
+/* Esc 退出，框保留（第 104 轮起 Esc 分层：有浮窗先收起，再按一次才退模式；多按无副作用） */
+await p.keyboard.press('Escape'); await wait(200);
 await p.keyboard.press('Escape'); await wait(200);
 const C3 = await p.evaluate(() => ({
   on: document.getElementById('udCanvas').classList.contains('is-mq'),

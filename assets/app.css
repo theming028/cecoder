@@ -5098,3 +5098,152 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
   .dsd-comps { grid-template-columns: 1fr; }
   .dsd-facts { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ============================================================
+   第 104 轮：编辑 UI 元素面板 / DOM 悬停选中框 / 批注浮窗
+   稿：4068:60295（面板 256×668）· 4068:59031（hover 虚线 1.6px + 蓝标签）
+       4068:59030（选中实线 1.6px + 蓝标签）· 4068:60916（区域批注 320×362）
+       4068:60781（位置批注 320×362）
+   ============================================================ */
+
+/* ---------- 编辑 UI 元素面板：贴画布右侧、毛玻璃 ---------- */
+.ud-ep {
+  position: absolute; right: 0; top: 0; bottom: 0; z-index: 6;
+  width: 256px; box-sizing: border-box; padding: 16px;
+  display: flex; flex-direction: column;
+  background: rgba(255, 255, 255, .8);
+  -webkit-backdrop-filter: blur(15px); backdrop-filter: blur(15px);
+  /* 半透明底 + 不透明子元素：左线与左投影只能自己画（inset 老坑） */
+  box-shadow: inset 1px 0 0 0 #EBECED, -4px 0 12px 0 rgba(0, 0, 0, .03);
+  overflow-y: auto; overflow-x: hidden;
+  animation: udEpIn 180ms var(--cds-motion-ease);
+}
+@keyframes udEpIn { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+.ud-ep-head { flex: 0 0 auto; height: 22px; margin-bottom: 8px; }
+.ud-ep-title { font-size: 14px; line-height: 22px; font-weight: 500; color: #1F1F1F; }
+.ud-ep-obj {
+  flex: 0 0 auto; height: 44px; margin-bottom: 16px; padding: 0 12px;
+  display: flex; align-items: center; gap: 8px;
+  background: #F7F7F7; box-shadow: inset 0 0 0 1px #E5E5E5;
+}
+.ud-ep-obj-t { flex: 0 0 auto; font-size: 14px; line-height: 22px; color: #1F1F1F; }
+.ud-ep-tag {
+  height: 20px; padding: 0 4px; display: inline-flex; align-items: center;
+  max-width: 132px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  background: #FFFFFF; border-radius: 4px; box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-size: 12px; line-height: 20px; color: #6B6B6B;
+}
+.ud-ep-line { flex: 0 0 auto; height: 1px; background: #EEEEEE; margin-bottom: 15px; }
+.ud-ep-h { flex: 0 0 auto; margin-bottom: 8px; font-size: 14px; line-height: 22px; font-weight: 500; color: #1F1F1F; }
+.ud-ep-lb { display: block; margin-bottom: 8px; font-size: 12px; line-height: 20px; color: #6B6B6B; }
+.ud-ep-fld { flex: 0 0 auto; }
+.ud-ep-ta {
+  display: block; width: 100%; height: 64px; box-sizing: border-box;
+  padding: 8px 12px; border: 0; border-radius: 4px; background: #FFFFFF;
+  box-shadow: inset 0 0 0 1px #E5E5E5; resize: none; outline: none;
+  font-family: inherit; font-size: 14px; line-height: 22px; color: #1F1F1F;
+}
+.ud-ep-ta:focus { box-shadow: inset 0 0 0 1px var(--cds-color-primary); }
+.ud-ep-ta:disabled { color: #A9A9A9; background: #FAFAFA; cursor: not-allowed; }
+.ud-ep-ta::placeholder { color: #A9A9A9; }
+.ud-ep-row { flex: 0 0 auto; display: flex; gap: 12px; margin-top: 16px; }
+.ud-ep-col { flex: 1 1 0; min-width: 0; }
+.ud-ep-color {
+  height: 28px; padding: 0 7px; display: flex; align-items: center; gap: 8px;
+  background: #F7F7F7; border-radius: 4px; box-shadow: inset 0 0 0 1px #E5E5E5;
+}
+.ud-ep-sw { position: relative; flex: 0 0 auto; display: block; width: 14px; height: 14px; cursor: pointer; }
+.ud-ep-sw input { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; opacity: 0; cursor: pointer; }
+.ud-ep-sw i { display: block; width: 14px; height: 14px; border-radius: 3px; background: #FFF; box-shadow: 0 0 0 1px #E5E5E5; pointer-events: none; }
+.ud-ep-hex {
+  flex: 1 1 auto; min-width: 0; width: 100%; padding: 0; border: 0; background: none; outline: none;
+  font-family: inherit; font-size: 12px; line-height: 20px; color: #1F1F1F;
+}
+.ud-ep-num {
+  height: 28px; padding: 0 8px; display: flex; align-items: center;
+  background: #F7F7F7; border-radius: 4px; box-shadow: inset 0 0 0 1px #E5E5E5;
+}
+.ud-ep-num input {
+  flex: 1 1 auto; min-width: 0; padding: 0; border: 0; background: none; outline: none;
+  font-family: inherit; font-size: 12px; line-height: 20px; color: #1F1F1F;
+}
+.ud-ep-num i { font-style: normal; font-size: 12px; line-height: 20px; color: #868686; }
+.ud-canvas.is-edit .ud-board { cursor: default; }
+/* 面板 256 落在 padding 区，内容区（左列 + 画布）自动右缩，画板不被盖 */
+.ud-canvas.is-edit { padding-right: 256px; }
+
+/* ---------- DOM 悬停（虚线）/ 选中（实线）框 ---------- */
+.ud-dom-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; border-radius: 4px; }
+.ud-dom {
+  position: absolute; box-sizing: border-box;
+  border: calc(1.6px / var(--ud-s, 1)) dashed var(--cds-color-primary);
+}
+.ud-dom.is-sel { border-style: solid; }
+.ud-dom-tag {
+  position: absolute; left: calc(-1.6px / var(--ud-s, 1)); bottom: 100%;
+  margin-bottom: calc(4px / var(--ud-s, 1));
+  height: 20px; padding: 0 8px; display: inline-flex; align-items: center;
+  border-radius: 4px; background: var(--cds-color-primary); color: #FFF;
+  font-size: 10px; line-height: 20px; font-weight: 500; white-space: nowrap;
+  transform: scale(var(--ud-inv, 1)); transform-origin: 0 100%;
+}
+
+/* ---------- 位置批注的序号点（靠 1/缩放 反缩，视觉恒 18px） ---------- */
+.ud-pin {
+  position: absolute; width: 18px; height: 18px; box-sizing: border-box;
+  border-radius: 50%; background: var(--cds-color-primary); color: #FFF;
+  font-size: 11px; line-height: 18px; font-weight: 500; text-align: center;
+  box-shadow: 0 0 0 1.5px #FFF;
+  transform: scale(var(--ud-inv, 1)); transform-origin: 0 0;
+}
+.ud-canvas.is-mark .ud-board { cursor: crosshair; }
+
+/* ---------- 批注浮窗（区域 / 位置共用） ---------- */
+.ud-pop {
+  position: fixed; z-index: 900; width: 320px; box-sizing: border-box;
+  padding: 16px 16px 20px; border-radius: 8px;
+  background: rgba(255, 255, 255, .9);
+  -webkit-backdrop-filter: blur(15px); backdrop-filter: blur(15px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, .12), inset 0 0 0 1px #E5E5E5;
+  animation: udPopIn 160ms var(--cds-motion-ease);
+}
+@keyframes udPopIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ud-pop-head { display: flex; align-items: center; height: 22px; margin-bottom: 8px; }
+.ud-pop-title { flex: 0 0 auto; font-size: 14px; line-height: 22px; font-weight: 500; color: #1F1F1F; }
+.ud-pop-grip { flex: 0 0 auto; margin-left: 74px; width: 16px; height: 16px; display: inline-flex; color: #6B6B6B; cursor: grab; }
+.ud-pop-grip svg { width: 16px; height: 16px; }
+.ud-pop.is-mark .ud-pop-grip { display: none; }
+.ud-pop-x {
+  flex: 0 0 auto; margin-left: auto; width: 14px; height: 14px; padding: 0;
+  border: 0; background: none; color: #6B6B6B; cursor: pointer; display: inline-flex;
+}
+.ud-pop-x svg { width: 14px; height: 14px; }
+.ud-pop-x:hover { color: #1F1F1F; }
+.ud-pop-meta {
+  height: 40px; padding: 10px 12px; box-sizing: border-box; margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  background: #F7F7F7; border-radius: 4px; box-shadow: inset 0 0 0 1px #E5E5E5;
+  font-size: 12px; line-height: 20px; color: #868686;
+}
+.ud-pop-lb { display: block; margin-bottom: 8px; font-size: 12px; line-height: 20px; color: #6B6B6B; }
+.ud-pop-ta {
+  display: block; width: 100%; height: 128px; box-sizing: border-box;
+  padding: 8px 12px; border: 0; border-radius: 4px; background: #FFFFFF;
+  box-shadow: inset 0 0 0 1px #E5E5E5; resize: none; outline: none;
+  font-family: inherit; font-size: 14px; line-height: 22px; color: #1F1F1F;
+}
+.ud-pop-ta::placeholder { color: #A9A9A9; }
+.ud-pop-ta:focus { box-shadow: inset 0 0 0 1px var(--cds-color-primary); }
+.ud-pop-hint { margin: 12px 0 0; font-size: 12px; line-height: 20px; color: #868686; }
+.ud-pop-foot { margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px; }
+.ud-pop-btn {
+  height: 32px; padding: 0 16px; box-sizing: border-box;
+  border: 1px solid #E5E5E5; border-radius: 4px; background: #FFFFFF;
+  font-family: inherit; font-size: 14px; line-height: 22px; color: #1F1F1F; cursor: pointer;
+}
+.ud-pop-btn:hover { background: #F7F7F7; }
+.ud-pop-btn.is-pri { border-color: var(--cds-color-primary); background: var(--cds-color-primary); color: #FFF; font-weight: 500; }
+.ud-pop-btn.is-pri:hover { border-color: #2B5FE0; background: #2B5FE0; }
+
+/* 发到右栏的消息里那行位置说明 */
+.ud-msg-note { margin: 4px 0 0; text-align: right; font-size: 12px; line-height: 20px; color: #868686; }

@@ -31,9 +31,10 @@ const boxes = () => p.evaluate(() => [...document.querySelectorAll('.ud-mq')].ma
 }));
 
 await p.click('#udFrame'); await wait(200);
-await draw(0.05, 0.06, 0.22, 0.18);
-await draw(0.30, 0.30, 0.46, 0.42);
-await draw(0.55, 0.60, 0.70, 0.72);
+/* 第 104 轮：每画完一个框都会弹批注浮窗（会挡住下一个框的位置），画完就 Esc 收起 —— 框保留、模式还在 */
+await draw(0.05, 0.06, 0.22, 0.18); await p.keyboard.press('Escape'); await wait(150);
+await draw(0.30, 0.30, 0.46, 0.42); await p.keyboard.press('Escape'); await wait(150);
+await draw(0.55, 0.60, 0.70, 0.72); await p.keyboard.press('Escape'); await wait(150);
 const B0 = await boxes();
 ok('A1 画了 3 个框，序号 1/2/3', B0.length === 3 && B0.map(x => x.badge).join('') === '123', JSON.stringify(B0.map(x => x.badge)));
 
@@ -77,6 +78,7 @@ B2 = await boxes();
 await p.mouse.click(B2[0].cx, B2[0].cy); await wait(160);
 const zero = await p.evaluate(() => document.querySelectorAll('.ud-mq').length);
 await draw(0.1, 0.5, 0.24, 0.62);
+await p.keyboard.press('Escape'); await wait(150);   /* 收起这一框弹的浮窗，下面那次 Esc 才是退模式 */
 const B3 = await boxes();
 ok('C3 删光后再画，序号从 1 开始', zero === 0 && B3.length === 1 && B3[0].badge === '1', JSON.stringify([zero, B3.map(x => x.badge)]));
 

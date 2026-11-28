@@ -3929,8 +3929,13 @@
       udBoardEl.addEventListener('click', function (e) { e.stopPropagation(); });
       udBoardEl.addEventListener('pointerdown', function (e) {
         if (e.button !== 0) return;
+        /* 第 104 轮：接着在画布上下手 = 放弃上一条没写完的批注，但框/点留着（撤销只走「取消 / ×」） */
+        if (udPop && !udPop.hidden) udClosePop(false);
+        var udPopBusy = false;
         /* 第 101 轮：框选模式下不拖画板，改成画红框 */
-        if (udMqOn) { udMqStart(e); return; }
+        if (udMqOn && !udPopBusy) { udMqStart(e); return; }
+        /* 第 104 轮：编辑 / 批注模式下的点按是「选元素 / 落批注点」，也不拖画板 */
+        if (udMode === 'edit' || udMode === 'mark') return;
         var sr = udScroll.getBoundingClientRect(), wr = udWrap.getBoundingClientRect();
         udDrag = {
           id: e.pointerId, sx: e.clientX, sy: e.clientY, tx: udTx, ty: udTy, moved: false,
@@ -4047,6 +4052,12 @@
         del.appendChild(document.createElement('i'));
         box.appendChild(del);
         if (udMqLayer) udMqLayer.appendChild(box);
+        /* 第 104 轮：松手即弹「区域批注」浮窗（稿 4068:60916），填完直接发到右栏 AI 对话 */
+        udOpenPop('area', {
+          x: Math.round(Math.min(a.x, b.x)), y: Math.round(Math.min(a.y, b.y)),
+          w: Math.round(Math.abs(a.x - b.x)), h: Math.round(Math.abs(a.y - b.y)),
+          box: box, rect: box.getBoundingClientRect()
+        });
       };
       udBoardEl.addEventListener('pointerup', udMqEnd);
       udBoardEl.addEventListener('pointercancel', udMqEnd);
@@ -4074,17 +4085,394 @@
         var box = e.target.closest('.ud-mq');
         if (!box) return;
         e.stopPropagation();
+        /* 第 104 轮：这只框正在被批注时，先把浮窗关掉（框随之消失，不重复删） */
+        if (udPopBox === box) udClosePop(false);
         box.parentNode.removeChild(box);
         udMqRenumber();
       });
     }
     if (udMqFrame) udMqFrame.addEventListener('click', function (e) {
       e.stopPropagation();
-      udMqSetMode(!udMqOn);
+      /* 第 104 轮：框选 / 批注 / 编辑三模式互斥，统一走 udEnter */
+      udEnter('mq');
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && udMqOn) udMqSetMode(false);
+      if (e.key !== 'Escape') return;
+      /* 第 104 轮：有浮窗先收起（框/点留着），再按一次才退模式 */
+      if (udPop && !udPop.hidden) { udClosePop(false); return; }
+      if (udMode) udExitAll();
     });
+
+
+    /* ============================================================
+       第 104 轮：编辑 UI 元素（右侧面板 + 画布内 DOM 悬停/选中）/ 位置批注 / 批注浮窗
+       稿：4068:60295 面板 256 · 4068:59031 hover 虚线 · 4068:59030 选中实线
+           4068:60916 区域批注浮窗 320×362 · 4068:60781 位置批注浮窗
+       ============================================================ */
+    var udEp = document.getElementById('udEp');
+    var udEpTag = document.getElementById('udEpTag');
+    var udEpText = document.getElementById('udEpText');
+    var udEpFg = document.getElementById('udEpFg');
+    var udEpFgSw = document.getElementById('udEpFgSw');
+    var udEpFgPick = document.getElementById('udEpFgPick');
+    var udEpBg = document.getElementById('udEpBg');
+    var udEpBgSw = document.getElementById('udEpBgSw');
+    var udEpBgPick = document.getElementById('udEpBgPick');
+    var udEpSize = document.getElementById('udEpSize');
+    var udEpRadius = document.getElementById('udEpRadius');
+    var udDomLayer = document.getElementById('udDomLayer');
+    var udDomBox = document.getElementById('udDomBox');
+    var udDomTag = document.getElementById('udDomTag');
+    var udMarkBtn = document.getElementById('udMark');
+    var udEditBtn = document.getElementById('udEdit');
+    var udBoardDoc = udBoardEl ? udBoardEl.querySelector('.ud-board-doc') : null;
+
+    var udPop = document.getElementById('udPop');
+    var udPopTitle = document.getElementById('udPopTitle');
+    var udPopGrip = document.getElementById('udPopGrip');
+    var udPopPos = document.getElementById('udPopPos');
+    var udPopSize = document.getElementById('udPopSize');
+    var udPopTa = document.getElementById('udPopTa');
+    var udPopSend = document.getElementById('udPopSend');
+    var udPopCancel = document.getElementById('udPopCancel');
+    var udPopX = document.getElementById('udPopX');
+
+    var udMode = '';            /* '' | 'mq' | 'mark' | 'edit' */
+    var udEpFolded = null;      /* 进编辑模式前的左列折叠状态（退出时还原） */
+    var udMarkOn = false, udEditOn = false;
+    var udMarkSeq = 0;
+    var udPickEl = null;
+    var udPopMode = '', udPopCtx = null, udPopBox = null, udPopPin = null;
+    var UD_HEXRE = /^#[0-9a-fA-F]{6}$/;
+
+    /* 浮窗挂到 body：祖先若带 backdrop-filter / transform，fixed 会退化成相对定位 */
+    if (udPop && udPop.parentNode !== document.body) document.body.appendChild(udPop);
+
+    /* ---------- 发到右栏 AI 对话（稿件要求「直接发出去」，不经过输入框） ---------- */
+    var udSendToAi = function (text, note) {
+      var sc = document.getElementById('aiScroll');
+      if (!sc) return;
+      var msg = document.createElement('div');
+      msg.className = 'ai-msg is-user';
+      var b = document.createElement('p');
+      b.className = 'ai-bubble';
+      b.textContent = text;
+      msg.appendChild(b);
+      if (note) {
+        var n = document.createElement('p');
+        n.className = 'ud-msg-note';
+        n.textContent = note;
+        msg.appendChild(n);
+      }
+      var meta = document.createElement('div');
+      meta.className = 'ai-meta';
+      var t = document.createElement('span');
+      t.className = 'ai-time';
+      var d = new Date();
+      t.textContent = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+      meta.appendChild(t);
+      msg.appendChild(meta);
+      sc.appendChild(msg);
+      sc.scrollTop = sc.scrollHeight;
+    };
+
+    /* ---------- 批注浮窗 ---------- */
+    var udPinRenumber = function () {
+      if (!udDomLayer) return;
+      var list = [].slice.call(udDomLayer.querySelectorAll('.ud-pin'));
+      list.forEach(function (el, i) {
+        el.textContent = String(i + 1);
+        el.setAttribute('data-no', String(i + 1));
+      });
+      udMarkSeq = list.length;
+    };
+
+    var udClosePop = function (drop) {
+      if (!udPop || udPop.hidden) return;
+      udPop.hidden = true;
+      if (drop) {
+        if (udPopBox && udPopBox.parentNode) { udPopBox.parentNode.removeChild(udPopBox); udMqRenumber(); }
+        if (udPopPin && udPopPin.parentNode) { udPopPin.parentNode.removeChild(udPopPin); udPinRenumber(); }
+      }
+      udPopBox = udPopPin = udPopCtx = null;
+      udPopMode = '';
+    };
+
+    var udOpenPop = function (mode, ctx) {
+      if (!udPop) return;
+      udPopMode = mode;
+      udPopCtx = ctx || null;
+      udPopBox = mode === 'area' ? (ctx.box || null) : null;
+      udPopPin = mode === 'mark' ? (ctx.el || null) : null;
+      udPop.classList.toggle('is-mark', mode === 'mark');
+      if (udPopTitle) udPopTitle.textContent = mode === 'area' ? '区域批注' : '位置批注';
+      if (udPopPos) udPopPos.textContent = (mode === 'area' ? '区域：X ' : '位置：X ') + ctx.x + '，Y ' + ctx.y;
+      if (udPopSize) {
+        udPopSize.hidden = mode !== 'area';
+        udPopSize.textContent = (ctx.w || 0) + ' × ' + (ctx.h || 0) + ' px';
+      }
+      /* 区域批注贴在框右侧，放不下翻到左侧；位置批注贴在点击点右下 */
+      var left, top;
+      if (mode === 'area' && ctx.rect) {
+        var r = ctx.rect;
+        left = r.right + 12;
+        top = r.top;
+        if (left + 320 > window.innerWidth - 12) left = r.left - 332;
+      } else {
+        left = (ctx.clientX || 0) + 16;
+        top = (ctx.clientY || 0) + 16;
+      }
+      udPop.hidden = false;
+      udPop.style.left = '0px';
+      udPop.style.top = '0px';
+      var ph = udPop.offsetHeight || 362;
+      left = Math.max(12, Math.min(window.innerWidth - 320 - 12, left));
+      top = Math.max(12, Math.min(window.innerHeight - ph - 12, top));
+      udPop.style.left = Math.round(left) + 'px';
+      udPop.style.top = Math.round(top) + 'px';
+      if (udPopTa) {
+        udPopTa.value = '';
+        /* preventScroll：别让聚焦把画布滚一下（第 95 轮闪动教训） */
+        setTimeout(function () { udPopTa.focus({ preventScroll: true }); }, 20);
+      }
+    };
+
+    /* 浮窗拖动（稿里区域批注标题右侧那颗 move 键） */
+    var udPopDrag = null;
+    if (udPopGrip) {
+      udPopGrip.addEventListener('pointerdown', function (e) {
+        if (!udPop) return;
+        var r = udPop.getBoundingClientRect();
+        udPopDrag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, l: r.left, t: r.top };
+        try { udPopGrip.setPointerCapture(e.pointerId); } catch (err) {}
+        e.preventDefault();
+      });
+      document.addEventListener('pointermove', function (e) {
+        if (!udPopDrag || e.pointerId !== udPopDrag.id) return;
+        udPop.style.left = Math.round(udPopDrag.l + e.clientX - udPopDrag.sx) + 'px';
+        udPop.style.top = Math.round(udPopDrag.t + e.clientY - udPopDrag.sy) + 'px';
+      });
+      document.addEventListener('pointerup', function () { udPopDrag = null; });
+    }
+
+    if (udPopSend) udPopSend.addEventListener('click', function () {
+      var v = udPopTa ? udPopTa.value.trim() : '';
+      if (!v) { if (udPopTa) udPopTa.focus({ preventScroll: true }); return; }
+      var c = udPopCtx || { x: 0, y: 0 };
+      var note = udPopMode === 'area'
+        ? '区域 ' + c.x + ',' + c.y + ' · ' + c.w + ' × ' + c.h + ' · 智能客服管理系统'
+        : '位置 ' + c.x + ',' + c.y + ' · 智能客服管理系统';
+      udSendToAi(v, note);
+      udClosePop(false);       /* 发出去后框/点保留，方便继续批注别的 */
+    });
+    if (udPopCancel) udPopCancel.addEventListener('click', function () { udClosePop(true); });
+    if (udPopX) udPopX.addEventListener('click', function () { udClosePop(true); });
+
+    /* ---------- 画布内 DOM 悬停 / 选中 ---------- */
+    var udDomName = function (el) {
+      if (!el) return '';
+      var cls = (el.getAttribute('class') || '').split(/\s+/)[0];
+      return el.tagName.toLowerCase() + (cls ? '.' + cls : '');
+    };
+    var udPickable = function (t) {
+      if (!t || !udBoardDoc) return null;
+      var n = t, i = 0;
+      while (n && n !== udBoardDoc && n.nodeType === 1 && i < 8) {
+        if ((n.getAttribute('class') || '').trim()) return n;
+        n = n.parentElement;
+        i += 1;
+      }
+      return null;
+    };
+    var udShowDom = function (el, sel) {
+      if (!el || !udDomBox || !udBoardEl) return;
+      var br = udBoardEl.getBoundingClientRect();
+      var sc = udMqScale(br);
+      var r = el.getBoundingClientRect();
+      udDomBox.hidden = false;
+      udDomBox.style.left = ((r.left - br.left) / sc).toFixed(1) + 'px';
+      udDomBox.style.top = ((r.top - br.top) / sc).toFixed(1) + 'px';
+      udDomBox.style.width = (r.width / sc).toFixed(1) + 'px';
+      udDomBox.style.height = (r.height / sc).toFixed(1) + 'px';
+      udDomBox.classList.toggle('is-sel', !!sel);
+      if (udDomTag) udDomTag.textContent = udDomName(el);
+    };
+    var udHideDom = function () { if (udDomBox) udDomBox.hidden = true; };
+
+    /* rgb() → #RRGGBB（全透明返回空） */
+    var udHex = function (c) {
+      if (!c) return '';
+      var m = /rgba?\(([^)]+)\)/.exec(c);
+      if (!m) return UD_HEXRE.test(c) ? c.toUpperCase() : '';
+      var p = m[1].split(',');
+      if (p.length > 3 && parseFloat(p[3]) === 0) return '';
+      var h = '#';
+      for (var i = 0; i < 3; i++) {
+        var v = Math.round(parseFloat(p[i])).toString(16).toUpperCase();
+        h += v.length < 2 ? '0' + v : v;
+      }
+      return h;
+    };
+
+    /* 选中元素后把真实样式灌进面板 */
+    /* 只认「元素直接子节点里的第一段非空文本」——容器上的文案不给改，免得 textContent 一写把子结构冲掉 */
+    var udFirstText = function (el) {
+      if (!el) return null;
+      var kids = el.childNodes;
+      for (var i = 0; i < kids.length; i++) {
+        if (kids[i].nodeType === 3 && kids[i].nodeValue.replace(/\s/g, '')) return kids[i];
+      }
+      return null;
+    };
+    var udFillEp = function (el) {
+      if (!el) return;
+      var cs = getComputedStyle(el);
+      var tNode = udFirstText(el);
+      if (udEpTag) udEpTag.textContent = udDomName(el);
+      if (udEpText) {
+        udEpText.value = tNode ? tNode.nodeValue.replace(/\s+/g, ' ').trim() : '';
+        udEpText.disabled = !tNode;
+        udEpText.placeholder = tNode ? '' : '该元素没有直接文本，请点到里面的文字上改';
+      }
+      var fg = udHex(cs.color) || '#1F1F1F';
+      var bg = udHex(cs.backgroundColor);
+      if (udEpFg) udEpFg.value = fg;
+      if (udEpFgSw) udEpFgSw.style.background = fg;
+      if (udEpFgPick) udEpFgPick.value = fg.toLowerCase();
+      if (udEpBg) udEpBg.value = bg || 'transparent';
+      if (udEpBgSw) udEpBgSw.style.background = bg || '#FFFFFF';
+      if (udEpBgPick) udEpBgPick.value = (bg || '#FFFFFF').toLowerCase();
+      if (udEpSize) udEpSize.value = String(Math.round(parseFloat(cs.fontSize) || 14));
+      if (udEpRadius) udEpRadius.value = String(Math.round(parseFloat(cs.borderRadius) || 0));
+    };
+
+    /* 面板 → DOM：改文案只替换第一段文本节点，尽量保住内部结构 */
+    if (udEpText) udEpText.addEventListener('input', function () {
+      if (!udPickEl) return;
+      var tNode = udFirstText(udPickEl);
+      if (!tNode) return;
+      tNode.nodeValue = udEpText.value;
+      udShowDom(udPickEl, true);
+    });
+
+    var udBindHex = function (input, pick, sw, apply) {
+      var push = function (v) {
+        if (pick) pick.value = v.toLowerCase();
+        if (input) input.value = v.toUpperCase();
+        if (sw) sw.style.background = v;
+        if (udPickEl) { apply(udPickEl, v); udShowDom(udPickEl, true); }
+      };
+      if (input) input.addEventListener('input', function () {
+        var v = input.value.trim();
+        if (UD_HEXRE.test(v)) push(v);
+      });
+      if (pick) pick.addEventListener('input', function () { push(pick.value); });
+    };
+    udBindHex(udEpFg, udEpFgPick, udEpFgSw, function (el, v) { el.style.color = v; });
+    udBindHex(udEpBg, udEpBgPick, udEpBgSw, function (el, v) { el.style.backgroundColor = v; });
+
+    var udBindNum = function (input, apply) {
+      if (!input) return;
+      input.addEventListener('input', function () {
+        var v = parseFloat(input.value);
+        if (isNaN(v) || !udPickEl) return;
+        apply(udPickEl, Math.max(0, v));
+        udShowDom(udPickEl, true);
+      });
+    };
+    udBindNum(udEpSize, function (el, v) { el.style.fontSize = v + 'px'; });
+    udBindNum(udEpRadius, function (el, v) { el.style.borderRadius = v + 'px'; });
+
+    /* ---------- 三个模式互斥 ---------- */
+    var udExitAll = function () {
+      /* 编辑模式会折叠左列腾宽度，退出时先还原（再撤 is-edit，最后重算缩放） */
+      if (udEpFolded === false && udPagesEl && udPagesEl.classList.contains('is-fold')) udFold.click();
+      udEpFolded = null;
+      if (udMqOn) udMqSetMode(false);
+      udMarkOn = false;
+      udEditOn = false;
+      if (udMarkBtn) { udMarkBtn.classList.remove('is-on'); udMarkBtn.setAttribute('aria-pressed', 'false'); }
+      if (udEditBtn) { udEditBtn.classList.remove('is-on'); udEditBtn.setAttribute('aria-pressed', 'false'); }
+      if (udCanvasBox) udCanvasBox.classList.remove('is-mark', 'is-edit');
+      if (udEp) udEp.hidden = true;
+      udPickEl = null;
+      udHideDom();
+      udMode = '';
+      if (!udUser) udApplyZoom();
+    };
+    var udEnter = function (m) {
+      if (udMode === m) { udExitAll(); return; }
+      udExitAll();
+      udMode = m;
+      if (m === 'mq') { udMqSetMode(true); return; }
+      if (m === 'mark') {
+        udMarkOn = true;
+        if (udMarkBtn) { udMarkBtn.classList.add('is-on'); udMarkBtn.setAttribute('aria-pressed', 'true'); }
+        if (udCanvasBox) udCanvasBox.classList.add('is-mark');
+        return;
+      }
+      if (m === 'edit') {
+        udEditOn = true;
+        if (udEditBtn) { udEditBtn.classList.add('is-on'); udEditBtn.setAttribute('aria-pressed', 'true'); }
+        if (udCanvasBox) udCanvasBox.classList.add('is-edit');
+        if (udEp) udEp.hidden = false;
+        /* 1440 视口下中栏放不下「左列 240 + 画板 + 面板 256」，折叠左列把宽度让出来（退出时还原） */
+        if (udPagesEl && udFold) {
+          udEpFolded = udPagesEl.classList.contains('is-fold');
+          if (!udEpFolded) udFold.click();
+        }
+      }
+    };
+
+    if (udMarkBtn) udMarkBtn.addEventListener('click', function (e) { e.stopPropagation(); udEnter('mark'); });
+    if (udEditBtn) udEditBtn.addEventListener('click', function (e) { e.stopPropagation(); udEnter('edit'); });
+
+    /* 画布内 hover → 虚线框；点选 → 实线框 + 灌面板 */
+    if (udBoardEl && udDomLayer) {
+      udBoardEl.addEventListener('pointermove', function (e) {
+        if (udMode !== 'edit' || udDrag || udMqDrag) return;
+        var el = udPickable(e.target);
+        if (!el) { if (!udPickEl) udHideDom(); return; }
+        if (el === udPickEl) return;
+        udShowDom(el, false);
+      });
+      udBoardEl.addEventListener('pointerleave', function () {
+        if (udMode === 'edit' && !udPickEl) udHideDom();
+      });
+      udBoardEl.addEventListener('pointerdown', function (e) {
+        if (udPop && !udPop.hidden) return;
+        if (udMode === 'edit') {
+          e.preventDefault();
+          e.stopPropagation();
+          var el = udPickable(e.target);
+          if (!el) { udPickEl = null; udHideDom(); return; }
+          udPickEl = el;
+          udShowDom(el, true);
+          udFillEp(el);
+          return;
+        }
+        if (udMode !== 'mark') return;
+        e.preventDefault();
+        e.stopPropagation();
+        var br = udBoardEl.getBoundingClientRect();
+        var sc2 = udMqScale(br);
+        var x = Math.round((e.clientX - br.left) / sc2);
+        var y = Math.round((e.clientY - br.top) / sc2);
+        udMarkSeq += 1;
+        var pin = document.createElement('div');
+        pin.className = 'ud-pin';
+        pin.textContent = String(udMarkSeq);
+        pin.setAttribute('data-no', String(udMarkSeq));
+        /* 视觉恒 18px：width/height 是板内 18（会被 scale 缩），offset 反向除以缩放，配合 transform-origin 0 0 */
+        var k = 9 / sc2;
+        pin.style.left = (x - k) + 'px';
+        pin.style.top = (y - k) + 'px';
+        if (udDomLayer) udDomLayer.appendChild(pin);
+        udOpenPop('mark', { x: x, y: y, el: pin, clientX: e.clientX, clientY: e.clientY });
+      });
+    }
+
+    if (udEp) udEp.hidden = true;
 
     /* ============================================================
        第 102 轮：截图 —— 把画板里的页面（.ud-board-doc）等比克隆成缩略图，
