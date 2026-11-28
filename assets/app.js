@@ -3883,8 +3883,9 @@
     var udUser = 0;          /* 0 = 跟随自适应 */
     var udFitPct = function () {
       if (!udScroll) return 100;
-      /* 滚动区两侧各留 24 内距、上下各 24，画板名再占 28；编辑面板浮在右侧时再扣掉它的 256 */
-      var aw = udScroll.clientWidth - 48 - (udCanvasBox && udCanvasBox.classList.contains('is-edit') ? 256 : 0);
+      /* 滚动区两侧各留 24 内距、上下各 24，画板名再占 28
+         第 106 轮：编辑面板是浮层、不再占位，所以这里不再扣 256（扣了反而把画板缩小） */
+      var aw = udScroll.clientWidth - 48;
       var ah = udScroll.clientHeight - 48 - UD_LABEL;
       var fit = Math.min(aw / UD_W, ah / UD_H, 1);
       return Math.max(10, Math.round(fit * 100));
@@ -3903,6 +3904,25 @@
     };
     udApplyZoom();
     window.addEventListener('resize', function () { if (!udUser) udApplyZoom(); });
+
+    /* 第 106 轮：画板尺寸与分辨率联动 —— 选中哪条预设，画板就换成那条的宽高，
+       然后回到自适应（标签里的 % 会跟着变），窄画板里生成的页面按 is-w-sm / is-w-xs 重排 */
+    var udSetRes = function (w, h) {
+      UD_W = w; UD_H = h;
+      if (udWrap) {
+        udWrap.style.setProperty('--ud-w', w + 'px');
+        udWrap.style.setProperty('--ud-h', h + 'px');
+      }
+      if (udBoardEl) {
+        udBoardEl.classList.toggle('is-w-sm', w <= 1100);
+        udBoardEl.classList.toggle('is-w-xs', w <= 760);
+      }
+      udApplyZoom();
+    };
+    if (udBoardEl) {
+      udBoardEl.classList.toggle('is-w-sm', UD_W <= 1100);
+      udBoardEl.classList.toggle('is-w-xs', UD_W <= 760);
+    }
 
     var udIn = document.getElementById('udZoomIn');
     var udOut = document.getElementById('udZoomOut');
@@ -4099,7 +4119,12 @@
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
       /* 第 105 轮：分辨率下拉开着先关它（它挂在工具条上，比模式更外一层） */
-      if (udResPop && !udResPop.hidden) { udResPop.hidden = true; udRes.setAttribute('aria-expanded', 'false'); return; }
+      if (udResPop && !udResPop.hidden) {
+        udResPop.hidden = true;
+        udRes.setAttribute('aria-expanded', 'false');
+        udRes.classList.remove('is-open');   /* 第 106 轮：顺带撤掉触发器的激活态描边 */
+        return;
+      }
       /* 第 104 轮：有浮窗先收起（框/点留着），再按一次才退模式 */
       if (udPop && !udPop.hidden) { udClosePop(false); return; }
       if (udMode) udExitAll();
@@ -4143,7 +4168,6 @@
 
     var udMode = '';            /* '' | 'mq' | 'mark' | 'edit' */
     var udEpT = 0;
-    var udEpFolded = null;      /* 进编辑模式前左列的折叠状态（退出时还原） */
     /* 第 105 轮：面板是浮层，进出都带位移；收回时先播 180ms 向右滑出再 hidden */
     var udEpShow = function () {
       if (!udEp) return;
@@ -4424,9 +4448,6 @@
 
     /* ---------- 三个模式互斥 ---------- */
     var udExitAll = function () {
-      /* 编辑模式会临时折叠左列腾出宽度（中栏只有 654），退出时还原 */
-      if (udEpFolded === false && udPagesEl && udPagesEl.classList.contains('is-fold')) udFold.click();
-      udEpFolded = null;
       if (udMqOn) udMqSetMode(false);
       udMarkOn = false;
       udEditOn = false;
@@ -4454,13 +4475,7 @@
         udEditOn = true;
         if (udEditBtn) { udEditBtn.classList.add('is-on'); udEditBtn.setAttribute('aria-pressed', 'true'); }
         if (udCanvasBox) udCanvasBox.classList.add('is-edit');
-        /* 面板浮在右侧 256，中栏（654）放不下「左列 240 + 画板 + 面板」→ 临时折叠左列；
-           画板再按「可见区」（画布减面板）重新自适应，不会被面板挡住 */
-        if (udPagesEl && udFold) {
-          udEpFolded = udPagesEl.classList.contains('is-fold');
-          if (!udEpFolded) udFold.click();
-        }
-        if (!udUser) udApplyZoom();
+        /* 第 106 轮：面板是浮层，悬浮在画布之上、不占空间 —— 不再有临时折叠左列 / 右缩内容区的动作 */
         udEpShow();
       }
     };
@@ -4729,6 +4744,16 @@
           rows[i].classList.toggle('is-on', on);
           rows[i].setAttribute('aria-selected', on ? 'true' : 'false');
         }
+        /* 第 106 轮：选中真的切换 —— 触发器文案回填，画板宽高同步换成这条分辨率 */
+        var dim = (rowEl.getAttribute('data-res') || '1440x900').split('x');
+        var vw = parseInt(dim[0], 10) || 1440;
+        var vh = parseInt(dim[1], 10) || 900;
+        var kv = rowEl.querySelector('.ud-res-k');
+        var isCustom = rowEl.parentNode === udResPop;   /* 分组行都在 .ud-res-grp 里 */
+        var labelEl = udRes.querySelector('.ud-sel-v');
+        if (labelEl) labelEl.textContent = isCustom ? '自定义分辨率' : vw + 'x' + vh;
+        udRes.setAttribute('title', (kv ? kv.textContent : '') + ' · ' + vw + '×' + vh);
+        udSetRes(vw, vh);
         udResSet(false);
       });
       document.addEventListener('click', function (e) {

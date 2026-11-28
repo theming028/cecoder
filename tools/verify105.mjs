@@ -104,7 +104,8 @@ const B1 = await p.evaluate(() => {
   };
 });
 ok('A1 进编辑模式：面板可见、键 is-on、画布不再右缩（浮层）', B1.epVisible && B1.pad === '0px' && /is-edit/.test(B1.cls) && B1.otherMode === 'false', JSON.stringify(B1));
-ok('A2 面板贴画布右缘、画板完整露在外面（panel.left ≥ board.right）', Math.abs((B.ep[0] + B.ep[2]) - (B.canvas[0] + B.canvas[2])) <= 1 && B.ep[0] >= B.board[0] + B.board[2] - 1, JSON.stringify([B.ep, B.board]));
+/* 第 106 轮：面板改成纯浮层，允许盖住画板右缘，「画板完整露在外面」不再成立 */
+ok('A2 面板贴画布右缘、悬浮于画板之上', Math.abs((B.ep[0] + B.ep[2]) - (B.canvas[0] + B.canvas[2])) <= 1 && B.ep[0] > B.canvas[0] && B.ep[0] + B.ep[2] <= B.canvas[0] + B.canvas[2] + 1, JSON.stringify([B.ep, B.canvas, B.board]));
 
 /* 点中栏空白 → 收回 */
 const blank = await p.evaluate(() => {

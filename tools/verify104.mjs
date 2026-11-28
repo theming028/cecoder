@@ -52,7 +52,7 @@ const B1s = await p.evaluate(() => {
   const t = s => { const e = document.querySelector(s); return e ? e.getBoundingClientRect().height : -1; };
   return {
     w: cs.width, bg: cs.backgroundColor, blur: cs.backdropFilter || cs.webkitBackdropFilter,
-    shadow: cs.boxShadow, pad: cs.padding,
+    shadow: cs.boxShadow, pad: cs.padding, z: cs.zIndex,
     editOn: ep.hidden === false && document.getElementById('udEdit').classList.contains('is-on')
       && document.getElementById('udEdit').getAttribute('aria-pressed') === 'true',
     folded: cv.className,
@@ -65,11 +65,12 @@ const B1s = await p.evaluate(() => {
 });
 ok('B1 面板 256 宽、白 80% + blur15、左线+左投影', B1s.w === '256px' && /rgba\(255, 255, 255, 0\.8\)/.test(B1s.bg) && /blur\(15px\)/.test(B1s.blur) && /rgb\(235, 236, 237\) 1px 0px 0px 0px inset/.test(B1s.shadow), JSON.stringify([B1s.w, B1s.bg, B1s.blur, B1s.shadow]));
 ok('B2 键 is-on + aria-pressed', B1s.editOn, B1s.editOn);
-ok('B3 编辑模式折叠左列（画布 is-folded，退出还原）', /is-edit/.test(B1s.folded) && /is-folded/.test(B1s.folded), B1s.folded);
+ok('B3 编辑模式不再折叠左列（第 106 轮：面板是纯浮层，不腾宽度）', /is-edit/.test(B1s.folded) && !/is-folded/.test(B1s.folded), B1s.folded);
 ok('B4 面板是浮层：画布不再右缩（padding 0），面板贴画布右缘', B1s.cvPad === '0px'
   && Math.abs((B1.ep[0] + B1.ep[2]) - (B1.canvas[0] + B1.canvas[2])) <= 1
   && Math.abs(B1.ep[2] - 256) <= 1, JSON.stringify([B1s.cvPad, B1.canvas, B1.ep]));
-ok('B5 面板整体不遮画板（panel.left ≥ board.right）', B1.ep[0] >= B1.board[0] + B1.board[2] - 1, JSON.stringify([B1.ep, B1.board]));
+/* 第 106 轮：面板改成「悬浮于 html 画布之上」，允许压住画板右缘（不再要求排在画板外侧） */
+ok('B5 面板悬浮在画布之上（z-index 6，可与画板重叠）', parseInt(B1s.z, 10) === 6 && B1.ep[0] < B1.canvas[0] + B1.canvas[2], JSON.stringify([B1s.z, B1.ep, B1.board]));
 ok('B6 结构尺寸：头 22 / 编辑对象 44 / 文案 64 / 色块行 28 / 数字行 28', B1s.hHead === 22 && B1s.hObj === 44 && B1s.hTa === 64 && B1s.hColor === 28 && B1s.hNum === 28, JSON.stringify([B1s.hHead, B1s.hObj, B1s.hTa, B1s.hColor, B1s.hNum]));
 ok('B7 五组标签齐（文案/文字颜色/背景颜色/字号/圆角度）', B1s.labels.join(',') === '文案,文字颜色,背景颜色,字号,圆角度', B1s.labels.join(','));
 
@@ -193,7 +194,8 @@ ok('E1 松手即弹浮窗', E1.hidden === false, E1.hidden);
 ok('E2 浮窗 320×362（稿 4068:60916）', E1.w === 320 && Math.abs(E1.h - 362) <= 3, JSON.stringify([E1.w, E1.h]));
 ok('E3 标题「区域批注」+ 坐标 + 尺寸', E1.title === '区域批注' && /^区域：X \d+，Y \d+$/.test(E1.pos) && /\d+ × \d+ px$/.test(E1.size) && !E1.sizeHidden, JSON.stringify([E1.title, E1.pos, E1.size]));
 ok('E4 按钮「取消 / 发送给 AI」', E1.btnCancel === '取消' && E1.btnSend === '发送给 AI', E1.btnCancel + ' / ' + E1.btnSend);
-ok('E5 白 90% + blur15 + r8 + 0/8/32 投影', /rgba\(255, 255, 255, 0\.9\)/.test(E1.bg) && /blur\(15px\)/.test(E1.blur) && E1.radius === '8px' && /rgba\(0, 0, 0, 0\.12\) 0px 8px 32px/.test(E1.shadow), JSON.stringify([E1.bg, E1.blur, E1.radius]));
+/* 第 106 轮：浮窗白底 90% → 96%（用户嫌太透） */
+ok('E5 白 96% + blur15 + r8 + 0/8/32 投影', /rgba\(255, 255, 255, 0\.96\)/.test(E1.bg) && /blur\(15px\)/.test(E1.blur) && E1.radius === '8px' && /rgba\(0, 0, 0, 0\.12\) 0px 8px 32px/.test(E1.shadow), JSON.stringify([E1.bg, E1.blur, E1.radius]));
 ok('E6 浮窗不压住红框（贴框右侧或翻到左侧）', E1.noOverlap, E1.noOverlap);
 ok('E7 内部尺寸：头 22 / 信息条 40 / 文本域 128', E1.headH === 22 && E1.metaH === 40 && E1.taH === 128, JSON.stringify([E1.headH, E1.metaH, E1.taH]));
 ok('E8 红框带序号', E1.boxNo === '1', E1.boxNo);

@@ -4505,12 +4505,21 @@ body[data-page="ui"] .ui-blank.is-gen {
   display: inline-flex; align-items: center;
   font-size: 13px; line-height: 22px; color: var(--cds-text-primary);
   white-space: nowrap;
-  transition: background var(--cds-motion-duration) var(--cds-motion-ease);
+  transition: background var(--cds-motion-duration) var(--cds-motion-ease),
+    box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
 }
 .ud-sel:hover { background: var(--cds-surface-inset); }
 .ud-sel:active { background: var(--cds-gray-hover); }
+/* 第 106 轮：激活态统一规范 —— 「版本 / 自定义分辨率 / 缩放」三种控件被展开或正在操作时，
+   都换成 1.6px 主题蓝粗描边（与搜索框、文本域焦点态同一套） */
+.ud-dd.is-open > .ud-sel,
+.ud-sel.is-open,
+.ud-zoom:focus-within {
+  background: #FFFFFF;
+  box-shadow: inset 0 0 0 1.6px var(--cds-color-primary);
+}
 .ud-sel-k { color: var(--cds-text-secondary); }
-.ud-sel-v { padding-right: 8px; }
+.ud-sel-v { padding-right: 8px; max-width: 108px; overflow: hidden; text-overflow: ellipsis; }
 .ud-desktop, .ud-caret { flex: 0 0 auto; width: 14px; height: 14px; }
 /* 「版本：当前设计」下拉（第 94 轮）：外壳是通用 .cds-dd，触发器里回填的 .ud-sel-v 挂 c-pill-txt，
    但工具条是 13px 的尺度，这里把 c-pill-txt 的 14px 拉回来 */
@@ -4531,6 +4540,7 @@ body[data-page="ui"] .ui-blank.is-gen {
   flex: 0 0 auto; height: 28px; padding: 0 4px; border-radius: 4px;
   background: #FFFFFF; box-shadow: inset 0 0 0 1px #E5E5E5;
   display: inline-flex; align-items: center; gap: 8px;
+  transition: box-shadow var(--cds-motion-duration) var(--cds-motion-ease);
 }
 .ud-zbtn {
   width: 20px; height: 20px; border-radius: 4px; flex: 0 0 auto;
@@ -4606,7 +4616,9 @@ body[data-page="ui"] .ui-blank.is-gen {
 
 /* ---------- 画板（稿 4068:64885 / 选中态 4138:57012） ---------- */
 .ud-board-wrap { position: relative; flex: 0 0 auto; --ud-s: 1;
-  width: calc(1440px * var(--ud-s)); height: calc(900px * var(--ud-s) + 28px); }
+  /* 第 106 轮：画板尺寸不再写死 1440×900，改由 --ud-w / --ud-h 驱动（分辨率下拉联动） */
+  --ud-w: 1440px; --ud-h: 900px;
+  width: calc(var(--ud-w) * var(--ud-s)); height: calc(var(--ud-h) * var(--ud-s) + 28px); }
 .ud-board-name {
   height: 20px; font-size: 12px; line-height: 20px; color: #868686;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -4614,7 +4626,7 @@ body[data-page="ui"] .ui-blank.is-gen {
 .ud-board {
   /* 第 100 轮：从 <button> 改成容器 <div>（里面要装真页面，button 里不能有块级内容） */
   position: absolute; left: 0; top: 28px; display: block;
-  width: 1440px; height: 900px; border-radius: 4px; background: #FFFFFF;
+  width: var(--ud-w, 1440px); height: var(--ud-h, 900px); border-radius: 4px; background: #FFFFFF;
   cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none;
   transform: scale(var(--ud-s)); transform-origin: 0 0;
   /* 画板里是不透明的页面，会把 inset 描边盖掉（老坑第 5 次）→ 描边画到外面；圆角裁切交给 .ud-board-doc，
@@ -4635,7 +4647,8 @@ body.ud-dragging { cursor: grabbing; -webkit-user-select: none; user-select: non
 .ud-board.is-sel .ud-handle { display: block; }
 /* 第 101 轮：框选图层 —— 点工具条「框选」后在画板（生成的 html）里拖出红色框并自动编号；
    框按画板原始 1440×900 坐标存，随缩放与拖动一起走；线宽与序号反向除以 --ud-s，视觉尺寸恒定 */
-.ud-mq-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+/* 第 106 轮：画板能换尺寸了，框按原始坐标存 —— 换小分辨率时超出的部分要裁掉，别画到画板外面 */
+.ud-mq-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
 .ud-mq, .ud-mq-preview {
   display: none; position: absolute; box-sizing: border-box; border-radius: 2px;
   border: calc(1.5px / var(--ud-s)) solid var(--cds-danger-6);
@@ -4841,6 +4854,19 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 .kb-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .kb-doc { padding: 8px 10px; border-radius: 6px; background: #FAFBFC; box-shadow: inset 0 0 0 1px #EEF0F3; font-size: 12px; line-height: 18px; }
 .kb-doc i { display: block; font-style: normal; font-size: 11.5px; color: #9A9A9A; }
+
+/* 第 106 轮：画板尺寸跟着分辨率联动 —— 窄画板里让生成的页面真的重排，
+   而不是把 1440 的四栏硬塞进 430：≤1100 收掉右侧客户栏，≤760 再收掉会话列表 */
+.ud-board.is-w-sm .kb-side { display: none; }
+.ud-board.is-w-xs .kb-list { display: none; }
+.ud-board.is-w-xs .kb-rail { flex: 0 0 48px; width: 48px; }
+.ud-board.is-w-xs .kb-chat-head { padding: 0 12px; }
+.ud-board.is-w-xs .kb-chat-acts .kb-btn,
+.ud-board.is-w-xs .kb-chat-acts .kb-tag { display: none; }
+.ud-board.is-w-xs .kb-msgs { padding: 12px; gap: 10px; }
+.ud-board.is-w-xs .kb-ai { margin-left: 0; }
+.ud-board.is-w-xs .kb-compose { padding: 8px 12px 10px; }
+.ud-board.is-w-xs .kb-bubble { max-width: 100%; }
 
 /* ---------- 左列「页面层级和状态」（稿 4068:65598）：240 定宽、上下拉通、与画布贴边 ---------- */
 .ud-pages {
@@ -5172,9 +5198,9 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 .ud-canvas.is-edit .ud-board { cursor: default; }
 /* 第 105 轮：面板是浮层（与「页面层级和状态」同一层语义），盖在画布右侧，不再挤压内容区；
    点中栏空白即向右收回 */
-/* 面板浮在右侧 256 宽，画板要让出这块：给 stage 补右内距，画板居中到「可见区」里，
-   再配合下面的 fit 扣掉 256，画板不会被面板挡住 */
-.ud-canvas.is-edit .ud-stage { padding-right: 280px; }
+/* 第 106 轮：面板是纯浮层（用户明确：悬浮于 html 画布之上、不占空间）——
+   给 stage 补右内距属于「挤出来」的做法，已删；画板仍按整块可见区自适应居中，
+   面板只是盖在右侧 */
 .ud-ep.is-out { animation: udEpOut 180ms var(--cds-motion-ease) forwards; pointer-events: none; }
 @keyframes udEpOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(100%); } }
 
@@ -5208,7 +5234,8 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 .ud-pop {
   position: fixed; z-index: 900; width: 320px; box-sizing: border-box;
   padding: 16px 16px 20px; border-radius: 8px;
-  background: rgba(255, 255, 255, .9);
+  /* 第 106 轮：原来是 90% 白，压在页面上太透（文字压着字看不清），提到 96% 只留一丝透感 */
+  background: rgba(255, 255, 255, .96);
   -webkit-backdrop-filter: blur(15px); backdrop-filter: blur(15px);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, .12), inset 0 0 0 1px #E5E5E5;
   animation: udPopIn 160ms var(--cds-motion-ease);
