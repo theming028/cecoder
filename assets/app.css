@@ -4452,44 +4452,13 @@ body[data-page="ui"] .ui-blank.is-gen {
   flex: 1 1 auto; min-height: 0; overflow: auto; padding: 20px;
   display: flex; align-items: center; justify-content: center;
 }
-/* 第 109 轮：卡底原来是静态图 ui-gen.png（蓝 / 桃两团柔光），换成两层会呼吸的色团：
-   只动 transform + opacity（小图层，合成器搬运），保证「彩色底在流动」但不掉帧 */
+/* 第 110 轮：按用户要求撤回动态色团，卡底回到原来的静态图（蓝 / 桃两团柔光） */
 .ug-gen-card {
   position: relative; flex: 0 0 auto;
   width: min(400px, 100%); aspect-ratio: 400 / 435;
-  background: var(--cds-bg-container);
-  isolation: isolate; overflow: hidden;
+  background: url(images/ui-gen.png) center / 100% 100% no-repeat;
 }
-.ug-gen-card::before,
-.ug-gen-card::after {
-  content: ''; position: absolute; inset: -12%; z-index: 0; pointer-events: none;
-  will-change: transform, opacity;
-}
-.ug-gen-card::before {
-  background:
-    radial-gradient(ellipse 44% 38% at 32% 24%, color-mix(in srgb, var(--cds-color-primary) 42%, transparent), transparent 72%),
-    radial-gradient(ellipse 26% 22% at 22% 58%, color-mix(in srgb, var(--cds-color-primary) 24%, transparent), transparent 76%),
-    radial-gradient(ellipse 22% 18% at 52% 62%, color-mix(in srgb, var(--cds-color-success) 14%, transparent), transparent 76%);
-  animation: ugGenBlobA 18s ease-in-out infinite alternate;
-}
-.ug-gen-card::after {
-  background:
-    radial-gradient(ellipse 34% 30% at 60% 64%, color-mix(in srgb, var(--cds-color-warning) 36%, transparent), transparent 74%),
-    radial-gradient(ellipse 24% 20% at 76% 50%, color-mix(in srgb, var(--cds-color-warning) 20%, transparent), transparent 78%);
-  animation: ugGenBlobB 23s ease-in-out infinite alternate;
-}
-@keyframes ugGenBlobA {
-  from { transform: translate3d(-4%, -3%, 0) scale(1); opacity: .88; }
-  to   { transform: translate3d(7%, 5%, 0) scale(1.06); opacity: 1; }
-}
-@keyframes ugGenBlobB {
-  from { transform: translate3d(5%, 3%, 0) scale(1.04); opacity: 1; }
-  to   { transform: translate3d(-6%, -4%, 0) scale(.97); opacity: .84; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ug-gen-card::before, .ug-gen-card::after { animation: none; }
-}
-.ug-gen-in { position: absolute; left: 50%; top: 18.3908%; width: 77%; z-index: 1; transform: translateX(-50%); text-align: center; }
+.ug-gen-in { position: absolute; left: 50%; top: 18.3908%; width: 77%; transform: translateX(-50%); text-align: center; }
 .ug-gen-ico { display: block; width: 72px; height: 72px; margin: 0 auto; }
 /* 稿里那段 90° 主色弧是持续旋转的加载环（绕圆心 36,36） */
 .ug-gen-arc { transform-box: view-box; transform-origin: 36px 36px; animation: ug-gen-spin 1.4s linear infinite; }
@@ -5366,18 +5335,16 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
    页面预览：灰底网格 + 只有 html 画布，纯预览（无标注 / 无选中 / 无工具键）
    ============================================================ */
 
-/* 关系图：铺满画布、灰底网格从 .ud-canvas 透过来；地图 592×271 居中，空间不够按比例缩 */
+/* 第 110 轮：地图不再是 592×271 的固定小画板 —— 铺满整个画布（灰底网格就是它的边界），
+   卡片可以拖到任意角落；初始版式仍按稿的 592×271 居中摆（由 JS 加居中偏移），不再整体缩放 */
 .ud-rel {
   position: relative; flex: 1 1 auto; min-width: 0; min-height: 0;
-  display: flex; align-items: center; justify-content: center; padding: 24px;
-  overflow: auto;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px; overflow: hidden;
 }
 .ud-rel[hidden] { display: none; }
-.ud-rel-map {
-  position: relative; flex: 0 0 auto; width: 592px; height: 271px;
-  transform: scale(var(--ud-rel-s, 1)); transform-origin: center center;
-}
-.ud-rel-lines { position: absolute; left: 0; top: 0; width: 592px; height: 271px; overflow: visible; }
+.ud-rel-map { position: relative; flex: 1 1 auto; align-self: stretch; min-width: 0; min-height: 0; }
+.ud-rel-lines { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
 .ud-rel-line {
   fill: none; stroke: #B7C6E4; stroke-width: 1.5; stroke-linecap: round;
   transition: stroke var(--cds-motion-duration) var(--cds-motion-ease), opacity var(--cds-motion-duration) var(--cds-motion-ease);
@@ -5422,40 +5389,37 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 .ud-canvas.is-prev .ud-handle { display: none !important; }
 
 /* ============================================================
-   第 108 轮 / 第 109 轮性能重做：首页 panel-main 的「浅蓝环境光」
-   —— 移植自 index(37) 的 brand ambient，但换成「一次画完 + 只动一层」的低开销版：
-   1) 两团蓝光 + 44×44 网格直接画在 .panel-main 自己的背景上 —— 静态，栅格一次，永不重画；
-   2) 只有 ::after 一层小色块（62%×62%，约 36 万 CSS 像素，是原来全尺寸双层 1458×1125 的 1/9）
-      做纯 translate 的慢漂移，合成器搬运，不触发重绘；
-   3) 没有 scale / rotate / opacity 动画 —— 这三种都会让 Chrome 反复重栅格化大图层（Retina 上最贵）。
+   第 110 轮：首页环境光重做为「云雾流场」
+   —— 参考 deepseek.com 首页那张 flow-field 背景（近白底上极淡的蓝雾缓慢流动），
+     但不照抄：色团用主色蓝 + 一点紫 / 青，整体沿「左下 → 右上」斜向漂，
+     44×44 细网格保留（这是本产品的底子，deepseek 用的大格）。
+   实现刻意选最省的一条路：
+   1) 云雾是一张 1/6 分辨率的 canvas（约 220×150），每 50ms（20fps）重画一遍 ——
+      单帧只涂 3 万像素，雾动得极慢，20fps 完全看不出；
+   2) CSS 把这张小图拉满整个 panel-main，双线性放大自带柔化，不用 filter:blur（那要重栅格大图层）；
+   3) 底色 / 两团静态柔光 / 网格仍是 panel-main 自己的背景，一次栅格永不重画。
    ============================================================ */
 body[data-page="home"] .panel-main {
   isolation: isolate;
-  background-color: color-mix(in srgb, var(--cds-color-primary) 6%, var(--cds-bg-container));
+  background-color: color-mix(in srgb, var(--cds-color-primary) 7%, var(--cds-bg-container));
   background-image:
-    radial-gradient(ellipse 62% 58% at 88% 12%, color-mix(in srgb, var(--cds-color-primary) 24%, transparent), transparent 72%),
-    radial-gradient(ellipse 58% 54% at 8% 84%, color-mix(in srgb, var(--cds-color-primary) 18%, transparent), transparent 74%),
-    linear-gradient(to right, color-mix(in srgb, var(--cds-color-primary) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--cds-color-primary) 5%, transparent) 1px, transparent 1px);
+    radial-gradient(ellipse 64% 60% at 92% 6%, color-mix(in srgb, var(--cds-color-primary) 15%, transparent), transparent 72%),
+    radial-gradient(ellipse 60% 56% at 4% 96%, color-mix(in srgb, var(--cds-color-primary) 13%, transparent), transparent 74%),
+    linear-gradient(to right, color-mix(in srgb, var(--cds-color-primary) 4.5%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--cds-color-primary) 4.5%, transparent) 1px, transparent 1px);
   background-repeat: no-repeat, no-repeat, repeat, repeat;
   background-size: 100% 100%, 100% 100%, 44px 44px, 44px 44px;
   background-position: 0 0, 0 0, 0 0, 0 0;
 }
-/* 唯一会动的一层：一团柔光沿对角慢慢游走，回程由 alternate 负责 */
-body[data-page="home"] .panel-main::after {
-  content: ''; position: absolute; left: -6%; top: -8%; width: 62%; height: 62%;
+/* 云雾层：低分辨率 canvas（尺寸由 JS 按 1/6 给），铺满整个 panel-main */
+.pm-mist { display: none; }
+body[data-page="home"] .pm-mist {
+  display: block; position: absolute; inset: 0; width: 100%; height: 100%;
   z-index: -1; pointer-events: none;
-  background:
-    radial-gradient(closest-side at 50% 50%, color-mix(in srgb, var(--cds-color-primary) 15%, transparent), transparent 76%),
-    radial-gradient(closest-side at 74% 34%, color-mix(in srgb, var(--cds-color-primary) 9%, transparent), transparent 80%);
-  will-change: transform;
-  animation: pmGlowDrift 44s ease-in-out infinite alternate;
 }
-@keyframes pmGlowDrift {
-  from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(88%, 104%, 0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  body[data-page="home"] .panel-main::after { animation: none; transform: none; }
-}
+/* 中心留白：雾压到标题 / 输入框下面仍然要读得清（静态层，不参与动画） */
+body[data-page="home"] .panel-main::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse 54% 48% at 50% 46%,
+    rgba(255, 255, 255, .38), rgba(255, 255, 255, .12) 58%, transparent 80%);
 }

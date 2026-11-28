@@ -101,29 +101,38 @@ const H0 = await h.evaluate(() => {
     /* 第 109 轮：静态两团蓝光改画在 .panel-main 自己身上，动的那层只剩 ::after */
     glows: cs.backgroundImage.split('radial-gradient').length - 1,
     before: { name: bs.animationName },
-    after: { name: as.animationName, dur: as.animationDuration, iter: as.animationIterationCount, dir: as.animationDirection, z: as.zIndex, pos: as.position }
+    after: { name: as.animationName, z: as.zIndex, pos: as.position, bg: as.backgroundImage },
+    /* 第 110 轮：动的那层换成 canvas 云雾（#pmMist） */
+    mist: (() => { const cv = document.getElementById('pmMist'); if (!cv) return null; const v = getComputedStyle(cv); return { disp: v.display, z: v.zIndex, pos: v.position, w: cv.width }; })()
   };
 });
 ok('D1 只在首页生效（body[data-page=home]）', H0.page === 'home', H0.page);
 ok('D2 底色是极淡主色（蓝通道 > 红通道，且几乎白）', H0.rgb[2] > H0.rgb[0] && H0.rgb[2] - H0.rgb[0] >= 3 && H0.rgb[0] > 235, JSON.stringify(H0.rgb));
 ok('D3 44×44 细网格两层 linear-gradient', H0.grid === 2 && /44px 44px/.test(H0.gridSize), JSON.stringify([H0.grid, H0.gridSize]));
 ok('D4 静态两团蓝光画在 panel-main 背景上（isolation + 2 个 radial）', H0.isolation === 'isolate' && H0.glows === 2, JSON.stringify([H0.isolation, H0.glows]));
-ok('D5 唯一会动的一层是 ::after，44s 往复漂移', H0.before.name === 'none' && H0.after.name === 'pmGlowDrift' && H0.after.dur === '44s' && H0.after.iter === 'infinite' && H0.after.dir === 'alternate', JSON.stringify([H0.before, H0.after]));
-ok('D6 动层自成层（absolute + z-index:-1）', H0.after.pos === 'absolute' && H0.after.z === '-1', JSON.stringify(H0.after));
+ok('D5 ::after 是静态的中心留白层（无动画）', H0.before.name === 'none' && H0.after.name === 'none' && /radial-gradient/.test(H0.after.bg), JSON.stringify([H0.before.name, H0.after.name]));
+ok('D6 云雾层自成层（absolute + z-index:-1 + 1/6 分辨率）', H0.mist && H0.mist.disp === 'block' && H0.mist.pos === 'absolute' && H0.mist.z === '-1' && H0.mist.w > 100 && H0.mist.w < 300, JSON.stringify(H0.mist));
 
-/* 动效真的在动（动层 transform 2.4s 后变了） */
-const t1 = await h.evaluate(() => getComputedStyle(document.getElementById('panelMain'), '::after').transform);
-await wait(2400);
-const t2 = await h.evaluate(() => getComputedStyle(document.getElementById('panelMain'), '::after').transform);
-ok('D7 动层在动（柔光沿对角漂移）', t1 !== t2, JSON.stringify([t1, t2]));
-
-/* reduced-motion 下停住 */
-await h.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
-const H3 = await h.evaluate(() => {
-  const as = getComputedStyle(document.getElementById('panelMain'), '::after');
-  return [as.animationName, as.transform];
+/* 动的是 canvas 的像素（不是 CSS 动画） */
+const sig = () => h.evaluate(() => {
+  const cv = document.getElementById('pmMist');
+  const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+  let a2 = 0; for (let i = 3; i < d.length; i += 4) a2 += d[i];
+  return Math.round(a2 / (d.length / 4));
 });
-ok('D8 prefers-reduced-motion：动层动画停掉', H3[0] === 'none', JSON.stringify(H3));
+const s1 = await sig();
+await wait(1600);
+const s2 = await sig();
+ok('D7 云雾在流动（canvas 像素在变）', s1 !== s2, JSON.stringify([s1, s2]));
+
+/* reduced-motion 下只画一帧就停 */
+await h.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+await h.reload({ waitUntil: 'load' });
+await wait(600);
+const r1 = await sig();
+await wait(1200);
+const r2 = await sig();
+ok('D8 prefers-reduced-motion：云雾停住', r1 === r2 && r1 > 0, JSON.stringify([r1, r2]));
 await h.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
 
 /* 内容仍然压在光层之上（标题可读、不被盖住） */
@@ -142,10 +151,10 @@ await s.goto('file:///' + BASE + '/cecoder-session.html', { waitUntil: 'load' })
 await wait(500);
 const H5 = await s.evaluate(() => {
   const pm = document.getElementById('panelMain');
-  const bs = getComputedStyle(pm, '::before');
-  return { page: document.body.dataset.page, anim: bs.animationName, content: bs.content };
+  const bs = getComputedStyle(pm, '::before'), cv = document.getElementById('pmMist');
+  return { page: document.body.dataset.page, anim: bs.animationName, content: bs.content, mist: cv ? getComputedStyle(cv).display : null };
 });
-ok('D10 会话页不受影响（::before 无漂移动画）', H5.page !== 'home' && H5.anim !== 'pmAmbientDrift', JSON.stringify(H5));
+ok('D10 会话页不受影响（无云雾层 / 无漂移动画）', H5.page !== 'home' && H5.mist === 'none' && H5.anim !== 'pmAmbientDrift', JSON.stringify(H5));
 ok('E1 首页无脚本报错', h.__e.length === 0, h.__e.join(' | '));
 
 console.log('\n第 108 轮：' + pass + ' / ' + (pass + fail.length) + ' 通过');

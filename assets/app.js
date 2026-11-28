@@ -4909,13 +4909,16 @@
     var udRelCardMove = function (e) {
       if (!udRelDrag || e.pointerId !== udRelDrag.id) return;
       var card = udRelDrag.card;
-      var k = (udRelMap.offsetWidth || 592) / 592;   /* 地图可能被 --ud-rel-s 缩过，位移要除回去 */
-      var dx = (e.clientX - udRelDrag.sx) / k, dy = (e.clientY - udRelDrag.sy) / k;
+      /* 第 110 轮：地图铺满画布（够宽时）—— 边界只认地图自己的宽高；
+         画布过窄时地图被 scale 缩过，位移要按缩放比除回去 */
+      var kr = (udRelMap.getBoundingClientRect().width || 592) / (udRelMap.offsetWidth || 592);
+      var dx = (e.clientX - udRelDrag.sx) / (kr || 1), dy = (e.clientY - udRelDrag.sy) / (kr || 1);
       if (!udRelDrag.moved && Math.abs(dx) + Math.abs(dy) < 3) return;
       if (!udRelDrag.moved) { udRelDrag.moved = true; card.classList.add('is-drag'); }
       var w = card.offsetWidth, h = card.offsetHeight;
-      var nx = Math.min(Math.max(0, udRelDrag.ox + dx), 592 - w);
-      var ny = Math.min(Math.max(0, udRelDrag.oy + dy), 271 - h);
+      var mw = udRelMap.clientWidth, mh = udRelMap.clientHeight;
+      var nx = Math.min(Math.max(0, udRelDrag.ox + dx), Math.max(0, mw - w));
+      var ny = Math.min(Math.max(0, udRelDrag.oy + dy), Math.max(0, mh - h));
       card.style.left = nx + 'px';
       card.style.top = ny + 'px';
       udRelRedraw();
@@ -4926,11 +4929,47 @@
       udRelDrag = null;
       udRelRedraw();
     };
+    /* 第 110 轮：地图铺满画布（画布够大时），卡片能拖到任意角落；
+       画布比稿的 592×271 还窄时退一步按比例整体缩小（否则卡片会互相压住）——
+       此时 map 固定 592×271，位移要按缩放比除回去 */
+    var udRelPlaced = false;
     var udRelFit = function () {
       if (!udRel || !udRelMap) return;
       var aw = udRel.clientWidth - 48, ah = udRel.clientHeight - 48;
-      var k = Math.min(aw / 592, ah / 271, 1);
-      udRelMap.style.setProperty('--ud-rel-s', String(Math.max(0.45, k)));
+      if (aw >= 592 && ah >= 271) {
+        udRelMap.style.flex = '1 1 auto';
+        udRelMap.style.width = '';
+        udRelMap.style.height = '';
+        udRelMap.style.transform = '';
+      } else {
+        var k = Math.max(.45, Math.min(aw / 592, ah / 271, 1));
+        udRelMap.style.flex = '0 0 auto';
+        udRelMap.style.width = '592px';
+        udRelMap.style.height = '271px';
+        udRelMap.style.transform = 'scale(' + k.toFixed(4) + ')';
+      }
+    };
+    var udRelLayout = function () {
+      if (!udRel || !udRelMap) return;
+      udRelFit();
+      var mw = udRelMap.clientWidth, mh = udRelMap.clientHeight;
+      if (!mw || !mh) return;
+      var ox = Math.max(0, Math.round((mw - 592) / 2));
+      var oy = Math.max(0, Math.round((mh - 271) / 2));
+      Array.prototype.forEach.call(udRelMap.querySelectorAll('.ud-rel-card'), function (c) {
+        if (c.dataset.bx == null) {
+          c.dataset.bx = String(parseFloat(c.style.left) || 0);
+          c.dataset.by = String(parseFloat(c.style.top) || 0);
+        }
+        var x = udRelPlaced ? (parseFloat(c.style.left) || 0) : parseFloat(c.dataset.bx) + ox;
+        var y = udRelPlaced ? (parseFloat(c.style.top) || 0) : parseFloat(c.dataset.by) + oy;
+        x = Math.min(Math.max(0, x), Math.max(0, mw - c.offsetWidth));
+        y = Math.min(Math.max(0, y), Math.max(0, mh - c.offsetHeight));
+        c.style.left = x + 'px';
+        c.style.top = y + 'px';
+      });
+      udRelPlaced = true;
+      udRelBuild();
     };
     var udBlank = document.getElementById('uiBlank');
     var udSetView = function (v) {
@@ -4946,7 +4985,7 @@
       /* 换视图时把标注 / 编辑 / 框选状态全部收干净（预览视图本来就不许标注） */
       udExitAll(); udSel(false); udHideDom();
       if (v === 'board') udApplyZoom();
-      if (v === 'rel') { udRelBuild(); udRelFit(); udRelPick(null); }
+      if (v === 'rel') { udRelLayout(); udRelPick(null); }
     };
     /* 第 108 轮：点关系图里任意空白处（含 592×271 地图之外的留白）都取消选中 */
     if (udRel) {
@@ -4974,7 +5013,7 @@
       if (!t || !t.getAttribute('data-ud-view')) return;
       udSetView(t.getAttribute('data-ud-view'));
     });
-    window.addEventListener('resize', function () { if (udView === 'rel') udRelFit(); });
+    window.addEventListener('resize', function () { if (udView === 'rel') udRelLayout(); });
 
     /* 分组展开/收起（默认展开，与稿一致） */
     var udTreeHead = document.getElementById('udTreeHead');
@@ -5160,4 +5199,134 @@
 
   var exit = document.getElementById('ugExit');
   if (exit) exit.addEventListener('click', function () { tip('退出引导，返回一页式'); });
+})();
+
+/* ============================================================
+   第 110 轮：首页环境光的「云雾流场」（canvas）
+   参考 deepseek.com 首页那张 flow-field 背景：近白底上一层极淡的蓝雾在慢慢走。
+   不照抄：色团用主色蓝 + 一点紫 / 青，整体沿「左下 → 右上」斜向漂；44px 细网格仍留在背景上。
+   开销：内部只按 1/6 分辨率画，每 50ms 一帧（20fps），
+         单帧约 3 万像素、几十个贴图 —— CSS 双线性放大就够柔，不用 filter:blur。
+   注：这几段脚本各自是独立 IIFE（文件里前面那些带 `if (!xxx) return` 的会早退），
+       所以这里自己判页面，不依赖前面的 PAGE。
+   ============================================================ */
+(function pmMist() {
+  var cv = document.getElementById('pmMist');
+  if (!cv || !cv.getContext) return;
+  if ((document.body.getAttribute('data-page') || 'home') !== 'home') return;
+  var host = document.getElementById('panelMain');
+  var ctx = host ? cv.getContext('2d') : null;
+  if (!ctx) return;
+  var SCALE = 6, W = 0, H = 0, raf = 0, drawnAt = -99;
+  var t0 = performance.now();
+  var rmq = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* 底层：6 团大柔光（雾的"底子"，很淡）—— cx/cy 基准位置（0..1）、ax/ay 漂幅、px/py 周期（秒，负＝反向） */
+  var haze = [
+    { cx: .14, cy: .82, ax: .06, ay: .05, px: 41, py: 33, r: .36, c: '55,112,247', a: .20 },
+    { cx: .34, cy: .56, ax: .07, ay: .05, px: -36, py: 44, r: .32, c: '55,112,247', a: .15 },
+    { cx: .64, cy: .74, ax: .06, ay: .05, px: -41, py: 37, r: .32, c: '55,112,247', a: .15 },
+    { cx: .83, cy: .30, ax: .06, ay: .05, px: 33, py: -45, r: .34, c: '112,110,248', a: .17 },
+    { cx: .09, cy: .24, ax: .05, ay: .05, px: 37, py: -35, r: .26, c: '110,86,248', a: .13 },
+    { cx: .72, cy: .96, ax: .05, ay: .05, px: 39, py: 41, r: .28, c: '57,176,246', a: .13 }
+  ];
+  /* 云絮：每个"雾点"是一张预渲染的软圆贴图，几十个点叠出云的层次；
+     每点自带相位，随时间错开 → 纹理在缓慢变形，而不是整块平移 */
+  var puffSprite = function (rgb) {
+    var s = document.createElement('canvas');
+    s.width = s.height = 64;
+    var c = s.getContext('2d');
+    var g = c.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, 'rgba(' + rgb + ',1)');
+    g.addColorStop(.35, 'rgba(' + rgb + ',.66)');
+    g.addColorStop(.72, 'rgba(' + rgb + ',.2)');
+    g.addColorStop(1, 'rgba(' + rgb + ',0)');
+    c.fillStyle = g;
+    c.beginPath(); c.arc(32, 32, 32, 0, 6.2831853); c.fill();
+    return s;
+  };
+  var SPR = [puffSprite('55,112,247'), puffSprite('112,110,248'), puffSprite('57,176,246')];
+  var seed = 20261128;
+  var rnd = function () { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
+  var centers = [[.16, .78], [.34, .52], [.60, .72], [.82, .28], [.50, .94], [.90, .66], [.10, .20], [.62, .10]];
+  var puffs = [];
+  for (var pi = 0; pi < 84; pi++) {
+    var c0 = centers[pi % centers.length];
+    puffs.push({
+      x: c0[0] + (rnd() - .5) * .34,
+      y: c0[1] + (rnd() - .5) * .30,
+      r: .038 + rnd() * .070,          /* 半径占长边的比例（1/6 分辨率下约 7~20px → 屏上 40~120px） */
+      a: .07 + rnd() * .08,
+      w1: .30 + rnd() * .50,           /* 角速度（都很慢） */
+      w2: .28 + rnd() * .45,
+      ph: rnd() * 6.2831853,
+      ax: .012 + rnd() * .028,
+      ay: .012 + rnd() * .028,
+      s: pi % 7 === 0 ? 1 : (pi % 11 === 0 ? 2 : 0)
+    });
+  }
+
+  var size = function () {
+    var r = host.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) return false;
+    W = Math.max(80, Math.round(r.width / SCALE));
+    H = Math.max(60, Math.round(r.height / SCALE));
+    if (cv.width !== W) cv.width = W;
+    if (cv.height !== H) cv.height = H;
+    return true;
+  };
+  var paint = function (sec) {
+    if (!W || !H) return;
+    drawnAt = sec;
+    ctx.clearRect(0, 0, W, H);
+    var long = Math.max(W, H), i, b, g, rad;
+    ctx.globalAlpha = 1;
+    for (i = 0; i < haze.length; i++) {
+      b = haze[i];
+      var hx = (b.cx + Math.sin(sec / b.px * 6.2831853 + i * 1.1) * b.ax) * W;
+      var hy = (b.cy + Math.cos(sec / b.py * 6.2831853 + i * 1.7) * b.ay) * H;
+      rad = b.r * long;
+      g = ctx.createRadialGradient(hx, hy, 0, hx, hy, rad);
+      g.addColorStop(0, 'rgba(' + b.c + ',' + b.a + ')');
+      g.addColorStop(.5, 'rgba(' + b.c + ',' + (b.a * .48).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(' + b.c + ',0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(hx, hy, rad, 0, 6.2831853); ctx.fill();
+    }
+    for (i = 0; i < puffs.length; i++) {
+      var p = puffs[i];
+      var x = (p.x + Math.sin(sec * p.w1 + p.ph) * p.ax) * W;
+      var y = (p.y + Math.cos(sec * p.w2 + p.ph * 1.3) * p.ay) * H;
+      var r = p.r * long * (1 + Math.sin(sec / 61 + p.ph) * .08);
+      ctx.globalAlpha = p.a;
+      ctx.drawImage(SPR[p.s], x - r, y - r, r * 2, r * 2);
+    }
+    ctx.globalAlpha = 1;
+  };
+  var loop = function (now) {
+    raf = requestAnimationFrame(loop);
+    var sec = (now - t0) / 1000;
+    if (sec - drawnAt < .05) return;   /* 20fps 足够：雾走得极慢 */
+    paint(sec);
+  };
+  var start = function () {
+    if (raf) return;
+    if (rmq.matches) { if (size()) paint((performance.now() - t0) / 1000); return; }
+    raf = requestAnimationFrame(loop);
+  };
+  var stop = function () { if (raf) { cancelAnimationFrame(raf); raf = 0; } };
+
+  /* 首帧：面板可能还没量到尺寸，量到再画；之后宽高变化交给 ResizeObserver */
+  var paintNow = function () { if (size()) paint((performance.now() - t0) / 1000); };
+  var boot = function (n) {
+    if (size()) { paint(0); start(); return; }
+    if (n < 120) requestAnimationFrame(function () { boot(n + 1); });
+  };
+  boot(0);
+  if (window.ResizeObserver) new ResizeObserver(paintNow).observe(host);
+  else window.addEventListener('resize', paintNow);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) stop(); else start();
+  });
+  if (rmq.addEventListener) rmq.addEventListener('change', function () { stop(); start(); });
 })();
