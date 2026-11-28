@@ -5398,15 +5398,16 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 .ud-canvas.is-prev .ud-handle { display: none !important; }
 
 /* ============================================================
-   第 110 轮：首页环境光重做为「云雾流场」
-   —— 参考 deepseek.com 首页那张 flow-field 背景（近白底上极淡的蓝雾缓慢流动），
-     但不照抄：色团用主色蓝 + 一点紫 / 青，整体沿「左下 → 右上」斜向漂，
-     44×44 细网格保留（这是本产品的底子，deepseek 用的大格）。
-   实现刻意选最省的一条路：
-   1) 云雾是一张 1/6 分辨率的 canvas（约 220×150），每 50ms（20fps）重画一遍 ——
-      单帧只涂 3 万像素，雾动得极慢，20fps 完全看不出；
-   2) CSS 把这张小图拉满整个 panel-main，双线性放大自带柔化，不用 filter:blur（那要重栅格大图层）；
-   3) 底色 / 两团静态柔光 / 网格仍是 panel-main 自己的背景，一次栅格永不重画。
+   第 117 轮：首页背景 = 参考站（www.deepseek.com）原版实现，逐项照搬
+   —— 他们 hero 用两层 canvas：
+      ① WebGL2 片元着色器「pattern」：checks 图案 → 噪声域扭曲 → 8 段漩涡 → 三段色混合；
+      ② 静态网格（90px 间距、线 10%、点 4%）。
+      参数、时间驱动、maxDpr 1.5、30fps 节流都在 assets/flowfield.js 里，与线上一致。
+   这一层只负责「摆」：两层都铺满 panel-main、压在内容之下（z-index:-1）、不吃事件，
+   并挂上他们那条 mask（顶部近乎不透明 → 到底部淡出），所以上半屏是原版那块蓝白流体、
+   往下自然化进底色；panel-main 自己的 background 只剩他们的降级渐变
+   （拿不到 WebGL2 时才看得见，与他们的行为一致）。
+   第 110~116 轮那套 1/6 / 1/2 分辨率的 2D 云雾（含中心留白伪元素）已整体下线。
    ============================================================ */
 body[data-page="home"] .panel-main {
   isolation: isolate;
