@@ -112,7 +112,8 @@ ok('D2 底色是极淡主色（蓝通道 > 红通道，且几乎白）', H0.rgb[
 ok('D3 网格已去掉（第 111 轮：首页不要格子）', H0.grid === 0 && !/44px/.test(H0.gridSize), JSON.stringify([H0.grid, H0.gridSize]));
 ok('D4 静态两团蓝光画在 panel-main 背景上（isolation + 2 个 radial）', H0.isolation === 'isolate' && H0.glows === 2, JSON.stringify([H0.isolation, H0.glows]));
 ok('D5 ::after 是静态的中心留白层（无动画）', H0.before.name === 'none' && H0.after.name === 'none' && /radial-gradient/.test(H0.after.bg), JSON.stringify([H0.before.name, H0.after.name]));
-ok('D6 云雾层自成层（absolute + z-index:-1 + 1/6 分辨率）', H0.mist && H0.mist.disp === 'block' && H0.mist.pos === 'absolute' && H0.mist.z === '-1' && H0.mist.w > 100 && H0.mist.w < 300, JSON.stringify(H0.mist));
+/* 第 116 轮：内部分辨率 1/6 → 1/2（每源像素 2 屏像素，块感不可辨） */
+ok('D6 云雾层自成层（absolute + z-index:-1 + 1/2 分辨率）', H0.mist && H0.mist.disp === 'block' && H0.mist.pos === 'absolute' && H0.mist.z === '-1' && H0.mist.w > 300, JSON.stringify(H0.mist));
 
 /* 动的是 canvas 的像素（不是 CSS 动画） */
 /* 用「按位置加权」的指纹：单看平均 alpha 会因四舍五入撞成同一个值 */

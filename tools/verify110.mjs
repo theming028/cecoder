@@ -135,7 +135,8 @@ const H = await h.evaluate(() => {
     w: cs.width, h: cs.height
   };
 });
-ok('D1 云雾 canvas 铺满面板、按 1/6 分辨率', H.disp === 'block' && H.z === '-1' && H.ratio >= 0.15 && H.ratio <= 0.18 && H.w === H.pm[0] + 'px' && H.h === H.pm[1] + 'px', JSON.stringify([H.disp, H.z, H.ratio, H.w, H.h]));
+/* 第 116 轮：1/6 → 1/2（6px 块换成 2px 块，肉眼看不出采样网格） */
+ok('D1 云雾 canvas 铺满面板、按 1/2 分辨率', H.disp === 'block' && H.z === '-1' && H.ratio >= 0.45 && H.ratio <= 0.55 && H.w === H.pm[0] + 'px' && H.h === H.pm[1] + 'px', JSON.stringify([H.disp, H.z, H.ratio, H.w, H.h]));
 ok('D2 画满了（>90% 像素有雾）', H.cov > 0.9, H.cov);
 ok('D3 雾是蓝调（蓝通道最高）', H.rgb && H.rgb[2] > H.rgb[0] && H.rgb[2] > H.rgb[1], JSON.stringify(H.rgb));
 ok('D4 不拦点击（pointer-events: none）', H.pe === 'none', H.pe);

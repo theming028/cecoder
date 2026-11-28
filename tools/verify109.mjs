@@ -178,7 +178,7 @@ const H0 = await h.evaluate(() => {
     anims: document.getAnimations().filter(a => a.playState === 'running').map(a => a.animationName).filter(n => /pm/i.test(n))
   };
 });
-ok('H1 首页有一层铺满面板的云雾 canvas（1/6 分辨率）', H0.disp === 'block' && H0.pos === 'absolute' && H0.z === '-1' && H0.ratio > 0.14 && H0.ratio < 0.19, JSON.stringify([H0.disp, H0.pos, H0.z, H0.ratio]));
+ok('H1 首页有一层铺满面板的云雾 canvas（1/2 分辨率）', H0.disp === 'block' && H0.pos === 'absolute' && H0.z === '-1' && H0.ratio > 0.45 && H0.ratio < 0.55, JSON.stringify([H0.disp, H0.pos, H0.z, H0.ratio]));
 ok('H2 canvas 铺满面板且真的画上了（>90% 像素有雾）', H0.w === H0.pm[0] + 'px' && H0.cov > 0.9, JSON.stringify([H0.w, H0.cov]));
 ok('H3 没有全尺寸 CSS 动画（::after 是静态留白层）', H0.afterAnim === 'none' && H0.anims.length === 0, JSON.stringify([H0.afterAnim, H0.anims]));
 ok('H4 两团静态柔光仍画在 panel-main 背景上，网格按第 111 轮去掉', H0.glows === 2 && !H0.grid, JSON.stringify([H0.glows, H0.grid]));

@@ -5217,54 +5217,65 @@
   var host = document.getElementById('panelMain');
   var ctx = host ? cv.getContext('2d') : null;
   if (!ctx) return;
-  var SCALE = 6, W = 0, H = 0, raf = 0, drawnAt = -99;
+  /* 第 116 轮：分辨率 1/6 → 1/2。
+     1/6 时一个源像素被拉成 6×6 屏像素，缓变的雾放大后是一片软方块 ——
+     用户原话「细看似乎有马赛克」，就是它；1/2 只剩 2px，肉眼分辨不出采样网格。
+     代价是像素量 ×9，所以做了两处对冲：
+       ① 6 团大雾光改成预渲染贴图，每帧 6 次 drawImage，不再每帧建 radialGradient
+          再填大面积 arc（建渐变 + 填充是原来最贵的两步）；
+       ② 帧率 20 → 15fps（雾走得很慢，15fps 已经足够顺）。
+     另外把漂幅整体放大、周期拉长、亮度提一档：原来每点只在自己 3~4% 的范围内
+     小幅来回（周期 8~20s），位移总量不到 60px，看着像没动。 */
+  var SCALE = 2, FPS_MS = 66, W = 0, H = 0, raf = 0, drawnAt = -99;
   var t0 = performance.now();
   var rmq = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  /* 底层：6 团大柔光（雾的"底子"，很淡）—— cx/cy 基准位置（0..1）、ax/ay 漂幅、px/py 周期（秒，负＝反向） */
-  /* 第 111 轮：色值换成参考站（deepseek.com）的那套冷蓝灰 —— 采样它的截图是
-     亮处 #FAFCFE、中间 #E0E8F0、最浓处 #B1C4E3，色相 ~218°，比产品主色蓝更灰更闷。
-     叠在白底上等价于 rgb(70,104,178) 这个"闷靛蓝"，所以这里直接用它在白底上刷。 */
+  /* 底层：6 团大柔光（雾的"底子"）—— cx/cy 基准位置（0..1）、ax/ay 漂幅、
+     px/py 周期（秒，负＝反向）。幅度 .10~.14、周期 52~74s：
+     10 秒内每团走 8~14% 屏宽，肉眼能看出云在「推」，又不会显得赶。 */
   var haze = [
-    { cx: .14, cy: .82, ax: .06, ay: .05, px: 41, py: 33, r: .40, c: '70,104,178', a: .30 },
-    { cx: .34, cy: .56, ax: .07, ay: .05, px: -36, py: 44, r: .34, c: '86,120,190', a: .24 },
-    { cx: .64, cy: .74, ax: .06, ay: .05, px: -41, py: 37, r: .34, c: '86,120,190', a: .24 },
-    { cx: .83, cy: .30, ax: .06, ay: .05, px: 33, py: -45, r: .38, c: '104,116,182', a: .26 },
-    { cx: .09, cy: .24, ax: .05, ay: .05, px: 37, py: -35, r: .30, c: '112,124,190', a: .22 },
-    { cx: .72, cy: .96, ax: .05, ay: .05, px: 39, py: 41, r: .30, c: '78,120,186', a: .22 }
+    { cx: .14, cy: .82, ax: .13, ay: .09, px: 62, py: 74, r: .46, c: '70,104,178', a: .32 },
+    { cx: .34, cy: .56, ax: .14, ay: .10, px: -68, py: 58, r: .40, c: '86,120,190', a: .26 },
+    { cx: .64, cy: .74, ax: .13, ay: .09, px: -74, py: 66, r: .40, c: '86,120,190', a: .26 },
+    { cx: .83, cy: .30, ax: .12, ay: .10, px: 56, py: -70, r: .44, c: '104,116,182', a: .28 },
+    { cx: .09, cy: .24, ax: .11, ay: .09, px: 66, py: -60, r: .36, c: '112,124,190', a: .24 },
+    { cx: .72, cy: .96, ax: .12, ay: .09, px: 70, py: 64, r: .36, c: '78,120,186', a: .24 }
   ];
-  /* 云絮：每个"雾点"是一张预渲染的软圆贴图，几十个点叠出云的层次；
-     每点自带相位，随时间错开 → 纹理在缓慢变形，而不是整块平移 */
-  var puffSprite = function (rgb) {
+  /* 贴图：软圆渐变预渲染一次，之后只做 drawImage（512 供大雾光，128 供云絮） */
+  var sprite = function (size, rgb) {
     var s = document.createElement('canvas');
-    s.width = s.height = 64;
+    s.width = s.height = size;
     var c = s.getContext('2d');
-    var g = c.createRadialGradient(32, 32, 0, 32, 32, 32);
+    var h = size / 2;
+    var g = c.createRadialGradient(h, h, 0, h, h, h);
     g.addColorStop(0, 'rgba(' + rgb + ',1)');
-    g.addColorStop(.35, 'rgba(' + rgb + ',.66)');
-    g.addColorStop(.72, 'rgba(' + rgb + ',.2)');
+    g.addColorStop(.38, 'rgba(' + rgb + ',.62)');
+    g.addColorStop(.72, 'rgba(' + rgb + ',.18)');
     g.addColorStop(1, 'rgba(' + rgb + ',0)');
     c.fillStyle = g;
-    c.beginPath(); c.arc(32, 32, 32, 0, 6.2831853); c.fill();
+    c.beginPath(); c.arc(h, h, h, 0, 6.2831853); c.fill();
     return s;
   };
-  var SPR = [puffSprite('70,104,178'), puffSprite('104,116,182'), puffSprite('86,120,190')];
+  var hazeSpr = haze.map(function (b) { return sprite(256, b.c); });
+  var SPR = [sprite(128, '70,104,178'), sprite(128, '104,116,182'), sprite(128, '86,120,190')];
   var seed = 20261128;
   var rnd = function () { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
   var centers = [[.16, .78], [.34, .52], [.60, .72], [.82, .28], [.50, .94], [.90, .66], [.10, .20], [.62, .10]];
+  /* 云絮：72 个软斑，每点自带相位与两种角速度 —— 位移叠起来是「变形」而不是整块平移。
+     幅度 .07~.17（屏宽的 7~17%）、周期 30~58s：一次摆幅就横跨一百多像素。 */
   var puffs = [];
-  for (var pi = 0; pi < 84; pi++) {
+  for (var pi = 0; pi < 72; pi++) {
     var c0 = centers[pi % centers.length];
     puffs.push({
-      x: c0[0] + (rnd() - .5) * .34,
-      y: c0[1] + (rnd() - .5) * .30,
-      r: .038 + rnd() * .070,          /* 半径占长边的比例（1/6 分辨率下约 7~20px → 屏上 40~120px） */
-      a: .10 + rnd() * .10,
-      w1: .30 + rnd() * .50,           /* 角速度（都很慢） */
-      w2: .28 + rnd() * .45,
+      x: c0[0] + (rnd() - .5) * .30,
+      y: c0[1] + (rnd() - .5) * .28,
+      r: .046 + rnd() * .078,
+      a: .12 + rnd() * .12,
+      w1: 2 * Math.PI / (30 + rnd() * 24),
+      w2: 2 * Math.PI / (34 + rnd() * 26),
       ph: rnd() * 6.2831853,
-      ax: .012 + rnd() * .028,
-      ay: .012 + rnd() * .028,
+      ax: .07 + rnd() * .10,
+      ay: .06 + rnd() * .09,
       s: pi % 7 === 0 ? 1 : (pi % 11 === 0 ? 2 : 0)
     });
   }
@@ -5282,34 +5293,30 @@
     if (!W || !H) return;
     drawnAt = sec;
     ctx.clearRect(0, 0, W, H);
-    var long = Math.max(W, H), i, b, g, rad;
+    var long = Math.max(W, H), i, b, rad, hx, hy;
     ctx.globalAlpha = 1;
     for (i = 0; i < haze.length; i++) {
       b = haze[i];
-      var hx = (b.cx + Math.sin(sec / b.px * 6.2831853 + i * 1.1) * b.ax) * W;
-      var hy = (b.cy + Math.cos(sec / b.py * 6.2831853 + i * 1.7) * b.ay) * H;
+      hx = (b.cx + Math.sin(sec / b.px * 6.2831853 + i * 1.1) * b.ax) * W;
+      hy = (b.cy + Math.cos(sec / b.py * 6.2831853 + i * 1.7) * b.ay) * H;
       rad = b.r * long;
-      g = ctx.createRadialGradient(hx, hy, 0, hx, hy, rad);
-      g.addColorStop(0, 'rgba(' + b.c + ',' + b.a + ')');
-      g.addColorStop(.5, 'rgba(' + b.c + ',' + (b.a * .48).toFixed(3) + ')');
-      g.addColorStop(1, 'rgba(' + b.c + ',0)');
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(hx, hy, rad, 0, 6.2831853); ctx.fill();
+      ctx.globalAlpha = b.a;
+      ctx.drawImage(hazeSpr[i], hx - rad, hy - rad, rad * 2, rad * 2);
     }
     for (i = 0; i < puffs.length; i++) {
       var p = puffs[i];
-      var x = (p.x + Math.sin(sec * p.w1 + p.ph) * p.ax) * W;
-      var y = (p.y + Math.cos(sec * p.w2 + p.ph * 1.3) * p.ay) * H;
-      var r = p.r * long * (1 + Math.sin(sec / 61 + p.ph) * .08);
+      var x = (p.x + Math.sin(sec * p.w1 + p.ph) * p.ax + Math.sin(sec * p.w2 * .6 + p.ph * 2.1) * p.ax * .35) * W;
+      var y = (p.y + Math.cos(sec * p.w2 + p.ph * 1.3) * p.ay + Math.cos(sec * p.w1 * .5 + p.ph) * p.ay * .3) * H;
+      var rr = p.r * long * (1 + Math.sin(sec * p.w1 * 2.2 + p.ph) * .12);
       ctx.globalAlpha = p.a;
-      ctx.drawImage(SPR[p.s], x - r, y - r, r * 2, r * 2);
+      ctx.drawImage(SPR[p.s], x - rr, y - rr, rr * 2, rr * 2);
     }
     ctx.globalAlpha = 1;
   };
   var loop = function (now) {
     raf = requestAnimationFrame(loop);
     var sec = (now - t0) / 1000;
-    if (sec - drawnAt < .05) return;   /* 20fps 足够：雾走得极慢 */
+    if (sec - drawnAt < FPS_MS / 1000) return;
     paint(sec);
   };
   var start = function () {
