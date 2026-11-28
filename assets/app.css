@@ -5018,10 +5018,26 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 .ud-tree-t { flex: 1 1 auto; min-width: 0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ud-chev, .ud-doc { flex: 0 0 auto; width: 14px; height: 14px; }
 .ud-chev { color: #868686; }
-.ud-chev-d { color: #1F1F1F; transition: transform var(--cds-motion-duration) var(--cds-motion-ease); }
+/* 第 125 轮：箭头改成与左侧任务栏 .wd-caret 同一套曲线 —— transform .22s cubic-bezier(.2,.8,.2,1)
+   配 opacity .17s，折叠时先缩一档（scale .86）再转向右，收起的箭头不会「硬拐」。
+   另外加 color 过渡，跟 .wd-caret 一样在 hover / 展开时转正文色。 */
+.ud-chev-d {
+  color: #1F1F1F; transform-origin: 50% 50%;
+  transition: transform .22s cubic-bezier(.2, .8, .2, 1), opacity .17s var(--cds-motion-ease),
+              color var(--cds-motion-duration) var(--cds-motion-ease);
+}
 .ud-doc { color: #1F1F1F; }
-.ud-tree-row.is-fold .ud-chev-d { transform: rotate(-90deg); }
-.ud-states { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.ud-tree-row.is-fold .ud-chev-d { transform: rotate(-90deg) scale(.86); }
+/* 第 125 轮：子状态列表的收齐/展开改成高度过渡（max-height 0 ↔ 320）+ 淡入淡出，
+   与 .wb-slot / .qf-slot 用的 .24~.26s 同一档，展开时是「滑出来」而不是啪一下出现 */
+.ud-states {
+  margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px;
+  max-height: 320px; opacity: 1; overflow: hidden;
+  transition: max-height .26s cubic-bezier(.2, .8, .2, 1),
+              opacity .18s var(--cds-motion-ease),
+              margin-top .26s cubic-bezier(.2, .8, .2, 1);
+}
+.ud-states.is-fold { max-height: 0; opacity: 0; margin-top: 0; }
 /* 第 99 轮：状态行可点切换（同组单选），所以要有指针 + 悬停底 */
 .ud-state {
   width: 100%; box-sizing: border-box; height: 28px; padding: 0 8px 0 32px; gap: 6px;
@@ -5042,8 +5058,12 @@ body.ud-mq-drag, body.ud-mq-drag * { cursor: crosshair !important; -webkit-user-
 .ud-tree-row.is-on .ud-doc, .ud-tree-row.is-on .ud-chev { color: var(--cds-color-primary); }
 .ud-canvas.is-prev .ud-page-t { font-weight: 500; }
 /* 页面组的折叠箭头：收起朝右，展开转 90° 朝下 */
-.ud-chev-r { transition: transform var(--cds-motion-duration) var(--cds-motion-ease); }
-.ud-tree-row[aria-expanded="true"] .ud-chev-r { transform: rotate(90deg); }
+.ud-chev-r {
+  transform-origin: 50% 50%;
+  transition: transform .22s cubic-bezier(.2, .8, .2, 1), color var(--cds-motion-duration) var(--cds-motion-ease);
+}
+.ud-tree-row.is-fold .ud-chev-r { transform: scale(.86); }
+.ud-tree-row[aria-expanded="true"] .ud-chev-r { transform: rotate(90deg) scale(1); }
 
 /* 左列折叠后 .ud-scroll 自动吃满整幅宽度（左列已脱离文档流），无需再让内距 */
 

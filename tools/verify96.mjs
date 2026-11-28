@@ -137,15 +137,18 @@ ok('F4 折叠图标提示变「展开」', F.tip === '展开', F.tip);
 
 /* 展开 + 分组收起 */
 await p.click('#udFold'); await wait(250);
-await p.click('#udTreeHead'); await wait(200);
+await p.click('#udTreeHead'); await wait(420);
+/* 第 125 轮：折叠态从 hidden 换成 .is-fold（display:none 没法做收展过渡），
+   所以这里判 is-fold + max-height 0 + aria-hidden，不再判 hidden/display */
 const T = await p.evaluate(() => {
   const s = document.querySelector('#udStates');
-  return [s.hidden, getComputedStyle(s).display, document.querySelector('#udTreeHead').getAttribute('aria-expanded'),
+  return [s.classList.contains('is-fold'), getComputedStyle(s).maxHeight, s.getAttribute('aria-hidden'),
+    document.querySelector('#udTreeHead').getAttribute('aria-expanded'),
     getComputedStyle(document.querySelector('.ud-chev-d')).transform];
 });
-ok('G1 点分组行收起状态列表（箭头转 -90°）', T[0] === true && T[1] === 'none' && T[2] === 'false' && T[3] !== 'none', JSON.stringify(T));
-await p.click('#udTreeHead'); await wait(200);
-ok('G2 再点展开回来', await p.evaluate(() => !document.querySelector('#udStates').hidden));
+ok('G1 点分组行收起状态列表（箭头转 -90° + 缩放）', T[0] === true && T[1] === '0px' && T[2] === 'true' && T[3] === 'false' && T[4] !== 'none', JSON.stringify(T));
+await p.click('#udTreeHead'); await wait(420);
+ok('G2 再点展开回来', await p.evaluate(() => !document.querySelector('#udStates').classList.contains('is-fold') && document.querySelector('#udStates').getAttribute('aria-hidden') === 'false'));
 
 /* 窗口变宽 → 自适应跟着变 */
 const q = await b.newPage();

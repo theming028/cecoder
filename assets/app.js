@@ -4677,16 +4677,9 @@
       if (!udUser) udApplyZoom();
     });
 
-    /* 页面组展开/收起（第 98 轮）：两个页面卡与「账密登录」同构，点行切自己的状态列表 */
-    Array.prototype.forEach.call(document.querySelectorAll('.ud-page > .ud-tree-row'), function (row) {
-      var list = document.getElementById(row.getAttribute('aria-controls') || '');
-      if (!list) return;
-      row.addEventListener('click', function () {
-        var open = row.getAttribute('aria-expanded') === 'true';
-        row.setAttribute('aria-expanded', open ? 'false' : 'true');
-        list.hidden = open;
-      });
-    });
+    /* 第 125 轮：第 98 轮那段（.ud-page > .ud-tree-row，list.hidden = open）已合并到下面
+       统一的 aria-controls 绑定里 —— 旧的用 hidden 驱动、新的用 .is-fold 驱动，
+       两套同时绑会在同一行上「展开又收起」，所以整段删掉。 */
 
     /* 第 99 轮：状态行可点切换 —— 同组内单选，「选中」= 主色底 + 亮圆点，其余回灰点 */
     var udStatesBox = document.querySelector('.ud-pages-body');
@@ -5022,14 +5015,25 @@
     window.addEventListener('resize', function () { if (udView === 'rel') udRelLayout(); });
 
     /* 分组展开/收起（默认展开，与稿一致） */
-    var udTreeHead = document.getElementById('udTreeHead');
-    var udStatesEl = document.getElementById('udStates');
-    if (udTreeHead && udStatesEl) udTreeHead.addEventListener('click', function () {
-      var open = udTreeHead.getAttribute('aria-expanded') !== 'false';
-      udTreeHead.setAttribute('aria-expanded', open ? 'false' : 'true');
-      udTreeHead.classList.toggle('is-fold', open);
-      udStatesEl.hidden = open;
-    });
+    /* 第 125 轮：三个页面组（账密登录 / Gmail 邮箱登录 / 账号恢复页）的「收齐 / 展开」
+       统一走同一条动效 —— 高度 + 淡入淡出靠 .ud-states.is-fold 过渡，箭头与左侧任务栏
+       用同一套曲线（旋转 + 缩放 + 颜色）。
+       注意：不能再用 hidden 驱动，display:none 的元素没法做过渡，所以折叠态换成 class，
+       可访问性用 aria-hidden 同步。 */
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.ud-pages-body .ud-tree-row[aria-controls]'),
+      function (row) {
+        var box = document.getElementById(row.getAttribute('aria-controls'));
+        if (!box) return;
+        row.addEventListener('click', function () {
+          var opened = row.getAttribute('aria-expanded') !== 'false';   /* 当前是展开态 → 这次要收起 */
+          row.setAttribute('aria-expanded', opened ? 'false' : 'true');
+          row.classList.toggle('is-fold', opened);
+          box.classList.toggle('is-fold', opened);
+          box.setAttribute('aria-hidden', opened ? 'true' : 'false');
+        });
+      }
+    );
 
     var udBar = document.getElementById('udBar');
     if (udBar) udBar.addEventListener('click', function (e) {
