@@ -25,3 +25,7 @@ tools/dump7*.mjs
 tools/probe*.mjs
 tools/perf*.mjs
 tools/shot*.mjs
+
+# 验收截图与一次性探针脚本（tools/_xxx.mjs 是当轮临时工具，验完即删）
+tools/shots/
+tools/_*.mjs
