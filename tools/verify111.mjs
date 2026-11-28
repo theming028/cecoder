@@ -71,7 +71,8 @@ ok('B1 两组 chip 都拿到了磨砂白 80%（第 112 轮由 85% 降下来）',
 ok('B2 chip 带毛玻璃（blur 15px）', /blur\(15px\)/.test(B.first.bf) && /blur\(15px\)/.test(B.quick1.bf), JSON.stringify([B.first.bf, B.quick1.bf]));
 ok('B2b 所有 chip 的边框都去掉了（transparent）', B.borders, String(B.borders));
 ok('B3 快速任务组不再整组压到 80% 透明（否则变 68% 白）', B.quick1.op === '1', B.quick1.op);
-ok('B4 tb-label 白字 85%（含「快速任务」）', /rgba\(255, 255, 255, 0\.85\)/.test(B.label.color) && /rgba\(255, 255, 255, 0\.85\)/.test(B.label2.color) && B.label2.op === '1', JSON.stringify([B.label, B.label2]));
+/* 第 113 轮：白 85% 在浅雾底上对比度仅 1.15:1，按用户意见改回次级正文色 */
+ok('B4 tb-label 改次级正文色（第 113 轮撤掉白字），「快速任务」不再压 opacity', !/rgba\(255, 255, 255/.test(B.label.color) && B.label.color === B.label2.color && B.label2.op === '1', JSON.stringify([B.label, B.label2]));
 ok('B5 选中态仍是浅蓝但做成透的（不打断玻璃感）', /rgba\(243, 247, 255, 0\.9\)/.test(B.active), B.active);
 
 /* ---------- C 三个容器：工作台子项 / 推荐工序 / 场景卡 ---------- */
